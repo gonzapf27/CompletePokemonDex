@@ -1,7 +1,7 @@
-package com.example.completepokemondex.model.repository
+package com.example.completepokemondex.data
 
-import com.example.completepokemondex.model.Pokemon
-import com.example.completepokemondex.services.RetrofitInstance
+import com.example.completepokemondex.core.RetrofitInstance
+import com.example.completepokemondex.data.model.Pokemon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

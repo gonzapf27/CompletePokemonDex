@@ -1,7 +1,7 @@
 package com.example.completepokemondex
 
 import android.app.Application
-import com.example.completepokemondex.services.RetrofitInstance
+import com.example.completepokemondex.core.RetrofitInstance
 
 /**
  * Clase principal de la aplicación que extiende de Application.

@@ -1,4 +1,4 @@
-package com.example.completepokemondex.services
+package com.example.completepokemondex.core
 
 import android.content.Context
 import okhttp3.Cache

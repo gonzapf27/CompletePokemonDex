@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.completepokemondex.model.Pokemon
-import com.example.completepokemondex.model.repository.PokemonRepository
+import com.example.completepokemondex.data.model.Pokemon
+import com.example.completepokemondex.data.PokemonRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineExceptionHandler
 

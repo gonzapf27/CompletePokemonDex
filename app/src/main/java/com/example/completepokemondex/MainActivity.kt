@@ -1,11 +1,11 @@
-package com.example.completepokemondex.view
+package com.example.completepokemondex
 
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.completepokemondex.data.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
-import com.example.completepokemondex.model.repository.PokemonRepository
 import com.example.completepokemondex.viewmodel.PokemonViewModel
 import com.example.completepokemondex.viewmodel.PokemonViewModelFactory
 import com.squareup.picasso.Picasso

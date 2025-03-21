@@ -1,6 +1,6 @@
-package com.example.completepokemondex.services
+package com.example.completepokemondex.core
 
-import com.example.completepokemondex.model.Pokemon
+import com.example.completepokemondex.data.model.Pokemon
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path

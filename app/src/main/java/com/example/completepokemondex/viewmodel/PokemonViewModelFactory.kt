@@ -2,7 +2,7 @@ package com.example.completepokemondex.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.completepokemondex.model.repository.PokemonRepository
+import com.example.completepokemondex.data.PokemonRepository
 
 /**
  * Factory para crear instancias de `PokemonViewModel`.

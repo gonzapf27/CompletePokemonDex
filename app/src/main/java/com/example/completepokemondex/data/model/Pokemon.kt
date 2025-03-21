@@ -1,4 +1,4 @@
-package com.example.completepokemondex.model
+package com.example.completepokemondex.data.model
 
 /**
  * Clase de datos que representa un Pokémon.
