@@ -1,8 +1,8 @@
 package com.example.completepokemondex.data.local.dao
 
 import androidx.room.*
-import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpritesEntity
+import com.example.completepokemondex.data.local.entities.PokemonEntity
 
 /**
  * Objeto de Acceso a Datos (DAO) para interactuar con las entidades Pokemon y PokemonSprites en la base de datos.
@@ -40,7 +40,7 @@ interface PokemonDao {
      * @param id El identificador único del Pokémon a buscar.
      * @return El [PokemonEntity] correspondiente al ID proporcionado, o null si no se encuentra.
      */
-    @Query("SELECT * FROM pokemon WHERE id = :id")
+    @Query("SELECT * FROM pokemon WHERE pokemon_id = :id")
     suspend fun getPokemonById(id: Int): PokemonEntity?
 
     /**
@@ -49,7 +49,7 @@ interface PokemonDao {
      * @param name El nombre del Pokémon a buscar.
      * @return El [PokemonEntity] correspondiente al nombre proporcionado, o null si no se encuentra.
      */
-    @Query("SELECT * FROM pokemon WHERE name = :name")
+    @Query("SELECT * FROM pokemon WHERE pokemon_name = :name")
     suspend fun getPokemonByName(name: String): PokemonEntity?
 
     /**
@@ -58,7 +58,7 @@ interface PokemonDao {
      * @param pokemonId El identificador único del Pokémon cuyos sprites se desean obtener.
      * @return El [PokemonSpritesEntity] correspondiente al ID proporcionado, o null si no se encuentra.
      */
-    @Query("SELECT * FROM pokemonsprites WHERE id = :pokemonId")
+    @Query("SELECT * FROM pokemonsprites WHERE pokemon_id = :pokemonId")
     suspend fun getPokemonSpritesById(pokemonId: Int): PokemonSpritesEntity?
 
     /**

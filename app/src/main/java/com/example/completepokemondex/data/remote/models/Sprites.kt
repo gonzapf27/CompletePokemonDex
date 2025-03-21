@@ -1,4 +1,5 @@
-package com.example.completepokemondex.data.model
+package com.example.completepokemondex.data.remote.models
+
 
 /**
  * Clase de datos que representa los sprites de un Pokémon para uso en la lógica de negocio.
