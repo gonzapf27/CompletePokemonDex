@@ -59,4 +59,5 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.8")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.room:room-runtime:2.6.1")
 }
