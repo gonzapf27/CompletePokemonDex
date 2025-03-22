@@ -2,13 +2,13 @@ package com.example.completepokemondex.data.repository
 
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.remote.models.ApiResponse
-import com.example.completepokemondex.data.remote.models.PokemonResponse
+import com.example.completepokemondex.data.remote.models.PokemonListDTO
 
 class PokemonRepository {
 
     val remoteDataSource = PokemonRemoteDataSource()
 
-    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<PokemonResponse> {
+    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<PokemonListDTO> {
         // Comprobar si existen datos en la base de datos local
         // Si existen, devolver los datos almacenados
 

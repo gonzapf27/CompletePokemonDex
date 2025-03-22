@@ -19,7 +19,7 @@ interface PokemonDao {
      * @param pokemon La entidad de Pokémon a insertar o actualizar.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPokemon(pokemon: PokemonDetailsEntity)
+    suspend fun insertPokemonDetails(pokemon: PokemonDetailsEntity)
 
     /**
      * Obtiene un Pokémon por su ID.
@@ -27,6 +27,6 @@ interface PokemonDao {
      * @param id El ID del Pokémon.
      * @return El Pokémon con el ID especificado.
      */
-    @Query("SELECT * FROM pokemon_details WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM pokemon_details_table WHERE id = :id LIMIT 1")
     suspend fun getPokemonById(id: Int): PokemonDetailsEntity?
 }

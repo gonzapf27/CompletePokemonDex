@@ -2,7 +2,7 @@ package com.example.completepokemondex.data.remote.datasource
 
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.models.ApiResponse
-import com.example.completepokemondex.data.remote.models.PokemonResponse
+import com.example.completepokemondex.data.remote.models.PokemonListDTO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,7 +27,7 @@ class PokemonRemoteDataSource(
      * @param offset Posición desde donde empezar a devolver elementos.
      * @return [ApiResponse] que contiene la respuesta de la API o un error.
      */
-    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<PokemonResponse> {
+    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<PokemonListDTO> {
         return withContext(dispatcher) {
             try {
                 val response = apiService.getPokemonList(limit, offset)
@@ -51,9 +51,9 @@ class PokemonRemoteDataSource(
     /**
      * Crea una respuesta vacía para casos de error.
      *
-     * @return Una instancia de [PokemonResponse] con valores predeterminados.
+     * @return Una instancia de [PokemonListDTO] con valores predeterminados.
      */
-    private fun createEmptyPokemonListResponse() = PokemonResponse(
+    private fun createEmptyPokemonListResponse() = PokemonListDTO(
         count = 0,
         next = null,
         previous = null,

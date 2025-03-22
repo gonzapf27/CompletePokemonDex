@@ -1,7 +1,7 @@
 package com.example.completepokemondex.data.remote.api
 
-import com.example.completepokemondex.data.remote.models.PokemonDetailResponse
-import com.example.completepokemondex.data.remote.models.PokemonResponse
+import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonListDTO
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -19,10 +19,10 @@ interface PokeApiService {
     suspend fun getPokemonList(
         @Query("limit") limit: Int,
         @Query("offset") offset: Int
-    ): PokemonResponse
+    ): PokemonListDTO
 
     @GET("pokemon/{id}")
     suspend fun getPokemonDetail(
         @Path("id") id: Int
-    ): PokemonDetailResponse
+    ): PokemonDetailsDTO
 }

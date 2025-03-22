@@ -1,9 +1,9 @@
 package com.example.completepokemondex.data.local.entities
 
- import androidx.room.Entity
- import androidx.room.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
- import com.example.completepokemondex.data.local.converters.SpritesTypeConverters
+import com.example.completepokemondex.data.local.converters.SpritesTypeConverters
 
 /**
  * Entidad que representa los sprites de un Pokémon en la base de datos.
@@ -11,10 +11,10 @@ import androidx.room.TypeConverters
  * Esta entidad almacena la estructura completa de sprites de un Pokémon según la PokeAPI,
  * incluyendo las representaciones oficiales, por generación y variantes especiales.
  */
- @Entity(tableName = "pokemonsprites")
+@Entity(tableName = "pokemonsprites_table")
 @TypeConverters(SpritesTypeConverters::class)
- data class PokemonSpritesEntity(
-     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+data class PokemonSpritesEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
 
     // Default sprites
     val back_default: String?,
@@ -201,7 +201,7 @@ data class PlatinumSprites(
     val front_female: String?,
     val front_shiny: String?,
     val front_shiny_female: String?
- )
+)
 
 data class GenerationVSprites(
     val black_white: BlackWhiteSprites?

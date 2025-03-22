@@ -16,7 +16,7 @@ import com.google.gson.annotations.SerializedName
  *               Si es `null`, no hay más páginas después de esta.
  * @property previous La URL para obtener la página anterior de resultados de Pokémon.
  *                   Si es `null`, esta es la primera página.
- * @property results Una lista de objetos [PokemonResult], cada uno representando una
+ * @property results Una lista de objetos [PokemonDTO], cada uno representando una
  *                  entrada de Pokémon individual en la página actual de resultados.
  *
  * Ejemplo de estructura JSON:
@@ -33,7 +33,7 @@ import com.google.gson.annotations.SerializedName
  * }
  * ```
  */// Clase principal que representa la respuesta de la API para la lista de Pokémon
-data class PokemonResponse(
+data class PokemonListDTO(
     @SerializedName("count")
     val count: Int, // Total de Pokémon obtenidos
 
@@ -44,14 +44,6 @@ data class PokemonResponse(
     val previous: String?, // URL de la página anterior, si existe
 
     @SerializedName("results")
-    val results: List<PokemonResult> // Lista de Pokémon obtenidos en esta página
+    val results: List<PokemonDTO> // Lista de Pokémon obtenidos en esta página
 )
 
-// Representa un Pokémon dentro de la lista de resultados
-data class PokemonResult(
-    @SerializedName("name")
-    val name: String, // Nombre del Pokémon
-
-    @SerializedName("url")
-    val url: String // URL con más información del Pokémon (puede usarse para obtener su ID o detalles)
-)

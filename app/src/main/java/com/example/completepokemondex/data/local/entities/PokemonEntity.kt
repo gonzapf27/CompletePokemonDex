@@ -1,29 +1,26 @@
 package com.example.completepokemondex.data.local.entities
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.ColumnInfo
 
 /**
- * Clase de datos que representa un Pokémon para uso en la lógica de negocio y comunicación entre capas.
- * Esta clase está diseñada para ser independiente de frameworks como Room o Retrofit.
+ * Entidad que representa un elemento individual en la lista de Pokémon.
+ * Esta entidad almacena la información básica de un Pokémon desde la vista de lista.
  *
- * @property id Identificador único del Pokémon.
- * @property name El nombre del Pokémon.
- * @property base_experience Experiencia base del Pokémon.
- * @property height La altura del Pokémon en decímetros.
- * @property weight El peso del Pokémon en hectogramos.
- * @property sprites Los sprites del Pokémon.
+ * @property id Identificador único del Pokémon en la base de datos.
+ * @property name Nombre del Pokémon.
+ * @property url URL para obtener los detalles completos del Pokémon.
  */
-
-/**
- * Entidad que representa la información básica de un Pokémon.
- *
- * Esta clase se utiliza principalmente para almacenar datos recibidos de la API
- * y proporcionar información esencial para listar Pokémon.
- *
- * @property name El nombre del Pokémon.
- * @property url La URL que contiene información detallada del Pokémon.
- */
+@Entity(tableName = "pokemon_table")
 data class PokemonEntity(
-    val name:String,
-    val url:String
+    @PrimaryKey
+    @ColumnInfo(name = "pokemon_id")
+    val id: Int,
+
+    @ColumnInfo(name = "pokemon_name")
+    val name: String,
+
+    @ColumnInfo(name = "pokemon_url")
+    val url: String
 )

@@ -5,7 +5,6 @@ import com.example.completepokemondex.data.remote.models.Sprites
 
 /**
  * Clase de datos que representa un Pokémon para uso en la lógica de negocio y comunicación entre capas.
- * Esta clase está diseñada para ser independiente de frameworks como Room o Retrofit.
  *
  * @property id Identificador único del Pokémon.
  * @property name El nombre del Pokémon.
@@ -14,7 +13,7 @@ import com.example.completepokemondex.data.remote.models.Sprites
  * @property weight El peso del Pokémon en hectogramos.
  * @property sprites Los sprites del Pokémon.
  */
-@Entity(tableName = "pokemon_details")
+@Entity(tableName = "pokemon_details_table")
 data class PokemonDetailsEntity(
     val id: Int,
     val name: String,

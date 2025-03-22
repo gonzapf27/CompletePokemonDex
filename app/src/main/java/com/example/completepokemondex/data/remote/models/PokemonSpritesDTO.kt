@@ -3,7 +3,6 @@ package com.example.completepokemondex.data.remote.models
 
 /**
  * Clase de datos que representa los sprites de un Pokémon para uso en la lógica de negocio.
- * Esta clase está diseñada para ser independiente de frameworks como Room o Retrofit.
  *
  * @property front_default URL de la imagen frontal por defecto del Pokémon.
  * @property front_female URL de la imagen frontal femenina del Pokémon.
