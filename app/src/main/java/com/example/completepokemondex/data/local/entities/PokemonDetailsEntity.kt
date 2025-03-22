@@ -1,6 +1,7 @@
 package com.example.completepokemondex.data.local.entities
 
 import androidx.room.Entity
+import com.example.completepokemondex.data.remote.models.Sprites
 
 /**
  * Clase de datos que representa un Pokémon para uso en la lógica de negocio y comunicación entre capas.
@@ -13,17 +14,12 @@ import androidx.room.Entity
  * @property weight El peso del Pokémon en hectogramos.
  * @property sprites Los sprites del Pokémon.
  */
-
-/**
- * Entidad que representa la información básica de un Pokémon.
- *
- * Esta clase se utiliza principalmente para almacenar datos recibidos de la API
- * y proporcionar información esencial para listar Pokémon.
- *
- * @property name El nombre del Pokémon.
- * @property url La URL que contiene información detallada del Pokémon.
- */
-data class PokemonEntity(
-    val name:String,
-    val url:String
+@Entity(tableName = "pokemon_details")
+data class PokemonDetailsEntity(
+    val id: Int,
+    val name: String,
+    val base_experience: Int,
+    val height: Int,
+    val weight: Int,
+    val sprites: Sprites
 )

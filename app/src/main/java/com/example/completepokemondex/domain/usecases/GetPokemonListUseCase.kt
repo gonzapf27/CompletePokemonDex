@@ -8,8 +8,7 @@ class GetPokemonListUseCase(
     private val pokemonRepository: PokemonRepository
 ) {
     suspend operator fun invoke(page: Int = 0, offset: Int = 16): Flow<List<Pokemon>> {
-
-        return pokemonRepository.getPokemonList(page, offset)
+        return pokemonRepository.getPokemonList(limit, offset);
     }
 }
 

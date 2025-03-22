@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.completepokemondex.data.local.converters.SpritesTypeConverters
 import com.example.completepokemondex.data.local.dao.PokemonDao
-import com.example.completepokemondex.data.local.entities.PokemonEntity
+import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpritesEntity
 
 /**
@@ -22,7 +22,7 @@ import com.example.completepokemondex.data.local.entities.PokemonSpritesEntity
  * @property exportSchema Determina si se exporta el esquema de la base de datos.
  */
 @Database(
-    entities = [PokemonEntity::class, PokemonSpritesEntity::class],
+    entities = [PokemonDetailsEntity::class, PokemonSpritesEntity::class],
     version = 1,
     exportSchema = false
 )
