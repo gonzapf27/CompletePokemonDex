@@ -5,7 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.completepokemondex.data.local.dao.PokemonDao
+import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
+import com.example.completepokemondex.data.local.entities.PokemonSpritesEntity
 
 /**
  * Base de datos principal de la aplicación Pokedex que contiene
@@ -14,7 +16,7 @@ import com.example.completepokemondex.data.local.entities.PokemonEntity
  * @property pokemonDao DAO para acceder a la información de Pokémon.
  */
 @Database(
-    entities = [PokemonEntity::class],
+    entities = [PokemonEntity::class, PokemonDetailsEntity::class, PokemonSpritesEntity::class],
     version = 1,
     exportSchema = false
 )

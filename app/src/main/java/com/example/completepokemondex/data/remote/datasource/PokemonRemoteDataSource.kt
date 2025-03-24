@@ -3,6 +3,7 @@ package com.example.completepokemondex.data.remote.datasource
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.PokemonDTO
+import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -45,4 +46,33 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             }
         }
     }
+
+    /**
+     * Obtiene un PokemonDetails de la API a partir de su ID.
+     *
+     * @param id ID del PokemonDetails a obtener..
+     * @return [Resource] que contiene la respuesta de la API o un error.
+     */
+    suspend fun getPokemonById(id: Int): Resource<PokemonDetailsDTO> {
+        return withContext(dispatcher) {
+            try {
+                val response = apiService.getPokemonDetailsById(id)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        Resource.Success(it)
+                    } ?: Resource.Error("Respuesta vacía", null)
+                } else {
+                    Resource.Error("Error HTTP ${response.code()}: ${response.message()}", null)
+                }
+            } catch (e: IOException) {
+                Resource.Error("Error de red: ${e.message}", null)
+            } catch (e: HttpException) {
+                Resource.Error("Error HTTP ${e.code()}: ${e.message()}", null)
+            } catch (e: Exception) {
+                Resource.Error("Error desconocido: ${e.message}", null)
+            }
+        }
+    }
 }
+
+

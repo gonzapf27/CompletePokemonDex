@@ -1,6 +1,7 @@
 package com.example.completepokemondex.data.remote.api
 
 import com.example.completepokemondex.data.remote.models.PokemonDTO
+import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -20,7 +21,13 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("offset") offset: Int
     ): Response<PokemonListResponse>
+
+    @GET("pokemon/{id}")
+    suspend fun getPokemonDetailsById(
+        @Query("id") id: Int
+    ): Response<PokemonDetailsDTO>
 }
+
 
 /**
  * Clase que representa la respuesta de la API para una lista de Pokémon

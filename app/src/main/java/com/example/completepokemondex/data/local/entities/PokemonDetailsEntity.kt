@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey
  * @property height Altura del Pokémon.
  * @property weight Peso del Pokémon.
  */
-@Entity(tableName = "pokemon_table")
+@Entity(tableName = "pokemon_details_table")
 data class PokemonDetailsEntity(
     @PrimaryKey
     @ColumnInfo(name = "pokemon_id")
