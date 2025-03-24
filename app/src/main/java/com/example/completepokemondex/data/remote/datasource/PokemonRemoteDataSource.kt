@@ -1,7 +1,7 @@
 package com.example.completepokemondex.data.remote.datasource
 
 import com.example.completepokemondex.data.remote.api.ApiClient
-import com.example.completepokemondex.data.remote.models.ApiResponse
+import com.example.completepokemondex.data.remote.models.Resource
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,26 +23,26 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
      *
      * @param limit Número máximo de elementos a devolver.
      * @param offset Posición desde donde empezar a devolver elementos.
-     * @return [ApiResponse] que contiene la respuesta de la API o un error.
+     * @return [Resource] que contiene la respuesta de la API o un error.
      */
-    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<List<PokemonDTO>> {
+    suspend fun getPokemonList(limit: Int, offset: Int): Resource<List<PokemonDTO>> {
         return withContext(dispatcher) {
             try {
                 val response = apiService.getPokemonList(limit, offset)
-                when (response) {
-                    is ApiResponse.Success -> ApiResponse.Success(response.data)
-                    is ApiResponse.Error -> ApiResponse.Error(response.message, emptyList())
-                    is ApiResponse.Loading -> ApiResponse.Loading
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        Resource.Success(it.results)
+                    } ?: Resource.Error("Respuesta vacía", emptyList())
+                } else {
+                    Resource.Error("Error HTTP ${response.code()}: ${response.message()}", emptyList())
                 }
             } catch (e: IOException) {
-                ApiResponse.Error("Error de red: ${e.message}", emptyList())
+                Resource.Error("Error de red: ${e.message}", emptyList())
             } catch (e: HttpException) {
-                ApiResponse.Error("Error HTTP ${e.code()}: ${e.message()}", emptyList())
+                Resource.Error("Error HTTP ${e.code()}: ${e.message()}", emptyList())
             } catch (e: Exception) {
-                ApiResponse.Error("Error desconocido: ${e.message}", emptyList())
+                Resource.Error("Error desconocido: ${e.message}", emptyList())
             }
         }
     }
-
-   
 }

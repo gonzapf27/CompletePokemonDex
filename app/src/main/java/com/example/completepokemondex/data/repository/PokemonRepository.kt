@@ -2,7 +2,7 @@ package com.example.completepokemondex.data.repository
 
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
-import com.example.completepokemondex.data.remote.models.ApiResponse
+import com.example.completepokemondex.data.remote.models.Resource
 import com.example.completepokemondex.domain.model.PokemonDomain
 import com.example.completepokemondex.domain.toDomainModelList
 import com.example.completepokemondex.domain.toEntityDomainModelList
@@ -33,83 +33,81 @@ class PokemonRepository(
      * @param offset Posición desde donde empezar a obtener Pokémon
      * @return Flow que emite la lista de Pokémon y el estado de carga
      */
-    fun getPokemonList(limit: Int, offset: Int): Flow<ApiResponse<List<PokemonDomain>>> =
+    fun getPokemonList(limit: Int, offset: Int): Flow<Resource<List<PokemonDomain>>> =
             flow {
-                        // Emitir estado de carga
-                        emit(ApiResponse.Loading)
+                // Emitir estado de carga
+                emit(Resource.Loading)
 
-                        try {
-                            // Intentar obtener datos de la base de datos local
-                            val localPokemon = pokemonDao.getAllPokemon()
+                try {
+                    // Intentar obtener datos de la base de datos local
+                    val localPokemon = pokemonDao.getAllPokemon()
 
-                            // Si hay datos en la base de datos local y son suficientes, devolverlos
-                            if (localPokemon.isNotEmpty() && localPokemon.size >= offset + limit) {
+                    // Si hay datos en la base de datos local y son suficientes, devolverlos
+                    if (localPokemon.isNotEmpty() && localPokemon.size >= offset + limit) {
+                        emit(
+                            Resource.Success(
+                                localPokemon
+                                    .drop(offset)
+                                    .take(limit)
+                                    .toEntityDomainModelList()
+                            )
+                        )
+                    } else {
+                        // Si no hay suficientes datos en la base de datos local, obtenerlos
+                        // de la API
+                        when (val apiResponse = remoteDataSource.getPokemonList(limit, offset)) {
+                            is Resource.Success -> {
+                                // Guardar los datos en la base de datos local
+                                withContext(Dispatchers.IO) {
+                                    pokemonDao.insertAllPokemon(
+                                        apiResponse.data.toEntityList()
+                                    )
+                                }
+
+                                // Devolver los datos obtenidos de la API
                                 emit(
-                                        ApiResponse.Success(
-                                                localPokemon
-                                                        .drop(offset)
-                                                        .take(limit)
-                                                        .toEntityDomainModelList()
-                                        )
+                                    Resource.Success(
+                                        apiResponse.data.toDomainModelList()
+                                    )
                                 )
-                            } else {
-                                // Si no hay suficientes datos en la base de datos local, obtenerlos
-                                // de la API
-                                when (val apiResponse =
-                                                remoteDataSource.getPokemonList(limit, offset)
-                                ) {
-                                    is ApiResponse.Success -> {
-                                        // Guardar los datos en la base de datos local
-                                        withContext(Dispatchers.IO) {
-                                            pokemonDao.insertAllPokemon(
-                                                    apiResponse.data.toEntityList()
-                                            )
-                                        }
-
-                                        // Devolver los datos obtenidos de la API
-                                        emit(
-                                                ApiResponse.Success(
-                                                        apiResponse.data.toDomainModelList()
-                                                )
+                            }
+                            is Resource.Error -> {
+                                // Si hay un error al obtener los datos de la API, pero hay
+                                // algunos datos en la base de datos local,
+                                // devolver los datos disponibles con un mensaje de error
+                                if (localPokemon.isNotEmpty()) {
+                                    emit(
+                                        Resource.Error(
+                                            message = apiResponse.message,
+                                            data = localPokemon.toEntityDomainModelList()
                                         )
-                                    }
-                                    is ApiResponse.Error -> {
-                                        // Si hay un error al obtener los datos de la API, pero hay
-                                        // algunos datos en la base de datos local,
-                                        // devolver los datos disponibles con un mensaje de error
-                                        if (localPokemon.isNotEmpty()) {
-                                            emit(
-                                                    ApiResponse.Error(
-                                                            message = apiResponse.message,
-                                                            data = localPokemon.toEntityDomainModelList()
-                                                    )
-                                            )
-                                        } else {
-                                            // Si no hay datos en la base de datos local, devolver
-                                            // el error
-                                            emit(
-                                                    ApiResponse.Error(
-                                                            message = apiResponse.message,
-                                                            data = emptyList()
-                                                    )
-                                            )
-                                        }
-                                    }
-                                    is ApiResponse.Loading -> {
-                                        // Mantener el estado de carga
-                                        emit(ApiResponse.Loading)
-                                    }
+                                    )
+                                } else {
+                                    // Si no hay datos en la base de datos local, devolver
+                                    // el error
+                                    emit(
+                                        Resource.Error(
+                                            message = apiResponse.message,
+                                            data = emptyList()
+                                        )
+                                    )
                                 }
                             }
-                        } catch (e: Exception) {
-                            // Manejar cualquier excepción no controladay
-                            emit(
-                                    ApiResponse.Error(
-                                            message = "Error: ${e.message}",
-                                            data = emptyList()
-                                    )
-                            )
+                            is Resource.Loading -> {
+                                // Mantener el estado de carga
+                                emit(Resource.Loading)
+                            }
                         }
                     }
-                    .flowOn(Dispatchers.IO)
+                } catch (e: Exception) {
+                    // Manejar cualquier excepción no controlada
+                    emit(
+                        Resource.Error(
+                            message = "Error: ${e.message}",
+                            data = emptyList()
+                        )
+                    )
+                }
+            }
+            .flowOn(Dispatchers.IO)
 }

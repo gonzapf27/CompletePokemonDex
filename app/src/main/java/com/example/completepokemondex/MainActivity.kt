@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
-import com.example.completepokemondex.data.remote.models.ApiResponse
+import com.example.completepokemondex.data.remote.models.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
@@ -40,8 +40,7 @@ class MainActivity : AppCompatActivity() {
 
         // Configurar eventos
         binding.btnPrueba.setOnClickListener {
-            println("Hola mundio!")
-          //  Log.d("MainActivity", "Botón prueba clicado")
+            println("Hola mundo!")
             loadPokemonList()
         }
     }
@@ -53,11 +52,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             pokemonRepository.getPokemonList(10, 0).collect { response ->
                 when (response) {
-                    is ApiResponse.Loading -> {
+                    is Resource.Loading -> {
                         Log.d("Pokemon", "Cargando lista de Pokémon...")
                     }
 
-                    is ApiResponse.Success -> {
+                    is Resource.Success -> {
                         val pokemons = response.data
                         Log.d(
                             "Pokemon",
@@ -68,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    is ApiResponse.Error -> {
+                    is Resource.Error -> {
                         Log.e("Pokemon", "Error al cargar la lista: ${response.message}")
                         if (response.data?.isNotEmpty() == true) {
                             Log.d(
