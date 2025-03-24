@@ -1,6 +1,6 @@
 package com.example.completepokemondex.data.remote.api
 
-import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonDetails
 import com.example.completepokemondex.data.remote.models.PokemonListDTO
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -24,5 +24,5 @@ interface PokeApiService {
     @GET("pokemon/{id}")
     suspend fun getPokemonDetail(
         @Path("id") id: Int
-    ): PokemonDetailsDTO
+    ): PokemonDetails
 }
