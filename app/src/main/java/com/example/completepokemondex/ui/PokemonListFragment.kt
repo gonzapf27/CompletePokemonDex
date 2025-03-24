@@ -1,4 +1,4 @@
-package com.example.completepokemondex.ui.pokemonlist
+package com.example.completepokemondex.ui
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -8,10 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.completepokemondex.R
 
-/**
- *  Fragmento para mostrar la lista
- */
 class PokemonListFragment : Fragment() {
+
     companion object {
         fun newInstance() = PokemonListFragment()
     }
