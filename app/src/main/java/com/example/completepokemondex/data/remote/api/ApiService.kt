@@ -1,7 +1,7 @@
 package com.example.completepokemondex.data.remote.api
 
-import com.example.completepokemondex.data.remote.models.PokemonDetails
-import com.example.completepokemondex.data.remote.models.PokemonListDTO
+import com.example.completepokemondex.data.remote.models.ApiResponse
+import com.example.completepokemondex.data.remote.models.PokemonDTO
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,16 +13,14 @@ import retrofit2.http.Query
  * para obtener datos de Pokémon.
  *
  * Incluye métodos para obtener una lista de Pokémon y detalles de un Pokémon específico.
+ * Cada método devuelve un objeto ApiResponse que encapsula el resultado de la operación.
  */
-interface PokeApiService {
+interface ApiService {
     @GET("pokemon")
     suspend fun getPokemonList(
         @Query("limit") limit: Int,
         @Query("offset") offset: Int
-    ): PokemonListDTO
+    ): ApiResponse<List<PokemonDTO>>
 
-    @GET("pokemon/{id}")
-    suspend fun getPokemonDetail(
-        @Path("id") id: Int
-    ): PokemonDetails
+    
 }

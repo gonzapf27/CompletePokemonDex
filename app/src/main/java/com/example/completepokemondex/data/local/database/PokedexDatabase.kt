@@ -4,57 +4,38 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.completepokemondex.data.local.converters.SpritesTypeConverters
 import com.example.completepokemondex.data.local.dao.PokemonDao
-import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
-import com.example.completepokemondex.data.local.entities.PokemonSpritesEntity
+import com.example.completepokemondex.data.local.entities.PokemonEntity
 
 /**
- * Base de datos Room para la aplicación Pokedex.
- *
- * Esta clase define la estructura de la base de datos SQLite utilizada para almacenar
- * información de Pokémon localmente en el dispositivo. Utiliza Room como capa de abstracción
- * y maneja múltiples entidades.
- *
- * @property entities Define las entidades que se manejarán en la base de datos.
- * @property version Número de versión actual de la base de datos.
- * @property exportSchema Determina si se exporta el esquema de la base de datos.
+ * Base de datos principal de la aplicación Pokedex que contiene
+ * todas las tablas relacionadas con los Pokémon.
+ * 
+ * @property pokemonDao DAO para acceder a la información de Pokémon.
  */
 @Database(
-    entities = [PokemonDetailsEntity::class, PokemonSpritesEntity::class],
+    entities = [PokemonEntity::class],
     version = 1,
     exportSchema = false
 )
-@TypeConverters(SpritesTypeConverters::class)
 abstract class PokedexDatabase : RoomDatabase() {
 
     /**
-     * Proporciona acceso al DAO de Pokémon para realizar operaciones en la base de datos.
-     *
-     * @return Instancia del DAO para manipular datos de Pokémon.
+     * Proporciona acceso al DAO de Pokémon.
      */
     abstract fun pokemonDao(): PokemonDao
 
-    /**
-     * Objeto compañero que contiene métodos estáticos y la instancia singleton de la base de datos.
-     */
     companion object {
-        /**
-         * Instancia única de la base de datos siguiendo el patrón Singleton.
-         * La anotación @Volatile garantiza que los cambios sean visibles inmediatamente para todos los hilos.
-         */
+        // Singleton para prevenir múltiples instancias de la base de datos
         @Volatile
         private var INSTANCE: PokedexDatabase? = null
 
         /**
-         * Obtiene la instancia de la base de datos, creándola si no existe.
+         * Obtiene una instancia de la base de datos Pokedex.
+         * Si la instancia ya existe, la retorna; de lo contrario, crea una nueva.
          *
-         * Este método implementa el patrón Singleton con bloqueo doble para garantizar
-         * que solo se cree una instancia de la base de datos, incluso en entornos multihilo.
-         *
-         * @param context El contexto de la aplicación utilizado para crear la base de datos.
-         * @return Instancia única de la base de datos PokedexDatabase.
+         * @param context El contexto de la aplicación.
+         * @return Una instancia de PokedexDatabase.
          */
         fun getDatabase(context: Context): PokedexDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -62,9 +43,7 @@ abstract class PokedexDatabase : RoomDatabase() {
                     context.applicationContext,
                     PokedexDatabase::class.java,
                     "pokedex_database"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

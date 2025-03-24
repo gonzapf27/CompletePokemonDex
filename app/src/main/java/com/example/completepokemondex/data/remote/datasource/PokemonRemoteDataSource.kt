@@ -2,22 +2,20 @@ package com.example.completepokemondex.data.remote.datasource
 
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.models.ApiResponse
-import com.example.completepokemondex.data.remote.models.PokemonListDTO
+import com.example.completepokemondex.data.remote.models.PokemonDTO
+import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.io.IOException
 
 /**
- * `PokemonRemoteDataSource` es responsable de obtener datos de Pokémon desde una API remota.
+ * `PokemonRemoteDataSource` es responsable de abstraer el uso de la Api de Pokémon.
  *
  * Esta clase maneja las peticiones de red para recuperar datos de Pokémon. Utiliza el `ApiClient`
  * para interactuar con la PokeAPI y gestiona posibles errores durante la comunicación de red.
  */
-class PokemonRemoteDataSource(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) {
+class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Dispatchers.IO) {
     private val apiService = ApiClient.pokeApiService
 
     /**
@@ -27,36 +25,24 @@ class PokemonRemoteDataSource(
      * @param offset Posición desde donde empezar a devolver elementos.
      * @return [ApiResponse] que contiene la respuesta de la API o un error.
      */
-    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<PokemonListDTO> {
+    suspend fun getPokemonList(limit: Int, offset: Int): ApiResponse<List<PokemonDTO>> {
         return withContext(dispatcher) {
             try {
                 val response = apiService.getPokemonList(limit, offset)
-                ApiResponse.Success(response)
+                when (response) {
+                    is ApiResponse.Success -> ApiResponse.Success(response.data)
+                    is ApiResponse.Error -> ApiResponse.Error(response.message, emptyList())
+                    is ApiResponse.Loading -> ApiResponse.Loading
+                }
             } catch (e: IOException) {
-                // Error de red (sin conexión, timeout, etc.)
-                ApiResponse.Error("Error de conexión: ${e.localizedMessage}", createEmptyPokemonListResponse())
+                ApiResponse.Error("Error de red: ${e.message}", emptyList())
             } catch (e: HttpException) {
-                // Error en la respuesta HTTP (4xx, 5xx)
-                ApiResponse.Error("Error del servidor: Código ${e.code()}", createEmptyPokemonListResponse())
+                ApiResponse.Error("Error HTTP ${e.code()}: ${e.message()}", emptyList())
             } catch (e: Exception) {
-                // Otros errores inesperados
-                ApiResponse.Error(
-                    "Error inesperado: ${e.message ?: "Error desconocido"}",
-                    createEmptyPokemonListResponse()
-                )
+                ApiResponse.Error("Error desconocido: ${e.message}", emptyList())
             }
         }
     }
 
-    /**
-     * Crea una respuesta vacía para casos de error.
-     *
-     * @return Una instancia de [PokemonListDTO] con valores predeterminados.
-     */
-    private fun createEmptyPokemonListResponse() = PokemonListDTO(
-        count = 0,
-        next = null,
-        previous = null,
-        results = emptyList()
-    )
+   
 }

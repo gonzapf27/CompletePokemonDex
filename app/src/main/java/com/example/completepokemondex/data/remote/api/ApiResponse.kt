@@ -1,4 +1,3 @@
-
 package com.example.completepokemondex.data.remote.models
 
 /**
@@ -12,8 +11,8 @@ package com.example.completepokemondex.data.remote.models
  *
  * @param T El tipo de dato contenido en la respuesta.
  */
-sealed class ApiResponse<T> {
+sealed class ApiResponse<out T> {
     data class Success<T>(val data: T) : ApiResponse<T>()
     data class Error<T>(val message: String, val data: T? = null) : ApiResponse<T>()
-    class Loading<T> : ApiResponse<T>()
+    data object Loading : ApiResponse<Nothing>()
 }
