@@ -25,31 +25,19 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    // Parámetros para la paginación
-    private var currentOffset = 0
-    private val pageSize = 20
+    // Límite fijo para la cantidad de Pokémon a cargar
+    private val limit = 150 // Cargar 150 Pokémon de una vez
 
     init {
         loadPokemonList()
     }
 
     /**
-     * Carga la lista inicial de Pokémon
+     * Carga la lista de Pokémon
      */
     fun loadPokemonList() {
         _uiState.value = UiState.Loading
-        fetchPokemonList(pageSize, currentOffset)
-    }
-
-    /**
-     * Carga la siguiente página de Pokémon
-     */
-    fun loadMorePokemon() {
-        // Solo cargamos más si el estado actual es Success
-        if (_uiState.value is UiState.Success) {
-            currentOffset += pageSize
-            fetchPokemonList(pageSize, currentOffset)
-        }
+        fetchPokemonList(limit, 0)
     }
 
     /**
@@ -63,15 +51,7 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                         _uiState.value = UiState.Loading
                     }
                     is Resource.Success -> {
-                        // Si ya teníamos pokémon (cargando más), añadimos los nuevos a la lista existente
-                        val currentState = _uiState.value
-                        val currentList = if (currentState is UiState.Success) currentState.pokemons else emptyList()
-                        
-                        if (offset > 0) {
-                            _uiState.value = UiState.Success(currentList + result.data)
-                        } else {
-                            _uiState.value = UiState.Success(result.data)
-                        }
+                        _uiState.value = UiState.Success(result.data)
                     }
                     is Resource.Error -> {
                         _uiState.value = UiState.Error(result.message, result.data)
