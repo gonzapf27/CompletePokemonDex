@@ -1,8 +1,9 @@
 package com.example.completepokemondex.data.repository
 
+import android.util.Log
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
-import com.example.completepokemondex.data.remote.models.Resource
+import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.domain.model.PokemonDomain
 import com.example.completepokemondex.domain.toDomainModelList
 import com.example.completepokemondex.domain.toEntityDomainModelList
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlin.math.log2
 
 /**
  * Repositorio para acceder a los datos de Pokémon. Implementa el patrón repositorio para abstraer
@@ -37,34 +39,52 @@ class PokemonRepository(
             flow {
                 // Emitir estado de carga
                 emit(Resource.Loading)
+                Log.d("PokemonRepository", "Iniciando búsqueda de Pokémon [limit=$limit, offset=$offset]")
 
                 try {
                     // Intentar obtener datos de la base de datos local
+                    Log.d("PokemonRepository", "Consultando base de datos local...")
                     val localPokemon = pokemonDao.getAllPokemon()
+                    Log.d("PokemonRepository", "Base de datos local contiene ${localPokemon.size} Pokémon")
 
                     // Si hay datos en la base de datos local y son suficientes, devolverlos
                     if (localPokemon.isNotEmpty() && localPokemon.size >= offset + limit) {
+                        Log.d("PokemonRepository", "📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                        Log.d("PokemonRepository", "Datos suficientes en DB local para offset=$offset y limit=$limit")
+                        
+                        val resultList = localPokemon.drop(offset).take(limit)
+                        Log.d("PokemonRepository", "Devolviendo ${resultList.size} Pokémon de la base de datos local")
+                        
                         emit(
                             Resource.Success(
-                                localPokemon
-                                    .drop(offset)
-                                    .take(limit)
-                                    .toEntityDomainModelList()
+                                resultList.toEntityDomainModelList()
                             )
                         )
                     } else {
                         // Si no hay suficientes datos en la base de datos local, obtenerlos
                         // de la API
+                        Log.d("PokemonRepository", "Datos insuficientes en DB local, consultando API...")
+                        
                         when (val apiResponse = remoteDataSource.getPokemonList(limit, offset)) {
                             is Resource.Success -> {
+                                Log.d("PokemonRepository", "📡 ORIGEN DE DATOS: API REMOTA")
+                                Log.d("PokemonRepository", "Recibidos ${apiResponse.data.size} Pokémon de la API")
+                                
                                 // Guardar los datos en la base de datos local
                                 withContext(Dispatchers.IO) {
+                                    Log.d("PokemonRepository", "💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
+                                    Log.d("PokemonRepository", "Insertando ${apiResponse.data.size} Pokémon en la base de datos")
+                                    
                                     pokemonDao.insertAllPokemon(
                                         apiResponse.data.toEntityList()
                                     )
+                                    
+                                    Log.d("PokemonRepository", "Datos guardados correctamente en la base de datos local")
                                 }
 
                                 // Devolver los datos obtenidos de la API
+                                Log.d("PokemonRepository", "Devolviendo ${apiResponse.data.size} Pokémon obtenidos de la API")
+
                                 emit(
                                     Resource.Success(
                                         apiResponse.data.toDomainModelList()
@@ -76,6 +96,8 @@ class PokemonRepository(
                                 // algunos datos en la base de datos local,
                                 // devolver los datos disponibles con un mensaje de error
                                 if (localPokemon.isNotEmpty()) {
+                                    Log.d("PokemonRepository", "Devolviendo lista de Pokemon desde la base de datos local con un mensaje de error por la Api")
+                                    Log.e("PokemonRepository", "Error al obtener lista de Pokemon de la API: ${apiResponse.message}")
                                     emit(
                                         Resource.Error(
                                             message = apiResponse.message,
@@ -83,8 +105,10 @@ class PokemonRepository(
                                         )
                                     )
                                 } else {
-                                    // Si no hay datos en la base de datos local, devolver
+                                    // Si  hay datos en la base de datos local, devolver
+                                    Log.d("PokemonRepository", "No hay datos en la base de datos local - devolviendo el error de la API")
                                     // el error
+                                    Log.e("PokemonRepository", "Error al obtener lista de Pokemon de la API: ${apiResponse.message}")
                                     emit(
                                         Resource.Error(
                                             message = apiResponse.message,

@@ -1,7 +1,7 @@
 package com.example.completepokemondex.data.remote.datasource
 
 import com.example.completepokemondex.data.remote.api.ApiClient
-import com.example.completepokemondex.data.remote.models.Resource
+import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
