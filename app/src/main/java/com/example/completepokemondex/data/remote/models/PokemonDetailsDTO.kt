@@ -20,10 +20,14 @@ data class PokemonDetailsDTO(
 
     @SerializedName("name")
     val name: String,
-    
+
     @SerializedName("height")
     val height: Int,
 
     @SerializedName("weight")
-    val weight: Int
+    val weight: Int,
+
+    @SerializedName("sprites")
+    val sprites: PokemonSpritesDTO
 )
+

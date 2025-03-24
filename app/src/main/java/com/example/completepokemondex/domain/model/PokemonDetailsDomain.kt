@@ -10,10 +10,12 @@ package com.example.completepokemondex.domain.model
  * @property name Nombre del Pokémon.
  * @property height Altura del Pokémon (en decímetros).
  * @property weight Peso del Pokémon (en hectogramos).
+ *@property sprites Sprites del Pokémon.
  */
 data class PokemonDetailsDomain(
     val id: Int,
     val name: String,
     val height: Int,
-    val weight: Int
+    val weight: Int,
+    val sprites: PokemonSpritesDomain
 )

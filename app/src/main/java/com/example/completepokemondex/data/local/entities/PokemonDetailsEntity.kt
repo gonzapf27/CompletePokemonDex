@@ -27,4 +27,7 @@ data class PokemonDetailsEntity(
 
     @ColumnInfo(name = "pokemon_weight")
     val weight: Int,
+
+    @ColumnInfo(name = "pokemon_sprites")
+    val sprites: PokemonSpritesEntity
 )
