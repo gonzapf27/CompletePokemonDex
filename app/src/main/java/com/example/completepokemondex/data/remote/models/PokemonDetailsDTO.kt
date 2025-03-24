@@ -3,21 +3,27 @@ package com.example.completepokemondex.data.remote.models
 import com.google.gson.annotations.SerializedName
 
 /**
- * Representa un Pokémon dentro de la lista de resultados de la API.
+ * Data Transfer Object (DTO) que representa la información detallada de un Pokémon obtenida de la API.
  *
- * Esta clase de datos encapsula la información básica de un Pokémon que es devuelta
- * por la PokeAPI cuando se solicita una lista de Pokémon. Contiene el nombre del Pokémon
- * y la URL donde se pueden obtener detalles específicos sobre el mismo.
+ * Esta clase encapsula los detalles de un Pokémon que son devueltos por la PokeAPI
+ * cuando se solicita información específica de un Pokémon. Contiene atributos como
+ * id, nombre, altura y peso del Pokémon.
  *
- * @property name El nombre del Pokémon.
- * @property url La URL que apunta a los detalles completos del Pokémon en la API.
- *             Esta URL puede ser utilizada para extraer el ID del Pokémon o para
- *             realizar peticiones adicionales para obtener información detallada.
+ * @property id Identificador único del Pokémon.
+ * @property name Nombre del Pokémon.
+ * @property height Altura del Pokémon (en decímetros).
+ * @property weight Peso del Pokémon (en hectogramos).
  */
-data class PokemonDTO(
+data class PokemonDetailsDTO(
+    @SerializedName("id")
+    val id: Int,
+
     @SerializedName("name")
     val name: String,
     
-    @SerializedName("url")
-    val url: String
+    @SerializedName("height")
+    val height: Int,
+
+    @SerializedName("weight")
+    val weight: Int
 )

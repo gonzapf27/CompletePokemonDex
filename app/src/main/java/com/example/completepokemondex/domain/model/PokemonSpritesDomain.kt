@@ -1,12 +1,10 @@
-package com.example.completepokemondex.data.remote.models
-
-import com.google.gson.annotations.SerializedName
+package com.example.completepokemondex.domain.model
 
 /**
- * Data Transfer Object (DTO) que representa los sprites (imágenes) de un Pokémon obtenidos de la API.
- *
- * Esta clase encapsula las diferentes URLs de imágenes para un Pokémon que son devueltas
- * por la PokeAPI cuando se solicita información específica de un Pokémon.
+ * Modelo de dominio que representa los sprites (imágenes) de un Pokémon.
+ * 
+ * Esta clase contiene las URLs de las diferentes imágenes de un Pokémon
+ * y sirve como modelo para la capa de presentación.
  *
  * @property backDefault URL de la vista trasera predeterminada.
  * @property backFemale URL de la vista trasera femenina (puede ser nula).
@@ -17,28 +15,13 @@ import com.google.gson.annotations.SerializedName
  * @property frontShiny URL de la vista frontal brillante.
  * @property frontShinyFemale URL de la vista frontal brillante femenina (puede ser nula).
  */
-data class PokemonSpritesDTO(
-    @SerializedName("back_default")
+data class PokemonSpritesDomain(
     val backDefault: String?,
-
-    @SerializedName("back_female")
     val backFemale: String?,
-
-    @SerializedName("back_shiny")
     val backShiny: String?,
-
-    @SerializedName("back_shiny_female")
     val backShinyFemale: String?,
-
-    @SerializedName("front_default")
     val frontDefault: String?,
-    
-    @SerializedName("front_female")
     val frontFemale: String?,
-
-    @SerializedName("front_shiny")
     val frontShiny: String?,
-
-    @SerializedName("front_shiny_female")
     val frontShinyFemale: String?
 )
