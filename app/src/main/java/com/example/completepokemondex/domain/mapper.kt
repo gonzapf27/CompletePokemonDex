@@ -34,7 +34,6 @@ fun PokemonDTO.pokemonDTOToDomain(): PokemonDomain {
             name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase() else it.toString()
             },
-        url = url
     )
 }
 
@@ -50,7 +49,6 @@ fun PokemonEntity.pokemonEntityToDomain(): PokemonDomain {
             name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase() else it.toString()
             },
-        url = url
     )
 }
 

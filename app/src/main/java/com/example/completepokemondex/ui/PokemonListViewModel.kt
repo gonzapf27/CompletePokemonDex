@@ -1,5 +1,6 @@
 package com.example.completepokemondex.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -49,7 +50,8 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                     }
 
                     is Resource.Success -> {
-                        _uiState.value = UiState.Success(result.data)
+                        val pokemonList = result.data
+                        loadPokemonImages(pokemonList)
                     }
 
                     is Resource.Error -> {
@@ -60,6 +62,70 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         }
     }
 
+    /** Carga las imágenes para la lista de Pokémon */
+    private fun loadPokemonImages(pokemons: List<PokemonDomain>) {
+        viewModelScope.launch {
+            val pokemonWithImages = mutableListOf<PokemonDomain>()
+            var loadedCount = 0
+            
+            for (pokemon in pokemons) {
+                viewModelScope.launch {
+                    try {
+                        // Obtener detalles del Pokémon para obtener la URL de la imagen
+                        repository.getPokemonDetailsById(pokemon.id).collect { detailsResource ->
+                            when (detailsResource) {
+                                is Resource.Success -> {
+                                    val imageUrl = detailsResource.data.sprites.frontDefault
+                                    // Crear un nuevo objeto PokemonDomain con la URL de la imagen
+                                    val pokemonWithImage = pokemon.copy(imageUrl = imageUrl)
+                                    
+                                    synchronized(pokemonWithImages) {
+                                        pokemonWithImages.add(pokemonWithImage)
+                                        loadedCount++
+                                        
+                                        // Cuando se han cargado todas las imágenes, actualizar el estado
+                                        if (loadedCount == pokemons.size) {
+                                            // Ordenar por ID para mantener el orden correcto
+                                            val sortedList = pokemonWithImages.sortedBy { it.id }
+                                            _uiState.value = UiState.Success(sortedList)
+                                        }
+                                    }
+                                }
+                                is Resource.Error -> {
+                                    synchronized(pokemonWithImages) {
+                                        // Si hay un error, agregar el Pokémon sin imagen
+                                        pokemonWithImages.add(pokemon)
+                                        loadedCount++
+                                        
+                                        if (loadedCount == pokemons.size) {
+                                            val sortedList = pokemonWithImages.sortedBy { it.id }
+                                            _uiState.value = UiState.Success(sortedList)
+                                        }
+                                    }
+                                    Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${detailsResource.message}")
+                                }
+                                is Resource.Loading -> {
+                                    // Ignorar estado de carga
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        synchronized(pokemonWithImages) {
+                            // Si hay un error, agregar el Pokémon sin imagen
+                            pokemonWithImages.add(pokemon)
+                            loadedCount++
+                            
+                            if (loadedCount == pokemons.size) {
+                                val sortedList = pokemonWithImages.sortedBy { it.id }
+                                _uiState.value = UiState.Success(sortedList)
+                            }
+                        }
+                        Log.e("PokemonListViewModel", "Error al cargar detalles: ${e.message}")
+                    }
+                }
+            }
+        }
+    }
 
     /** Factory para crear instancias del ViewModel con el repositorio necesario */
     class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {

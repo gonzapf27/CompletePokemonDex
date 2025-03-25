@@ -65,5 +65,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.bumptech.glide/glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("androidx.room:room-compiler:2.6.1")
+    
+    // Glide for image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
 }
