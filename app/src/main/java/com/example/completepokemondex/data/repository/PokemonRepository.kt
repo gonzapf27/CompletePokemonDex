@@ -1,13 +1,16 @@
 package com.example.completepokemondex.data.repository
 
-import android.net.eap.EapAkaInfo
 import android.util.Log
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.domain.PokemonDTOToEntityList
+import com.example.completepokemondex.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.domain.model.PokemonDomain
 import com.example.completepokemondex.domain.pokemonDTOToDomainList
+import com.example.completepokemondex.domain.pokemonDetailsEntityToDomain
+import com.example.completepokemondex.domain.pokemonDetailsDTOToDomain
+import com.example.completepokemondex.domain.pokemonDetailsDTOToEntity
 import com.example.completepokemondex.domain.pokemonEntityToDomainList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -175,4 +178,70 @@ class PokemonRepository(
                         }
                     }
                     .flowOn(Dispatchers.IO)
+
+    /**
+     * Obtiene los detalles de un Pokémon específico por su ID. Primero intenta obtener los datos de la 
+     * base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
+     *
+     * @param id Identificador único del Pokémon
+     * @return Flow que emite los detalles del Pokémon y el estado de carga
+     */
+    fun getPokemonDetailsById(id: Int): Flow<Resource<PokemonDetailsDomain>> =
+        flow {
+            // Emitir estado de carga
+            emit(Resource.Loading)
+            Log.d("PokemonRepository", "Iniciando búsqueda de detalles del Pokémon [id=$id]")
+
+            try {
+                // Intentar obtener datos de la base de datos local
+                Log.d("PokemonRepository", "Consultando base de datos local para detalles del Pokémon $id...")
+                val localPokemonDetails = pokemonDao.getPokemonById(id)
+                
+                if (localPokemonDetails != null) {
+                    // Si hay datos en la base de datos local, devolverlos
+                    Log.d("PokemonRepository", "📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    Log.d("PokemonRepository", "Devolviendo detalles del Pokémon $id de la base de datos local")
+                    
+                    emit(Resource.Success(localPokemonDetails.pokemonDetailsEntityToDomain()))
+                } else {
+                    // Si no hay datos en la base de datos local, obtenerlos de la API
+                    Log.d("PokemonRepository", "No se encontraron detalles del Pokémon $id en la DB local, consultando API...")
+
+                    when (val apiResponse = remoteDataSource.getPokemonDetailsById(id)) {
+                        is Resource.Success -> {
+                            Log.d("PokemonRepository", "📡 ORIGEN DE DATOS: API REMOTA")
+                            Log.d("PokemonRepository", "Recibidos detalles del Pokémon $id de la API")
+
+                            // Guardar los datos en la base de datos local
+                            withContext(Dispatchers.IO) {
+                                Log.d("PokemonRepository", "💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
+                                Log.d("PokemonRepository", "Insertando detalles del Pokémon $id en la base de datos")
+                                
+                                pokemonDao.insertPokemonDetails(apiResponse.data.pokemonDetailsDTOToEntity())
+                                
+                                Log.d("PokemonRepository", "Datos guardados correctamente en la base de datos local")
+                            }
+
+                            // Devolver los datos obtenidos de la API
+                            Log.d("PokemonRepository", "Devolviendo detalles del Pokémon $id obtenidos de la API")
+                            
+                            emit(Resource.Success(apiResponse.data.pokemonDetailsDTOToDomain()))
+                        }
+                        is Resource.Error -> {
+                            Log.e("PokemonRepository", "Error al obtener detalles del Pokémon $id de la API: ${apiResponse.message}")
+                            emit(Resource.Error(message = apiResponse.message))
+                        }
+                        is Resource.Loading -> {
+                            // Mantener el estado de carga
+                            emit(Resource.Loading)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Manejar cualquier excepción no controlada
+                Log.e("PokemonRepository", "Error inesperado al obtener detalles del Pokémon: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }
+        .flowOn(Dispatchers.IO)
 }

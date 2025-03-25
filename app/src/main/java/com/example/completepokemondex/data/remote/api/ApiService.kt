@@ -4,6 +4,7 @@ import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -24,7 +25,7 @@ interface ApiService {
 
     @GET("pokemon/{id}")
     suspend fun getPokemonDetailsById(
-        @Query("id") id: Int
+        @Path("id") id: Int
     ): Response<PokemonDetailsDTO>
 }
 

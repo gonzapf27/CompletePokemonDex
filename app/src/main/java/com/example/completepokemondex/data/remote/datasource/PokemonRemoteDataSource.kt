@@ -1,5 +1,6 @@
 package com.example.completepokemondex.data.remote.datasource
 
+import android.util.Log
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.PokemonDTO
@@ -71,6 +72,31 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             } catch (e: Exception) {
                 Resource.Error("Error desconocido: ${e.message}", null)
             }
+        }
+    }
+    
+    /**
+     * Obtiene los detalles de un Pokémon específico por su ID desde la API.
+     *
+     * @param id Identificador único del Pokémon
+     * @return Un objeto Resource que contiene los detalles del Pokémon o un mensaje de error
+     */
+    suspend fun getPokemonDetailsById(id: Int): Resource<PokemonDetailsDTO> {
+        return try {
+            val response = apiService.getPokemonDetailsById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo detalles del pokemon: ${e.message}")
+            Resource.Error("Error de red: ${e.message}")
         }
     }
 }

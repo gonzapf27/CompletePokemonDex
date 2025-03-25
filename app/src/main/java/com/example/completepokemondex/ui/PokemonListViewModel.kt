@@ -1,5 +1,6 @@
 package com.example.completepokemondex.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import android.widget.Toast
 
 class PokemonListViewModel(private val repository: PokemonRepository) : ViewModel() {
     // Definir el estado de UI como sealed class
@@ -55,6 +57,25 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                     }
                     is Resource.Error -> {
                         _uiState.value = UiState.Error(result.message, result.data)
+                    }
+                }
+            }
+        }
+    }
+
+    fun fetchPokemonDetails(id: Int) {
+        viewModelScope.launch {
+            repository.getPokemonDetailsById(id).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _uiState.value = UiState.Loading
+                    }
+                    is Resource.Success -> {
+                       Log.d("PokemonDetails", "PokemonDetails: ${result.data}")
+                         fetchPokemonList(limit,0)
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = UiState.Error(result.message)
                     }
                 }
             }

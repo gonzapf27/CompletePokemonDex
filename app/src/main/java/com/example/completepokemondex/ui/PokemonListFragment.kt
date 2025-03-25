@@ -50,7 +50,8 @@ class PokemonListFragment : Fragment() {
         adapter = PokemonListAdapter { pokemon ->
             // Manejo de clic en un Pokémon (para implementar navegación al detalle)
             Toast.makeText(context, "Pokémon seleccionado: ${pokemon.name}, ${pokemon.id}", Toast.LENGTH_SHORT).show()
-            
+            // fetch pokemon details
+            viewModel.fetchPokemonDetails(pokemon.id)
         }
 
         binding.pokemonListRecyclerView.adapter = adapter

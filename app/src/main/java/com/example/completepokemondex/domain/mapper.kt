@@ -3,6 +3,12 @@ package com.example.completepokemondex.domain
 import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.domain.model.PokemonDomain
+import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
+import com.example.completepokemondex.data.local.entities.PokemonSpritesEmbedded
+import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonSpritesDTO
+import com.example.completepokemondex.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.domain.model.PokemonSpritesDomain
 
 /**
  * Extrae el ID del Pokémon a partir de la URL proporcionada por la API.
@@ -84,5 +90,104 @@ fun List<PokemonDTO>.pokemonDTOToDomainList(): List<PokemonDomain> {
  */
 fun List<PokemonEntity>.pokemonEntityToDomainList(): List<PokemonDomain> {
     return map { it.pokemonEntityToDomain() }
+}
+
+/**
+ * Convierte un objeto PokemonDetailsDTO (capa de datos) en un objeto PokemonDetailsDomain (capa de dominio).
+ *
+ * @return Un objeto PokemonDetailsDomain con los datos mapeados desde el DTO.
+ */
+fun PokemonDetailsDTO.pokemonDetailsDTOToDomain(): PokemonDetailsDomain {
+    return PokemonDetailsDomain(
+        id = id,
+        name = name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+        height = height,
+        weight = weight,
+        sprites = sprites.pokemonSpritesDTOToDomain()
+    )
+}
+
+/**
+ * Convierte un objeto PokemonDetailsEntity (capa de datos local) en un objeto PokemonDetailsDomain (capa de dominio).
+ *
+ * @return Un objeto PokemonDetailsDomain con los datos mapeados desde la entidad.
+ */
+fun PokemonDetailsEntity.pokemonDetailsEntityToDomain(): PokemonDetailsDomain {
+    return PokemonDetailsDomain(
+        id = id,
+        name = name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+        height = height,
+        weight = weight,
+        sprites = sprites.pokemonSpritesEmbeddedToDomain()
+    )
+}
+
+/**
+ * Convierte un objeto PokemonDetailsDTO (capa de datos remota) en un objeto PokemonDetailsEntity (capa de datos local).
+ *
+ * @return Un objeto PokemonDetailsEntity con los datos mapeados desde el DTO.
+ */
+fun PokemonDetailsDTO.pokemonDetailsDTOToEntity(): PokemonDetailsEntity {
+    return PokemonDetailsEntity(
+        id = id,
+        name = name,
+        height = height,
+        weight = weight,
+        sprites = sprites.pokemonSpritesDTOToEmbedded()
+    )
+}
+
+/**
+ * Convierte un objeto PokemonSpritesDTO (capa de datos) en un objeto PokemonSpritesDomain (capa de dominio).
+ *
+ * @return Un objeto PokemonSpritesDomain con los datos mapeados desde el DTO.
+ */
+fun PokemonSpritesDTO.pokemonSpritesDTOToDomain(): PokemonSpritesDomain {
+    return PokemonSpritesDomain(
+        backDefault = backDefault,
+        backFemale = backFemale,
+        backShiny = backShiny,
+        backShinyFemale = backShinyFemale,
+        frontDefault = frontDefault,
+        frontFemale = frontFemale,
+        frontShiny = frontShiny,
+        frontShinyFemale = frontShinyFemale
+    )
+}
+
+/**
+ * Convierte un objeto PokemonSpritesEmbedded (capa de datos local) en un objeto PokemonSpritesDomain (capa de dominio).
+ *
+ * @return Un objeto PokemonSpritesDomain con los datos mapeados desde la entidad.
+ */
+fun PokemonSpritesEmbedded.pokemonSpritesEmbeddedToDomain(): PokemonSpritesDomain {
+    return PokemonSpritesDomain(
+        backDefault = backDefault,
+        backFemale = backFemale,
+        backShiny = backShiny,
+        backShinyFemale = backShinyFemale,
+        frontDefault = frontDefault,
+        frontFemale = frontFemale,
+        frontShiny = frontShiny,
+        frontShinyFemale = frontShinyFemale
+    )
+}
+
+/**
+ * Convierte un objeto PokemonSpritesDTO (capa de datos remota) en un objeto PokemonSpritesEmbedded (capa de datos local).
+ *
+ * @return Un objeto PokemonSpritesEmbedded con los datos mapeados desde el DTO.
+ */
+fun PokemonSpritesDTO.pokemonSpritesDTOToEmbedded(): PokemonSpritesEmbedded {
+    return PokemonSpritesEmbedded(
+        backDefault = backDefault,
+        backFemale = backFemale,
+        backShiny = backShiny,
+        backShinyFemale = backShinyFemale,
+        frontDefault = frontDefault,
+        frontFemale = frontFemale,
+        frontShiny = frontShiny,
+        frontShinyFemale = frontShinyFemale
+    )
 }
 
