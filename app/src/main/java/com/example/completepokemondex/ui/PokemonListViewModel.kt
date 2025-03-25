@@ -1,6 +1,7 @@
 package com.example.completepokemondex.ui
 
-import android.util.Log
+import android.os.Bundle
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -13,14 +14,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import android.widget.Toast
 
 class PokemonListViewModel(private val repository: PokemonRepository) : ViewModel() {
     // Definir el estado de UI como sealed class
     sealed class UiState {
         data object Loading : UiState()
         data class Success(val pokemons: List<PokemonDomain>) : UiState()
-        data class Error(val message: String, val pokemons: List<PokemonDomain>? = null) : UiState()
+        data class Error(val message: String, val pokemons: List<PokemonDomain>? = null) :
+                UiState()
     }
 
     // Estado de UI como StateFlow para ser observado por el Fragment
@@ -34,17 +35,13 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         loadPokemonList()
     }
 
-    /**
-     * Carga la lista de Pokémon
-     */
+    /** Carga la lista de Pokémon */
     fun loadPokemonList() {
         _uiState.value = UiState.Loading
         fetchPokemonList(limit, 0)
     }
 
-    /**
-     * Obtiene la lista de Pokémon del repositorio
-     */
+    /** Obtiene la lista de Pokémon del repositorio */
     private fun fetchPokemonList(limit: Int, offset: Int) {
         viewModelScope.launch {
             repository.getPokemonList(limit, offset).collect { result ->
@@ -63,28 +60,21 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         }
     }
 
-    fun fetchPokemonDetails(id: Int) {
-        viewModelScope.launch {
-            repository.getPokemonDetailsById(id).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        _uiState.value = UiState.Loading
-                    }
-                    is Resource.Success -> {
-                       Log.d("PokemonDetails", "PokemonDetails: ${result.data}")
-                         fetchPokemonList(limit,0)
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = UiState.Error(result.message)
-                    }
-                }
-            }
-        }
+    fun handlePokemonClick(fragmentManager: FragmentManager, pokemonId: Int) {
+
+        val fragment = PokemonDetailsFragment()
+        val args = Bundle()
+        args.putInt("pokemonId", pokemonId)
+        fragment.arguments = args
+
+        // Reemplazar el fragment actual por el fragment de detalles
+        fragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
-    /**
-     * Factory para crear instancias del ViewModel con el repositorio necesario
-     */
+    /** Factory para crear instancias del ViewModel con el repositorio necesario */
     class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -28,10 +28,7 @@ class PokemonDetailsViewModel(private val repository: PokemonRepository) : ViewM
 
     }
 
-    fun loadPokemonDetails(id: Int) {
-        //_uiState.value = UiState.Loading
-        //fetchPokemonDetails(id)
-    }
+    
 
 
 
