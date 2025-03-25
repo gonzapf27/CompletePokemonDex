@@ -87,6 +87,7 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Detalles del pokemon obtenidos: $body")
                     Resource.Success(body)
                 } else {
                     Resource.Error("Cuerpo de respuesta vacío")

@@ -211,7 +211,7 @@ class PokemonRepository(
                         is Resource.Success -> {
                             Log.d("PokemonRepository", "📡 ORIGEN DE DATOS: API REMOTA")
                             Log.d("PokemonRepository", "Recibidos detalles del Pokémon $id de la API")
-
+                            Log.d("PokemonRepository", "Datos del pokemon en la API: ${apiResponse.data}")
                             // Guardar los datos en la base de datos local
                             withContext(Dispatchers.IO) {
                                 Log.d("PokemonRepository", "💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")

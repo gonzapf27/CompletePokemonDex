@@ -19,6 +19,22 @@ import androidx.room.PrimaryKey
  * @property frontFemale URL de la vista frontal femenina (puede ser nula).
  * @property frontShiny URL de la vista frontal brillante.
  * @property frontShinyFemale URL de la vista frontal brillante femenina (puede ser nula).
+ * @property dreamWorldFrontDefault URL del sprite Dream World frontal predeterminado.
+ * @property dreamWorldFrontFemale URL del sprite Dream World frontal femenino.
+ * @property homeFrontDefault URL del sprite Home frontal predeterminado.
+ * @property homeFrontFemale URL del sprite Home frontal femenino.
+ * @property homeFrontShiny URL del sprite Home frontal brillante.
+ * @property homeFrontShinyFemale URL del sprite Home frontal brillante femenino.
+ * @property officialArtworkDefault URL del artwork oficial predeterminado.
+ * @property officialArtworkShiny URL del artwork oficial brillante.
+ * @property showdownBackDefault URL del sprite Showdown trasero predeterminado.
+ * @property showdownBackFemale URL del sprite Showdown trasero femenino.
+ * @property showdownBackShiny URL del sprite Showdown trasero brillante.
+ * @property showdownBackShinyFemale URL del sprite Showdown trasero brillante femenino.
+ * @property showdownFrontDefault URL del sprite Showdown frontal predeterminado.
+ * @property showdownFrontFemale URL del sprite Showdown frontal femenino.
+ * @property showdownFrontShiny URL del sprite Showdown frontal brillante.
+ * @property showdownFrontShinyFemale URL del sprite Showdown frontal brillante femenino.
  */
 @Entity(
     tableName = "pokemon_sprites",
@@ -61,7 +77,55 @@ data class PokemonSpritesEntity(
     val frontShiny: String?,
 
     @ColumnInfo(name = "front_shiny_female")
-    val frontShinyFemale: String?
+    val frontShinyFemale: String?,
+
+    @ColumnInfo(name = "dream_world_front_default")
+    val dreamWorldFrontDefault: String?,
+
+    @ColumnInfo(name = "dream_world_front_female")
+    val dreamWorldFrontFemale: String?,
+
+    @ColumnInfo(name = "home_front_default")
+    val homeFrontDefault: String?,
+
+    @ColumnInfo(name = "home_front_female")
+    val homeFrontFemale: String?,
+
+    @ColumnInfo(name = "home_front_shiny")
+    val homeFrontShiny: String?,
+
+    @ColumnInfo(name = "home_front_shiny_female")
+    val homeFrontShinyFemale: String?,
+
+    @ColumnInfo(name = "official_artwork_default")
+    val officialArtworkDefault: String?,
+
+    @ColumnInfo(name = "official_artwork_shiny")
+    val officialArtworkShiny: String?,
+
+    @ColumnInfo(name = "showdown_back_default")
+    val showdownBackDefault: String?,
+
+    @ColumnInfo(name = "showdown_back_female")
+    val showdownBackFemale: String?,
+
+    @ColumnInfo(name = "showdown_back_shiny")
+    val showdownBackShiny: String?,
+
+    @ColumnInfo(name = "showdown_back_shiny_female")
+    val showdownBackShinyFemale: String?,
+
+    @ColumnInfo(name = "showdown_front_default")
+    val showdownFrontDefault: String?,
+
+    @ColumnInfo(name = "showdown_front_female")
+    val showdownFrontFemale: String?,
+
+    @ColumnInfo(name = "showdown_front_shiny")
+    val showdownFrontShiny: String?,
+
+    @ColumnInfo(name = "showdown_front_shiny_female")
+    val showdownFrontShinyFemale: String?
 )
 
 /**
@@ -76,5 +140,21 @@ data class PokemonSpritesEmbedded(
     val frontDefault: String?,
     val frontFemale: String?,
     val frontShiny: String?,
-    val frontShinyFemale: String?
+    val frontShinyFemale: String?,
+    val dreamWorldFrontDefault: String?,
+    val dreamWorldFrontFemale: String?,
+    val homeFrontDefault: String?,
+    val homeFrontFemale: String?,
+    val homeFrontShiny: String?,
+    val homeFrontShinyFemale: String?,
+    val officialArtworkDefault: String?,
+    val officialArtworkShiny: String?,
+    val showdownBackDefault: String?,
+    val showdownBackFemale: String?,
+    val showdownBackShiny: String?,
+    val showdownBackShinyFemale: String?,
+    val showdownFrontDefault: String?,
+    val showdownFrontFemale: String?,
+    val showdownFrontShiny: String?,
+    val showdownFrontShinyFemale: String?
 )

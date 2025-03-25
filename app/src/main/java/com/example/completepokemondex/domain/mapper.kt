@@ -1,13 +1,13 @@
 package com.example.completepokemondex.domain
 
-import com.example.completepokemondex.data.local.entities.PokemonEntity
-import com.example.completepokemondex.data.remote.models.PokemonDTO
-import com.example.completepokemondex.domain.model.PokemonDomain
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
+import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpritesEmbedded
+import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpritesDTO
 import com.example.completepokemondex.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.domain.model.PokemonDomain
 import com.example.completepokemondex.domain.model.PokemonSpritesDomain
 
 /**
@@ -149,7 +149,23 @@ fun PokemonSpritesDTO.pokemonSpritesDTOToDomain(): PokemonSpritesDomain {
         frontDefault = frontDefault,
         frontFemale = frontFemale,
         frontShiny = frontShiny,
-        frontShinyFemale = frontShinyFemale
+        frontShinyFemale = frontShinyFemale,
+        officialArtworkDefault = other?.officialArtwork?.frontDefault,
+        officialArtworkShiny = other?.officialArtwork?.frontShiny,
+        dreamWorldFrontDefault = other?.dreamWorld?.frontDefault,
+        dreamWorldFrontFemale = other?.dreamWorld?.frontFemale,
+        homeFrontDefault = other?.home?.frontDefault,
+        homeFrontFemale = other?.home?.frontFemale,
+        homeFrontShiny = other?.home?.frontShiny,
+        homeFrontShinyFemale = other?.home?.frontShinyFemale,
+        showdownBackDefault = other?.showdown?.backDefault,
+        showdownBackFemale = other?.showdown?.backFemale,
+        showdownBackShiny = other?.showdown?.backShiny,
+        showdownBackShinyFemale = other?.showdown?.backShinyFemale,
+        showdownFrontDefault = other?.showdown?.frontDefault,
+        showdownFrontFemale = other?.showdown?.frontFemale,
+        showdownFrontShiny = other?.showdown?.frontShiny,
+        showdownFrontShinyFemale = other?.showdown?.frontShinyFemale
     )
 }
 
@@ -167,7 +183,23 @@ fun PokemonSpritesEmbedded.pokemonSpritesEmbeddedToDomain(): PokemonSpritesDomai
         frontDefault = frontDefault,
         frontFemale = frontFemale,
         frontShiny = frontShiny,
-        frontShinyFemale = frontShinyFemale
+        frontShinyFemale = frontShinyFemale,
+        officialArtworkDefault = officialArtworkDefault,
+        officialArtworkShiny = officialArtworkShiny,
+        dreamWorldFrontDefault = dreamWorldFrontDefault,
+        dreamWorldFrontFemale = dreamWorldFrontFemale,
+        homeFrontDefault = homeFrontDefault,
+        homeFrontFemale = homeFrontFemale,
+        homeFrontShiny = homeFrontShiny,
+        homeFrontShinyFemale = homeFrontShinyFemale,
+        showdownBackDefault = showdownBackDefault,
+        showdownBackFemale = showdownBackFemale,
+        showdownBackShiny = showdownBackShiny,
+        showdownBackShinyFemale = showdownBackShinyFemale,
+        showdownFrontDefault = showdownFrontDefault,
+        showdownFrontFemale = showdownFrontFemale,
+        showdownFrontShiny = showdownFrontShiny,
+        showdownFrontShinyFemale = showdownFrontShinyFemale
     )
 }
 
@@ -185,7 +217,23 @@ fun PokemonSpritesDTO.pokemonSpritesDTOToEmbedded(): PokemonSpritesEmbedded {
         frontDefault = frontDefault,
         frontFemale = frontFemale,
         frontShiny = frontShiny,
-        frontShinyFemale = frontShinyFemale
+        frontShinyFemale = frontShinyFemale,
+        officialArtworkDefault = other?.officialArtwork?.frontDefault,
+        officialArtworkShiny = other?.officialArtwork?.frontShiny,
+        dreamWorldFrontDefault = other?.dreamWorld?.frontDefault,
+        dreamWorldFrontFemale = other?.dreamWorld?.frontFemale,
+        homeFrontDefault = other?.home?.frontDefault,
+        homeFrontFemale = other?.home?.frontFemale,
+        homeFrontShiny = other?.home?.frontShiny,
+        homeFrontShinyFemale = other?.home?.frontShinyFemale,
+        showdownBackDefault = other?.showdown?.backDefault,
+        showdownBackFemale = other?.showdown?.backFemale,
+        showdownBackShiny = other?.showdown?.backShiny,
+        showdownBackShinyFemale = other?.showdown?.backShinyFemale,
+        showdownFrontDefault = other?.showdown?.frontDefault,
+        showdownFrontFemale = other?.showdown?.frontFemale,
+        showdownFrontShiny = other?.showdown?.frontShiny,
+        showdownFrontShinyFemale = other?.showdown?.frontShinyFemale
     )
 }
 

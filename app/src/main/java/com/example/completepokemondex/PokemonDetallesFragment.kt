@@ -1,6 +1,7 @@
 package com.example.completepokemondex
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,10 +98,11 @@ class PokemonDetallesFragment : Fragment() {
            // Actualizar Weight
            binding.pokemonDetailsWeight.text = pokemon.weight.toString()
            // Actualizar imagen
-           pokemon.sprites.frontDefault?.let { imageUrl ->
+           val imageUrl = pokemon.sprites.officialArtworkShiny ?: pokemon.sprites.frontDefault
+           imageUrl?.let {
                // Usar Glide para cargar la imagen desde la URL
                com.bumptech.glide.Glide.with(requireContext())
-                   .load(imageUrl)
+                   .load(it)
                    .into(binding.pokemonImage)
            }
        }
