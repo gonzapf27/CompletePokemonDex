@@ -11,26 +11,56 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.completepokemondex.PokemonDetallesFragment
+import com.example.completepokemondex.R
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonListBinding
 import com.example.completepokemondex.ui.adapters.PokemonListAdapter
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Fragmento que muestra una lista de Pokémon.
+ * Este fragmento recupera y presenta los datos de los Pokémon en un RecyclerView,
+ * permitiendo la selección de un Pokémon específico para ver sus detalles.
+ */
 class PokemonListFragment : Fragment() {
 
     companion object {
+        /**
+         * Crea una nueva instancia de PokemonListFragment.
+         * @return Una nueva instancia del fragmento.
+         */
         fun newInstance() = PokemonListFragment()
     }
 
-    private val viewModel: PokemonListViewModel by viewModels { 
+    /**
+     * ViewModel que gestiona los datos y la lógica de negocio para este fragmento.
+     * Se inicializa con la base de datos de Pokédex.
+     */
+    private val viewModel: PokemonListViewModel by viewModels {
         PokemonListViewModel.Factory(PokedexDatabase.getDatabase(requireContext())) 
     }
     
+    /**
+     * Binding para acceder a las vistas del layout.
+     * Se inicializa en onCreateView y se limpia en onDestroyView.
+     */
     private var _binding: FragmentPokemonListBinding? = null
     private val binding get() = _binding!!
+
+    /**
+     * Adaptador para el RecyclerView que muestra la lista de Pokémon.
+     */
     private lateinit var adapter: PokemonListAdapter
 
+    /**
+     * Infla el layout del fragmento y configura el binding.
+     * @param inflater Utilizado para inflar el layout.
+     * @param container Contenedor donde se añadirá la vista.
+     * @param savedInstanceState Estado guardado del fragmento.
+     * @return La vista raíz del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,6 +69,12 @@ class PokemonListFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Se llama después de que la vista se haya creado.
+     * Configura el RecyclerView y observa los cambios en el ViewModel.
+     * @param view La vista creada por onCreateView.
+     * @param savedInstanceState Estado guardado del fragmento.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -46,18 +82,28 @@ class PokemonListFragment : Fragment() {
         observeViewModel()
     }
 
+    /**
+     * Configura el RecyclerView con el adaptador y el layout manager.
+     * Define el comportamiento cuando se selecciona un Pokémon.
+     */
     private fun setupRecyclerView() {
         adapter = PokemonListAdapter { pokemon ->
-            // Manejo de clic en un Pokémon (para implementar navegación al detalle)
-            Toast.makeText(context, "Pokémon seleccionado: ${pokemon.name}, ${pokemon.id}", Toast.LENGTH_SHORT).show()
-            // Llamar a la función handlePokemonClick del ViewModel
-            viewModel.handlePokemonClick(parentFragmentManager, pokemon.id)
+            val fragmentoDetalles = PokemonDetallesFragment.newInstance(pokemon.id, pokemon.name)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView, fragmentoDetalles)
+                .addToBackStack(null)
+                .commit()
+            Toast.makeText(context, "Pokémon seleccionado: ${pokemon.name}, ID: ${pokemon.id}", Toast.LENGTH_SHORT).show()
         }
 
         binding.pokemonListRecyclerView.adapter = adapter
         binding.pokemonListRecyclerView.layoutManager = LinearLayoutManager(context)
     }
 
+    /**
+     * Observa los cambios en el estado de la UI del ViewModel y actualiza la interfaz
+     * de acuerdo al estado actual (cargando, éxito o error).
+     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -89,6 +135,10 @@ class PokemonListFragment : Fragment() {
         }
     }
 
+    /**
+     * Se llama cuando la vista del fragmento está siendo destruida.
+     * Limpia la referencia al binding para evitar fugas de memoria.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -1,7 +1,5 @@
 package com.example.completepokemondex.ui
 
-import android.os.Bundle
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -21,7 +19,7 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         data object Loading : UiState()
         data class Success(val pokemons: List<PokemonDomain>) : UiState()
         data class Error(val message: String, val pokemons: List<PokemonDomain>? = null) :
-                UiState()
+            UiState()
     }
 
     // Estado de UI como StateFlow para ser observado por el Fragment
@@ -49,9 +47,11 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                     is Resource.Loading -> {
                         _uiState.value = UiState.Loading
                     }
+
                     is Resource.Success -> {
                         _uiState.value = UiState.Success(result.data)
                     }
+
                     is Resource.Error -> {
                         _uiState.value = UiState.Error(result.message, result.data)
                     }
@@ -60,19 +60,6 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         }
     }
 
-    fun handlePokemonClick(fragmentManager: FragmentManager, pokemonId: Int) {
-
-        val fragment = PokemonDetailsFragment()
-        val args = Bundle()
-        args.putInt("pokemonId", pokemonId)
-        fragment.arguments = args
-
-        // Reemplazar el fragment actual por el fragment de detalles
-        fragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
 
     /** Factory para crear instancias del ViewModel con el repositorio necesario */
     class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
