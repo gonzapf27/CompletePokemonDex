@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesBinding
-import com.example.completepokemondex.domain.model.PokemonDetailsDomain
 
 /**
  * Fragmento que muestra los detalles de un Pokémon específico.
@@ -28,6 +27,7 @@ class PokemonDetallesFragment : Fragment() {
 
     companion object {
         private const val ARG_POKEMON_ID = "pokemon_id"
+
         /**
          * Crea una nueva instancia del fragmento con el ID numérico del Pokémon como argumento.
          *
@@ -87,12 +87,24 @@ class PokemonDetallesFragment : Fragment() {
         viewModel.fetchPokemon()
     }
 
-    private fun observeViewModel() {
-        // Observar el ID del Pokémon y actualizarlo
-        viewModel.idPokemon.observe(viewLifecycleOwner) { idPokemon ->
-            binding.pokemonDetailsId.text = idPokemon.toString()
-        }
-    }
+   private fun observeViewModel() {
+       // Observar el POkemon details y actualizarlo
+       viewModel.pokemonDetails.observe(viewLifecycleOwner) { pokemon ->
+           // Actualizar ID
+           binding.pokemonDetailsId.text = pokemon.id.toString()
+           // Actualizar Height
+           binding.pokemonDetailsHeight.text = pokemon.height.toString()
+           // Actualizar Weight
+           binding.pokemonDetailsWeight.text = pokemon.weight.toString()
+           // Actualizar imagen
+           pokemon.sprites.frontDefault?.let { imageUrl ->
+               // Usar Glide para cargar la imagen desde la URL
+               com.bumptech.glide.Glide.with(requireContext())
+                   .load(imageUrl)
+                   .into(binding.pokemonImage)
+           }
+       }
+   }
 
     /**
      * Se ejecuta cuando la vista del fragmento está siendo destruida.
