@@ -88,7 +88,7 @@ class PokemonListFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         adapter = PokemonListAdapter { pokemon ->
-            val fragmentoDetalles = PokemonDetallesFragment.newInstance(pokemon.id, pokemon.name)
+            val fragmentoDetalles = PokemonDetallesFragment.newInstance(pokemon.id)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
                 .addToBackStack(null)

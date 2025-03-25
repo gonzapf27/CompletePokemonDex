@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesBinding
+import com.example.completepokemondex.domain.model.PokemonDetailsDomain
 
 /**
  * Fragmento que muestra los detalles de un Pokémon específico.
@@ -20,23 +22,22 @@ class PokemonDetallesFragment : Fragment() {
     private val binding get() = _binding!!
 
     /** ViewModel que maneja la lógica de presentación y los datos del Pokémon */
-    private val viewModel: PokemonDetallesViewModel by viewModels()
+    private val viewModel: PokemonDetallesViewModel by viewModels {
+        PokemonDetallesViewModel.Factory(PokedexDatabase.getDatabase(requireContext()))
+    }
 
     companion object {
         private const val ARG_POKEMON_ID = "pokemon_id"
-        private const val ARG_POKEMON_NOMBRE = "pokemon_nombre"
-
         /**
          * Crea una nueva instancia del fragmento con el ID numérico del Pokémon como argumento.
          *
          * @param pokemonId El ID numérico del Pokémon cuyos detalles se mostrarán.
-         * @param pokemonNombre El nombre del Pokémon cuyos detalles se mostrarán.
+         *
          * @return Una nueva instancia de [PokemonDetallesFragment].
          */
-        fun newInstance(pokemonId: Int, pokemonNombre: String) = PokemonDetallesFragment().apply {
+        fun newInstance(pokemonId: Int) = PokemonDetallesFragment().apply {
             arguments = Bundle().apply {
                 putInt(ARG_POKEMON_ID, pokemonId)
-                putString(ARG_POKEMON_NOMBRE, pokemonNombre)
             }
         }
     }
@@ -51,7 +52,6 @@ class PokemonDetallesFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let { args ->
             args.getInt(ARG_POKEMON_ID).let { viewModel.setPokemonId(it) }
-            args.getString(ARG_POKEMON_NOMBRE)?.let { viewModel.setPokemonNombre(it) }
         }
     }
 
@@ -83,11 +83,14 @@ class PokemonDetallesFragment : Fragment() {
 
 
         observeViewModel()
+        // Obtenemos los detalles del Pokémon
+        viewModel.fetchPokemon()
     }
 
     private fun observeViewModel() {
-        viewModel.pokemonNombre.observe(viewLifecycleOwner) { nombrePokemon ->
-            binding.pokemonDetailsNombre.text = nombrePokemon
+        // Observar el ID del Pokémon y actualizarlo
+        viewModel.idPokemon.observe(viewLifecycleOwner) { idPokemon ->
+            binding.pokemonDetailsId.text = idPokemon.toString()
         }
     }
 

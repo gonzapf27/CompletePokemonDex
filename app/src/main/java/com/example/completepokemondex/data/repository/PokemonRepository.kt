@@ -180,7 +180,7 @@ class PokemonRepository(
                     .flowOn(Dispatchers.IO)
 
     /**
-     * Obtiene los detalles de un Pokémon específico por su ID. Primero intenta obtener los datos de la 
+     * Obtiene los detalles de un Pokémon específico por su ID. Primero intenta obtener los datos de la
      * base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
      *
      * @param id Identificador único del Pokémon
@@ -196,12 +196,12 @@ class PokemonRepository(
                 // Intentar obtener datos de la base de datos local
                 Log.d("PokemonRepository", "Consultando base de datos local para detalles del Pokémon $id...")
                 val localPokemonDetails = pokemonDao.getPokemonById(id)
-                
+
                 if (localPokemonDetails != null) {
                     // Si hay datos en la base de datos local, devolverlos
                     Log.d("PokemonRepository", "📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
                     Log.d("PokemonRepository", "Devolviendo detalles del Pokémon $id de la base de datos local")
-                    
+
                     emit(Resource.Success(localPokemonDetails.pokemonDetailsEntityToDomain()))
                 } else {
                     // Si no hay datos en la base de datos local, obtenerlos de la API
@@ -216,15 +216,15 @@ class PokemonRepository(
                             withContext(Dispatchers.IO) {
                                 Log.d("PokemonRepository", "💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
                                 Log.d("PokemonRepository", "Insertando detalles del Pokémon $id en la base de datos")
-                                
+
                                 pokemonDao.insertPokemonDetails(apiResponse.data.pokemonDetailsDTOToEntity())
-                                
+
                                 Log.d("PokemonRepository", "Datos guardados correctamente en la base de datos local")
                             }
 
                             // Devolver los datos obtenidos de la API
                             Log.d("PokemonRepository", "Devolviendo detalles del Pokémon $id obtenidos de la API")
-                            
+
                             emit(Resource.Success(apiResponse.data.pokemonDetailsDTOToDomain()))
                         }
                         is Resource.Error -> {
