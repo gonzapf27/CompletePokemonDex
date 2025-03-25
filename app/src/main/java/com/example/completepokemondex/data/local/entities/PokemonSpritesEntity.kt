@@ -63,3 +63,18 @@ data class PokemonSpritesEntity(
     @ColumnInfo(name = "front_shiny_female")
     val frontShinyFemale: String?
 )
+
+/**
+ * Clase que contiene solo los campos de sprites para embeber en PokemonDetailsEntity.
+ * Esta clase no es una entidad por sí misma, sino un objeto que se incrustará en otra entidad.
+ */
+data class PokemonSpritesEmbedded(
+    val backDefault: String?,
+    val backFemale: String?,
+    val backShiny: String?,
+    val backShinyFemale: String?,
+    val frontDefault: String?,
+    val frontFemale: String?,
+    val frontShiny: String?,
+    val frontShinyFemale: String?
+)

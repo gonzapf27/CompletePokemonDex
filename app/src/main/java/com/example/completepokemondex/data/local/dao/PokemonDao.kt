@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
 
@@ -49,4 +50,11 @@ interface PokemonDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPokemonDetails(pokemonDetails: PokemonDetailsEntity)
+
+    /**
+     * Obtiene todos los detalles de Pokémon de la base de datos.
+     * Los sprites están embebidos en los resultados.
+     */
+    @Query("SELECT * FROM pokemon_details_table")
+    suspend fun getAllPokemonDetails(): List<PokemonDetailsEntity>
 }

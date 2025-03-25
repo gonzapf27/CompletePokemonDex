@@ -1,8 +1,10 @@
 package com.example.completepokemondex.data.local.entities
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.completepokemondex.data.local.entities.PokemonSpritesEmbedded
 
 /**
  * Entidad que representa un elemento individual en la lista de Pokémon.
@@ -12,6 +14,7 @@ import androidx.room.PrimaryKey
  * @property name Nombre del Pokémon.
  * @property height Altura del Pokémon.
  * @property weight Peso del Pokémon.
+ * @property sprites Sprites del Pokémon embebidos en la misma tabla.
  */
 @Entity(tableName = "pokemon_details_table")
 data class PokemonDetailsEntity(
@@ -27,7 +30,7 @@ data class PokemonDetailsEntity(
 
     @ColumnInfo(name = "pokemon_weight")
     val weight: Int,
-
-    @ColumnInfo(name = "pokemon_sprites")
-    val sprites: PokemonSpritesEntity
+    
+    @Embedded(prefix = "sprite_")
+    val sprites: PokemonSpritesEmbedded
 )

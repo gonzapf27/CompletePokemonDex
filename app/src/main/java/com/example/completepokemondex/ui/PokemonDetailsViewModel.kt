@@ -29,29 +29,10 @@ class PokemonDetailsViewModel(private val repository: PokemonRepository) : ViewM
     }
 
     fun loadPokemonDetails(id: Int) {
-        _uiState.value = UiState.Loading
-        fetchPokemonDetails(id)
+        //_uiState.value = UiState.Loading
+        //fetchPokemonDetails(id)
     }
 
 
-    /**
-     * Obtiene el PokémonDetails con el ID especificado del repositorio
-     */
-    private fun fetchPokemonDetails(id: Int) {
-        viewModelScope.launch {
-            repository.getPokemonDetails(id).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        _uiState.value = PokemonDetailsViewModel.UiState.Loading
-                    }
-                    is Resource.Success -> {
-                        _uiState.value = PokemonDetailsViewModel.UiState.Success(result.data)
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = PokemonDetailsViewModel.UiState.Error(result.message, result.data)
-                    }
-                }
-            }
-        }
-    }
+
 }
