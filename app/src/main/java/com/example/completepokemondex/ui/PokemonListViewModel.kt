@@ -76,7 +76,7 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                             when (detailsResource) {
                                 is Resource.Success -> {
                                     // Usar el sprite front_default de manera segura con Elvis operator
-                                    val imageUrl = detailsResource.data.sprites.front_default ?: ""
+                                    val imageUrl = detailsResource.data.sprites?.front_default ?: ""
                                     
                                     // Crear un nuevo objeto PokemonDomain con la URL de la imagen
                                     val pokemonWithImage = pokemon.copy(imageUrl = imageUrl)

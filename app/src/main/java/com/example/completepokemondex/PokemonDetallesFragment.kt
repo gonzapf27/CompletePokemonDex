@@ -100,7 +100,7 @@ class PokemonDetallesFragment : Fragment() {
             // Actualizar imagen
             
             // Usar operadores de navegación segura para evitar NullPointerException
-            val imageUrl = pokemon.sprites.other?.`official-artwork`?.front_default ?: pokemon.sprites.front_default
+            val imageUrl = pokemon.sprites?.other?.`official-artwork`?.front_default ?: pokemon.sprites?.front_default
             // Mostrar los sprites del pokemon por el log
             Log.d("PokemonDetallesFragment", "Sprites: ${pokemon.sprites}")
             
