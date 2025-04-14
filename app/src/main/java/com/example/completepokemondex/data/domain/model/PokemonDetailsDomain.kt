@@ -12,6 +12,7 @@ package com.example.completepokemondex.data.domain.model
  * @property weight Peso del Pokémon (en hectogramos).
  * @property sprites Sprites (imágenes) del Pokémon.
  */
+
 data class PokemonDetailsDomain(
     val abilities: List<Ability>,
     val base_experience: Int,
@@ -97,7 +98,7 @@ data class PokemonDetailsDomain(
         data class VersionGroupDetail(
             val level_learned_at: Int,
             val move_learn_method: MoveLearnMethod,
-            val order: Any?,
+            val order: Int?,
             val version_group: VersionGroup
         ) {
             data class MoveLearnMethod(
@@ -135,20 +136,20 @@ data class PokemonDetailsDomain(
 
     data class Sprites(
         val back_default: String,
-        val back_female: Any?,
+        val back_female: String,
         val back_shiny: String,
-        val back_shiny_female: Any?,
+        val back_shiny_female: String,
         val front_default: String,
-        val front_female: Any?,
+        val front_female: String,
         val front_shiny: String,
-        val front_shiny_female: Any?,
+        val front_shiny_female: String,
         val other: Other,
         val versions: Versions
     ) {
         data class Other(
             val dream_world: DreamWorld,
             val home: Home,
-            val official_artwork: OfficialArtwork,
+            val `official-artwork`: OfficialArtwork,
             val showdown: Showdown
         ) {
             data class DreamWorld(
@@ -158,9 +159,9 @@ data class PokemonDetailsDomain(
 
             data class Home(
                 val front_default: String,
-                val front_female: Any?,
+                val front_female: String,
                 val front_shiny: String,
-                val front_shiny_female: Any?
+                val front_shiny_female: String
             )
 
             data class OfficialArtwork(
@@ -170,28 +171,28 @@ data class PokemonDetailsDomain(
 
             data class Showdown(
                 val back_default: String,
-                val back_female: Any?,
+                val back_female: String,
                 val back_shiny: String,
                 val back_shiny_female: Any?,
                 val front_default: String,
-                val front_female: Any?,
+                val front_female: String,
                 val front_shiny: String,
-                val front_shiny_female: Any?
+                val front_shiny_female: String
             )
         }
 
         data class Versions(
-            val generation_i: GenerationI,
-            val generation_ii: GenerationIi,
-            val generation_iii: GenerationIii,
-            val generation_iv: GenerationIv,
-            val generation_v: GenerationV,
-            val generation_vi: GenerationVi,
-            val generation_vii: GenerationVii,
-            val generation_viii: GenerationViii
+            val `generation-i`: GenerationI,
+            val `generation-ii`: GenerationIi,
+            val `generation-iii`: GenerationIii,
+            val `generation-iv`: GenerationIv,
+            val `generation-v`: GenerationV,
+            val `generation-vi`: GenerationVi,
+            val `generation-vii`: GenerationVii,
+            val `generation-viii`: GenerationViii
         ) {
             data class GenerationI(
-                val red_blue: RedBlue,
+                val `red-blue`: RedBlue,
                 val yellow: Yellow
             ) {
                 data class RedBlue(
@@ -248,8 +249,8 @@ data class PokemonDetailsDomain(
 
             data class GenerationIii(
                 val emerald: Emerald,
-                val firered_leafgreen: FireredLeafgreen,
-                val ruby_sapphire: RubySapphire
+                val `firered-leafgreen`: FireredLeafgreen,
+                val `ruby-sapphire`: RubySapphire
             ) {
                 data class Emerald(
                     val front_default: String,
@@ -272,93 +273,93 @@ data class PokemonDetailsDomain(
             }
 
             data class GenerationIv(
-                val diamond_pearl: DiamondPearl,
-                val heartgold_soulsilver: HeartgoldSoulsilver,
+                val `diamond-pearl`: DiamondPearl,
+                val `heartgold-soulsilver`: HeartgoldSoulsilver,
                 val platinum: Platinum
             ) {
                 data class DiamondPearl(
                     val back_default: String,
-                    val back_female: Any?,
+                    val back_female: String,
                     val back_shiny: String,
-                    val back_shiny_female: Any?,
+                    val back_shiny_female: String,
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
 
                 data class HeartgoldSoulsilver(
                     val back_default: String,
-                    val back_female: Any?,
+                    val back_female: String,
                     val back_shiny: String,
-                    val back_shiny_female: Any?,
+                    val back_shiny_female: String,
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
 
                 data class Platinum(
                     val back_default: String,
-                    val back_female: Any?,
+                    val back_female: String,
                     val back_shiny: String,
-                    val back_shiny_female: Any?,
+                    val back_shiny_female: String,
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
             }
 
             data class GenerationV(
-                val black_white: BlackWhite
+                val `black-white`: BlackWhite
             ) {
                 data class BlackWhite(
                     val animated: Animated,
                     val back_default: String,
-                    val back_female: Any?,
+                    val back_female: String,
                     val back_shiny: String,
-                    val back_shiny_female: Any?,
+                    val back_shiny_female: String,
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 ) {
                     data class Animated(
                         val back_default: String,
-                        val back_female: Any?,
+                        val back_female: String,
                         val back_shiny: String,
-                        val back_shiny_female: Any?,
+                        val back_shiny_female: String,
                         val front_default: String,
-                        val front_female: Any?,
+                        val front_female: String,
                         val front_shiny: String,
-                        val front_shiny_female: Any?
+                        val front_shiny_female: String
                     )
                 }
             }
 
             data class GenerationVi(
-                val omegaruby_alphasapphire: OmegarubyAlphasapphire,
-                val x_y: XY
+                val `omegaruby-alphasapphire`: OmegarubyAlphasapphire,
+                val `x-y`: XY
             ) {
                 data class OmegarubyAlphasapphire(
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
 
                 data class XY(
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
             }
 
             data class GenerationVii(
                 val icons: Icons,
-                val ultra_sun_ultra_moon: UltraSunUltraMoon
+                val `ultra-sun-ultra-moon`: UltraSunUltraMoon
             ) {
                 data class Icons(
                     val front_default: String,
@@ -367,9 +368,9 @@ data class PokemonDetailsDomain(
 
                 data class UltraSunUltraMoon(
                     val front_default: String,
-                    val front_female: Any?,
+                    val front_female: String,
                     val front_shiny: String,
-                    val front_shiny_female: Any?
+                    val front_shiny_female: String
                 )
             }
 
@@ -378,7 +379,7 @@ data class PokemonDetailsDomain(
             ) {
                 data class Icons(
                     val front_default: String,
-                    val front_female: Any?
+                    val front_female: String
                 )
             }
         }

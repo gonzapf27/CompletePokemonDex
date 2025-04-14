@@ -88,25 +88,31 @@ class PokemonDetallesFragment : Fragment() {
         viewModel.fetchPokemon()
     }
 
-   private fun observeViewModel() {
-       // Observar el POkemon details y actualizarlo
-       viewModel.pokemonDetails.observe(viewLifecycleOwner) { pokemon ->
-           // Actualizar ID
-           binding.pokemonDetailsId.text = pokemon.id.toString()
-           // Actualizar Height
-           binding.pokemonDetailsHeight.text = pokemon.height.toString()
-           // Actualizar Weight
-           binding.pokemonDetailsWeight.text = pokemon.weight.toString()
-           // Actualizar imagen
-           val imageUrl = pokemon.sprites.other.official_artwork.front_shiny ?: pokemon.sprites.front_default
-           imageUrl?.let {
-               // Usar Glide para cargar la imagen desde la URL
-               com.bumptech.glide.Glide.with(requireContext())
-                   .load(it)
-                   .into(binding.pokemonImage)
-           }
-       }
-   }
+    private fun observeViewModel() {
+        // Observar el POkemon details y actualizarlo
+        viewModel.pokemonDetails.observe(viewLifecycleOwner) { pokemon ->
+            // Actualizar ID
+            binding.pokemonDetailsId.text = pokemon.id.toString()
+            // Actualizar Height
+            binding.pokemonDetailsHeight.text = pokemon.height.toString()
+            // Actualizar Weight
+            binding.pokemonDetailsWeight.text = pokemon.weight.toString()
+            // Actualizar imagen
+            
+            // Usar operadores de navegación segura para evitar NullPointerException
+            val imageUrl = pokemon.sprites.other?.`official-artwork`?.front_default ?: pokemon.sprites.front_default
+            // Mostrar los sprites del pokemon por el log
+            Log.d("PokemonDetallesFragment", "Sprites: ${pokemon.sprites}")
+            
+            // Si imageUrl no es nulo, cargar la imagen
+            imageUrl?.let {
+                // Usar Glide para cargar la imagen desde la URL
+                com.bumptech.glide.Glide.with(requireContext())
+                    .load(it)
+                    .into(binding.pokemonImage)
+            }
+        }
+    }
 
     /**
      * Se ejecuta cuando la vista del fragmento está siendo destruida.

@@ -75,7 +75,9 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                         repository.getPokemonDetailsById(pokemon.id).collect { detailsResource ->
                             when (detailsResource) {
                                 is Resource.Success -> {
-                                    val imageUrl = detailsResource.data.sprites.front_default
+                                    // Usar el sprite front_default de manera segura con Elvis operator
+                                    val imageUrl = detailsResource.data.sprites.front_default ?: ""
+                                    
                                     // Crear un nuevo objeto PokemonDomain con la URL de la imagen
                                     val pokemonWithImage = pokemon.copy(imageUrl = imageUrl)
                                     
@@ -93,8 +95,10 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                 }
                                 is Resource.Error -> {
                                     synchronized(pokemonWithImages) {
-                                        // Si hay un error, agregar el Pokémon sin imagen
-                                        pokemonWithImages.add(pokemon)
+                                        // Si hay un error, agregar el Pokémon con la imagen front_default
+                                        val defaultImageUrl = detailsResource.data?.sprites?.front_default
+                                        val pokemonWithDefaultImage = pokemon.copy(imageUrl = defaultImageUrl)
+                                        pokemonWithImages.add(pokemonWithDefaultImage)
                                         loadedCount++
                                         
                                         if (loadedCount == pokemons.size) {
@@ -111,8 +115,10 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                         }
                     } catch (e: Exception) {
                         synchronized(pokemonWithImages) {
-                            // Si hay un error, agregar el Pokémon sin imagen
-                            pokemonWithImages.add(pokemon)
+                            // Si hay una excepción, agregar el Pokémon con una imagen predeterminada
+                            val defaultImageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png"
+                            val pokemonWithDefaultImage = pokemon.copy(imageUrl = defaultImageUrl)
+                            pokemonWithImages.add(pokemonWithDefaultImage)
                             loadedCount++
                             
                             if (loadedCount == pokemons.size) {
@@ -120,7 +126,7 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                 _uiState.value = UiState.Success(sortedList)
                             }
                         }
-                        Log.e("PokemonListViewModel", "Error al cargar detalles: ${e.message}")
+                        Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${e.message}")
                     }
                 }
             }

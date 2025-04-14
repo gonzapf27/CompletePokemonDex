@@ -14,6 +14,7 @@ import com.google.gson.annotations.SerializedName
  * @property height Altura del Pokémon (en decímetros).
  * @property weight Peso del Pokémon (en hectogramos).
  */
+
 data class PokemonDetailsDTO(
     @SerializedName("abilities")
     val abilities: List<Ability>,
@@ -147,7 +148,7 @@ data class PokemonDetailsDTO(
             @SerializedName("move_learn_method")
             val moveLearnMethod: MoveLearnMethod,
             @SerializedName("order")
-            val order: Any?,
+            val order: Int?,
             @SerializedName("version_group")
             val versionGroup: VersionGroup
         ) {
@@ -201,19 +202,19 @@ data class PokemonDetailsDTO(
         @SerializedName("back_default")
         val backDefault: String,
         @SerializedName("back_female")
-        val backFemale: Any?,
+        val backFemale: String,
         @SerializedName("back_shiny")
         val backShiny: String,
         @SerializedName("back_shiny_female")
-        val backShinyFemale: Any?,
+        val backShinyFemale: String,
         @SerializedName("front_default")
         val frontDefault: String,
         @SerializedName("front_female")
-        val frontFemale: Any?,
+        val frontFemale: String,
         @SerializedName("front_shiny")
         val frontShiny: String,
         @SerializedName("front_shiny_female")
-        val frontShinyFemale: Any?,
+        val frontShinyFemale: String,
         @SerializedName("other")
         val other: Other,
         @SerializedName("versions")
@@ -240,11 +241,11 @@ data class PokemonDetailsDTO(
                 @SerializedName("front_default")
                 val frontDefault: String,
                 @SerializedName("front_female")
-                val frontFemale: Any?,
+                val frontFemale: String,
                 @SerializedName("front_shiny")
                 val frontShiny: String,
                 @SerializedName("front_shiny_female")
-                val frontShinyFemale: Any?
+                val frontShinyFemale: String
             )
 
             data class OfficialArtwork(
@@ -258,7 +259,7 @@ data class PokemonDetailsDTO(
                 @SerializedName("back_default")
                 val backDefault: String,
                 @SerializedName("back_female")
-                val backFemale: Any?,
+                val backFemale: String,
                 @SerializedName("back_shiny")
                 val backShiny: String,
                 @SerializedName("back_shiny_female")
@@ -266,11 +267,11 @@ data class PokemonDetailsDTO(
                 @SerializedName("front_default")
                 val frontDefault: String,
                 @SerializedName("front_female")
-                val frontFemale: Any?,
+                val frontFemale: String,
                 @SerializedName("front_shiny")
                 val frontShiny: String,
                 @SerializedName("front_shiny_female")
-                val frontShinyFemale: Any?
+                val frontShinyFemale: String
             )
         }
 
@@ -433,57 +434,57 @@ data class PokemonDetailsDTO(
                     @SerializedName("back_default")
                     val backDefault: String,
                     @SerializedName("back_female")
-                    val backFemale: Any?,
+                    val backFemale: String,
                     @SerializedName("back_shiny")
                     val backShiny: String,
                     @SerializedName("back_shiny_female")
-                    val backShinyFemale: Any?,
+                    val backShinyFemale: String,
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
 
                 data class HeartgoldSoulsilver(
                     @SerializedName("back_default")
                     val backDefault: String,
                     @SerializedName("back_female")
-                    val backFemale: Any?,
+                    val backFemale: String,
                     @SerializedName("back_shiny")
                     val backShiny: String,
                     @SerializedName("back_shiny_female")
-                    val backShinyFemale: Any?,
+                    val backShinyFemale: String,
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
 
                 data class Platinum(
                     @SerializedName("back_default")
                     val backDefault: String,
                     @SerializedName("back_female")
-                    val backFemale: Any?,
+                    val backFemale: String,
                     @SerializedName("back_shiny")
                     val backShiny: String,
                     @SerializedName("back_shiny_female")
-                    val backShinyFemale: Any?,
+                    val backShinyFemale: String,
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
             }
 
@@ -497,37 +498,37 @@ data class PokemonDetailsDTO(
                     @SerializedName("back_default")
                     val backDefault: String,
                     @SerializedName("back_female")
-                    val backFemale: Any?,
+                    val backFemale: String,
                     @SerializedName("back_shiny")
                     val backShiny: String,
                     @SerializedName("back_shiny_female")
-                    val backShinyFemale: Any?,
+                    val backShinyFemale: String,
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 ) {
                     data class Animated(
                         @SerializedName("back_default")
                         val backDefault: String,
                         @SerializedName("back_female")
-                        val backFemale: Any?,
+                        val backFemale: String,
                         @SerializedName("back_shiny")
                         val backShiny: String,
                         @SerializedName("back_shiny_female")
-                        val backShinyFemale: Any?,
+                        val backShinyFemale: String,
                         @SerializedName("front_default")
                         val frontDefault: String,
                         @SerializedName("front_female")
-                        val frontFemale: Any?,
+                        val frontFemale: String,
                         @SerializedName("front_shiny")
                         val frontShiny: String,
                         @SerializedName("front_shiny_female")
-                        val frontShinyFemale: Any?
+                        val frontShinyFemale: String
                     )
                 }
             }
@@ -542,22 +543,22 @@ data class PokemonDetailsDTO(
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
 
                 data class XY(
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
             }
 
@@ -578,11 +579,11 @@ data class PokemonDetailsDTO(
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?,
+                    val frontFemale: String,
                     @SerializedName("front_shiny")
                     val frontShiny: String,
                     @SerializedName("front_shiny_female")
-                    val frontShinyFemale: Any?
+                    val frontShinyFemale: String
                 )
             }
 
@@ -594,7 +595,7 @@ data class PokemonDetailsDTO(
                     @SerializedName("front_default")
                     val frontDefault: String,
                     @SerializedName("front_female")
-                    val frontFemale: Any?
+                    val frontFemale: String
                 )
             }
         }

@@ -138,7 +138,7 @@ fun PokemonDetailsDTO.toDomain(): PokemonDetailsDomain {
                     front_shiny = sprites.other.home.frontShiny,
                     front_shiny_female = sprites.other.home.frontShinyFemale
                 ),
-                official_artwork = PokemonDetailsDomain.Sprites.Other.OfficialArtwork(
+                `official-artwork` = PokemonDetailsDomain.Sprites.Other.OfficialArtwork(
                     front_default = sprites.other.officialArtwork.frontDefault,
                     front_shiny = sprites.other.officialArtwork.frontShiny
                 ),
@@ -154,14 +154,14 @@ fun PokemonDetailsDTO.toDomain(): PokemonDetailsDomain {
                 )
             ),
             versions = PokemonDetailsDomain.Sprites.Versions(
-                generation_i = sprites.versions.generationI.toDomain(),
-                generation_ii = sprites.versions.generationIi.toDomain(),
-                generation_iii = sprites.versions.generationIii.toDomain(),
-                generation_iv = sprites.versions.generationIv.toDomain(),
-                generation_v = sprites.versions.generationV.toDomain(),
-                generation_vi = sprites.versions.generationVi.toDomain(),
-                generation_vii = sprites.versions.generationVii.toDomain(),
-                generation_viii = sprites.versions.generationViii.toDomain()
+                `generation-i` = sprites.versions.generationI.toDomain(),
+                `generation-ii` = sprites.versions.generationIi.toDomain(),
+                `generation-iii` = sprites.versions.generationIii.toDomain(),
+                `generation-iv` = sprites.versions.generationIv.toDomain(),
+                `generation-v` = sprites.versions.generationV.toDomain(),
+                `generation-vi` = sprites.versions.generationVi.toDomain(),
+                `generation-vii` = sprites.versions.generationVii.toDomain(),
+                `generation-viii` = sprites.versions.generationViii.toDomain()
             )
         ),
         stats = stats.map { statDTO ->
@@ -194,7 +194,7 @@ fun PokemonDetailsDTO.pokemonDetailsDTOToDomain(): PokemonDetailsDomain = this.t
 
 private fun PokemonDetailsDTO.Sprites.Versions.GenerationI.toDomain() =
     PokemonDetailsDomain.Sprites.Versions.GenerationI(
-        red_blue = PokemonDetailsDomain.Sprites.Versions.GenerationI.RedBlue(
+        `red-blue` = PokemonDetailsDomain.Sprites.Versions.GenerationI.RedBlue(
             back_default = redBlue.backDefault,
             back_gray = redBlue.backGray,
             back_transparent = redBlue.backTransparent,
@@ -246,13 +246,13 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationIii.toDomain() =
             front_default = emerald.frontDefault,
             front_shiny = emerald.frontShiny
         ),
-        firered_leafgreen = PokemonDetailsDomain.Sprites.Versions.GenerationIii.FireredLeafgreen(
+        `firered-leafgreen` = PokemonDetailsDomain.Sprites.Versions.GenerationIii.FireredLeafgreen(
             back_default = fireredLeafgreen.backDefault,
             back_shiny = fireredLeafgreen.backShiny,
             front_default = fireredLeafgreen.frontDefault,
             front_shiny = fireredLeafgreen.frontShiny
         ),
-        ruby_sapphire = PokemonDetailsDomain.Sprites.Versions.GenerationIii.RubySapphire(
+        `ruby-sapphire` = PokemonDetailsDomain.Sprites.Versions.GenerationIii.RubySapphire(
             back_default = rubySapphire.backDefault,
             back_shiny = rubySapphire.backShiny,
             front_default = rubySapphire.frontDefault,
@@ -262,7 +262,7 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationIii.toDomain() =
 
 private fun PokemonDetailsDTO.Sprites.Versions.GenerationIv.toDomain() =
     PokemonDetailsDomain.Sprites.Versions.GenerationIv(
-        diamond_pearl = PokemonDetailsDomain.Sprites.Versions.GenerationIv.DiamondPearl(
+        `diamond-pearl` = PokemonDetailsDomain.Sprites.Versions.GenerationIv.DiamondPearl(
             back_default = diamondPearl.backDefault,
             back_female = diamondPearl.backFemale,
             back_shiny = diamondPearl.backShiny,
@@ -272,7 +272,7 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationIv.toDomain() =
             front_shiny = diamondPearl.frontShiny,
             front_shiny_female = diamondPearl.frontShinyFemale
         ),
-        heartgold_soulsilver = PokemonDetailsDomain.Sprites.Versions.GenerationIv.HeartgoldSoulsilver(
+        `heartgold-soulsilver` = PokemonDetailsDomain.Sprites.Versions.GenerationIv.HeartgoldSoulsilver(
             back_default = heartgoldSoulsilver.backDefault,
             back_female = heartgoldSoulsilver.backFemale,
             back_shiny = heartgoldSoulsilver.backShiny,
@@ -296,7 +296,7 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationIv.toDomain() =
 
 private fun PokemonDetailsDTO.Sprites.Versions.GenerationV.toDomain() =
     PokemonDetailsDomain.Sprites.Versions.GenerationV(
-        black_white = PokemonDetailsDomain.Sprites.Versions.GenerationV.BlackWhite(
+        `black-white` = PokemonDetailsDomain.Sprites.Versions.GenerationV.BlackWhite(
             animated = PokemonDetailsDomain.Sprites.Versions.GenerationV.BlackWhite.Animated(
                 back_default = blackWhite.animated.backDefault,
                 back_female = blackWhite.animated.backFemale,
@@ -320,13 +320,13 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationV.toDomain() =
 
 private fun PokemonDetailsDTO.Sprites.Versions.GenerationVi.toDomain() =
     PokemonDetailsDomain.Sprites.Versions.GenerationVi(
-        omegaruby_alphasapphire = PokemonDetailsDomain.Sprites.Versions.GenerationVi.OmegarubyAlphasapphire(
+        `omegaruby-alphasapphire` = PokemonDetailsDomain.Sprites.Versions.GenerationVi.OmegarubyAlphasapphire(
             front_default = omegarubyAlphasapphire.frontDefault,
             front_female = omegarubyAlphasapphire.frontFemale,
             front_shiny = omegarubyAlphasapphire.frontShiny,
             front_shiny_female = omegarubyAlphasapphire.frontShinyFemale
         ),
-        x_y = PokemonDetailsDomain.Sprites.Versions.GenerationVi.XY(
+        `x-y` = PokemonDetailsDomain.Sprites.Versions.GenerationVi.XY(
             front_default = xY.frontDefault,
             front_female = xY.frontFemale,
             front_shiny = xY.frontShiny,
@@ -340,7 +340,7 @@ private fun PokemonDetailsDTO.Sprites.Versions.GenerationVii.toDomain() =
             front_default = icons.frontDefault,
             front_female = icons.frontFemale
         ),
-        ultra_sun_ultra_moon = PokemonDetailsDomain.Sprites.Versions.GenerationVii.UltraSunUltraMoon(
+        `ultra-sun-ultra-moon` = PokemonDetailsDomain.Sprites.Versions.GenerationVii.UltraSunUltraMoon(
             front_default = ultraSunUltraMoon.frontDefault,
             front_female = ultraSunUltraMoon.frontFemale,
             front_shiny = ultraSunUltraMoon.frontShiny,
