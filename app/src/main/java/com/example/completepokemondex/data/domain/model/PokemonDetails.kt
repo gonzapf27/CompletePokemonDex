@@ -1,18 +1,6 @@
 package com.example.completepokemondex.data.domain.model
 
-/**
- * Modelo de dominio que representa los detalles de un Pokémon.
- * 
- * Esta clase proporciona una representación limpia y específica de dominio para los detalles
- * de un Pokémon, abstrayendo los detalles de implementación de la capa de datos.
- * 
- * @property id Identificador único del Pokémon.
- * @property name Nombre del Pokémon con primera letra en mayúscula.
- * @property height Altura del Pokémon (en decímetros).
- * @property weight Peso del Pokémon (en hectogramos).
- * @property sprites Sprites (imágenes) del Pokémon.
- */
-data class PokemonDetailsDomain(
+data class PokemonDetails(
     val abilities: List<Ability>,
     val base_experience: Int,
     val cries: Cries,
@@ -338,7 +326,7 @@ data class PokemonDetailsDomain(
             }
 
             data class GenerationVi(
-                val omegaruby_alphasapphire: OmegarubyAlphasapphire,
+                val omega_ruby_alpha_sapphire: OmegarubyAlphasapphire,
                 val x_y: XY
             ) {
                 data class OmegarubyAlphasapphire(

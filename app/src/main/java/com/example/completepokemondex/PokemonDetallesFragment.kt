@@ -98,7 +98,7 @@ class PokemonDetallesFragment : Fragment() {
            // Actualizar Weight
            binding.pokemonDetailsWeight.text = pokemon.weight.toString()
            // Actualizar imagen
-           val imageUrl = pokemon.sprites.officialArtworkShiny ?: pokemon.sprites.frontDefault
+           val imageUrl = pokemon.sprites.other.official_artwork.front_shiny ?: pokemon.sprites.front_default
            imageUrl?.let {
                // Usar Glide para cargar la imagen desde la URL
                com.bumptech.glide.Glide.with(requireContext())

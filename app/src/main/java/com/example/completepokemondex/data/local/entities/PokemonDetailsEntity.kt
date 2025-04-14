@@ -1,21 +1,9 @@
 package com.example.completepokemondex.data.local.entities
 
 import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.completepokemondex.data.local.entities.PokemonSpritesEmbedded
 
-/**
- * Entidad que representa un elemento individual en la lista de Pokémon.
- * Esta entidad almacena la información básica de un Pokémon desde la vista de lista.
- *
- * @property id Identificador único del Pokémon en la base de datos.
- * @property name Nombre del Pokémon.
- * @property height Altura del Pokémon.
- * @property weight Peso del Pokémon.
- * @property sprites Sprites del Pokémon embebidos en la misma tabla.
- */
 @Entity(tableName = "pokemon_details_table")
 data class PokemonDetailsEntity(
     @PrimaryKey
@@ -30,7 +18,52 @@ data class PokemonDetailsEntity(
 
     @ColumnInfo(name = "pokemon_weight")
     val weight: Int,
-    
-    @Embedded(prefix = "sprite_")
-    val sprites: PokemonSpritesEmbedded
+
+    @ColumnInfo(name = "base_experience")
+    val baseExperience: Int,
+
+    @ColumnInfo(name = "is_default")
+    val isDefault: Boolean,
+
+    @ColumnInfo(name = "location_area_encounters")
+    val locationAreaEncounters: String,
+
+    @ColumnInfo(name = "order")
+    val order: Int,
+
+    @ColumnInfo(name = "abilities")
+    val abilities: String, // JSON serializado
+
+    @ColumnInfo(name = "cries")
+    val cries: String, // JSON serializado
+
+    @ColumnInfo(name = "forms")
+    val forms: String, // JSON serializado
+
+    @ColumnInfo(name = "game_indices")
+    val gameIndices: String, // JSON serializado
+
+    @ColumnInfo(name = "held_items")
+    val heldItems: String, // JSON serializado
+
+    @ColumnInfo(name = "moves")
+    val moves: String, // JSON serializado
+
+    @ColumnInfo(name = "past_abilities")
+    val pastAbilities: String, // JSON serializado
+
+    @ColumnInfo(name = "past_types")
+    val pastTypes: String, // JSON serializado
+
+    @ColumnInfo(name = "species")
+    val species: String, // JSON serializado
+
+    @ColumnInfo(name = "sprites")
+    val sprites: String, // JSON serializado
+
+    @ColumnInfo(name = "stats")
+    val stats: String, // JSON serializado
+
+    @ColumnInfo(name = "types")
+    val types: String // JSON serializado
 )

@@ -75,7 +75,7 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                         repository.getPokemonDetailsById(pokemon.id).collect { detailsResource ->
                             when (detailsResource) {
                                 is Resource.Success -> {
-                                    val imageUrl = detailsResource.data.sprites.frontDefault
+                                    val imageUrl = detailsResource.data.sprites.front_default
                                     // Crear un nuevo objeto PokemonDomain con la URL de la imagen
                                     val pokemonWithImage = pokemon.copy(imageUrl = imageUrl)
                                     

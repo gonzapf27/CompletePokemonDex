@@ -6,5 +6,6 @@ package com.example.completepokemondex.data.domain.model
 data class PokemonDomain(
     val id: Int,
     val name: String,
+    val url: String,
     val imageUrl: String? = null  // URL de la imagen del Pokémon (frontDefault sprite)
 )
