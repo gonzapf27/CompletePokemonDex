@@ -1,14 +1,14 @@
 package com.example.completepokemondex.data.repository
 
 import android.util.Log
-import com.example.completepokemondex.data.domain.PokemonDTOToEntityList
+import com.example.completepokemondex.data.PokemonDTOToEntityList
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
-import com.example.completepokemondex.data.domain.pokemonDTOToDomainList
-import com.example.completepokemondex.data.domain.pokemonDetailsDTOToDomain
-import com.example.completepokemondex.data.domain.pokemonDetailsDTOToEntity
-import com.example.completepokemondex.data.domain.pokemonDetailsEntityToDomain
-import com.example.completepokemondex.data.domain.pokemonEntityToDomainList
+import com.example.completepokemondex.data.pokemonDTOToDomainList
+import com.example.completepokemondex.data.pokemonDetailsDTOToDomain
+import com.example.completepokemondex.data.pokemonDetailsDTOToEntity
+import com.example.completepokemondex.data.pokemonDetailsEntityToDomain
+import com.example.completepokemondex.data.pokemonEntityToDomainList
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource

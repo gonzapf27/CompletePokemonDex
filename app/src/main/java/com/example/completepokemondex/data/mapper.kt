@@ -1,4 +1,4 @@
-package com.example.completepokemondex.data.domain
+package com.example.completepokemondex.data
 
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
