@@ -1,4 +1,4 @@
-package com.example.completepokemondex.domain.model
+package com.example.completepokemondex.data.domain.model
 
 /**
  * Modelo de dominio que representa los detalles de un Pokémon.

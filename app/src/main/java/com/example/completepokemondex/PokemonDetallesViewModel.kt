@@ -9,7 +9,7 @@ import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
-import com.example.completepokemondex.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import kotlinx.coroutines.launch
 
 /**

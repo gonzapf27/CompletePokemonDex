@@ -1,4 +1,4 @@
-package com.example.completepokemondex.domain.model
+package com.example.completepokemondex.data.domain.model
 
 /**
  * Modelo de dominio para un Pokémon básico en la lista

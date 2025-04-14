@@ -1,4 +1,4 @@
-package com.example.completepokemondex.domain.usecases
+package com.example.completepokemondex.data.domain.usecases
 
 import com.example.completepokemondex.data.repository.PokemonRepository
 

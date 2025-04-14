@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.completepokemondex.R
-import com.example.completepokemondex.domain.model.PokemonDomain
+import com.example.completepokemondex.data.domain.model.PokemonDomain
 
 /**
  * Adaptador para mostrar la lista de Pokémon en un RecyclerView

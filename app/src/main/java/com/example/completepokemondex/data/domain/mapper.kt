@@ -1,4 +1,4 @@
-package com.example.completepokemondex.domain
+package com.example.completepokemondex.data.domain
 
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
@@ -6,9 +6,9 @@ import com.example.completepokemondex.data.local.entities.PokemonSpritesEmbedded
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpritesDTO
-import com.example.completepokemondex.domain.model.PokemonDetailsDomain
-import com.example.completepokemondex.domain.model.PokemonDomain
-import com.example.completepokemondex.domain.model.PokemonSpritesDomain
+import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.data.domain.model.PokemonDomain
+import com.example.completepokemondex.data.domain.model.PokemonSpritesDomain
 
 /**
  * Extrae el ID del Pokémon a partir de la URL proporcionada por la API.
