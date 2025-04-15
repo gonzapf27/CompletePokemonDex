@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,20 +59,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:background="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:background="@android:color/transparent">
 
-                    <TextView
+                <TextView
                         android:id="@+id/pokemon_details_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="20sp"
+                    android:background="@android:color/transparent"
                         tools:text="#001" />
 
                     <TextView
@@ -82,6 +85,7 @@
                         android:layout_marginStart="8dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
                         android:textStyle="bold"
+                        android:background="@android:color/transparent"
                         tools:text="Bulbasaur" />
                 </LinearLayout>
 
@@ -103,6 +107,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -110,18 +115,21 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:background="@android:color/transparent"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/pokemon_height"
+                            android:background="@android:color/transparent"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/pokemon_details_height"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
                             tools:text="0.7 m" />
                     </LinearLayout>
 
@@ -130,18 +138,21 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:background="@android:color/transparent"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/pokemon_weight"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:background="@android:color/transparent"/>
 
                         <TextView
                             android:id="@+id/pokemon_details_weight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
                             tools:text="6.9 kg" />
                     </LinearLayout>
                 </LinearLayout>
@@ -153,7 +164,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -210,7 +221,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
