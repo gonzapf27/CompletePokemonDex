@@ -11,7 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.completepokemondex.PokemonDetallesFragment
+import com.example.completepokemondex.PokemonDetallesMainFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonListBinding
@@ -88,7 +88,7 @@ class PokemonListFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         adapter = PokemonListAdapter { pokemon ->
-            val fragmentoDetalles = PokemonDetallesFragment.newInstance(pokemon.id)
+            val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
                 .addToBackStack(null)
