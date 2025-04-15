@@ -89,6 +89,7 @@ class PokemonDetallesFragment : Fragment() {
      * - Indicador de carga
      * - Detalles del Pokémon (ID, nombre, altura, peso)
      * - Imagen del Pokémon
+     * - Fondo gradiente dinámico
      * - Chips de tipos del Pokémon
      *
      * @param view La vista del fragmento que fue creada
@@ -105,10 +106,24 @@ class PokemonDetallesFragment : Fragment() {
 
             // Imagen
             state.imageUrl?.let {
+                // Asegura fondo transparente antes de cargar la imagen
+                binding.pokemonImage.setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 com.bumptech.glide.Glide.with(requireContext())
                     .load(it)
                     .into(binding.pokemonImage)
             }
+
+            // Fondo gradiente para todo el fragmento
+            val gradientBg = binding.pokemonFragmentGradientBg
+            val mainTypeColor = state.types.firstOrNull()?.color ?: android.graphics.Color.LTGRAY
+            val isDark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            val endColor = if (isDark) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+            val gradientDrawable = android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(mainTypeColor, endColor)
+            )
+            gradientDrawable.cornerRadius = 0f
+            gradientBg.background = gradientDrawable
 
             // Chips de tipos
             binding.pokemonTypeChips.removeAllViews()
