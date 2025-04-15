@@ -139,8 +139,9 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(PokemonListViewModel::class.java)) {
                 val pokemonDao = database.pokemonDao()
+                val pokemonDetailsDao = database.pokemonDetailsDao()
                 val remoteDataSource = PokemonRemoteDataSource()
-                val repository = PokemonRepository(pokemonDao, remoteDataSource)
+                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, remoteDataSource)
                 return PokemonListViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

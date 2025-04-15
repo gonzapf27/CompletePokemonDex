@@ -35,10 +35,11 @@ class MainActivity : AppCompatActivity() {
 
         // Inicializar repository manualmente
         val pokemonDao = PokedexDatabase.Companion.getDatabase(applicationContext).pokemonDao()
+        val pokemonDetailsDao =
+            PokedexDatabase.Companion.getDatabase(applicationContext).pokemonDetailsDao()
         val remoteDataSource = PokemonRemoteDataSource()
-        pokemonRepository = PokemonRepository(pokemonDao, remoteDataSource)
-
-
+        pokemonRepository =
+            PokemonRepository(pokemonDao, pokemonDetailsDao, remoteDataSource)
     }
 
     /**

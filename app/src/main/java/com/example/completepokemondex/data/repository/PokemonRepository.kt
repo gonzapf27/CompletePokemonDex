@@ -10,6 +10,7 @@ import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToEntity
 import com.example.completepokemondex.data.mapping.pokemonDetailsEntityToDomain
 import com.example.completepokemondex.data.mapping.pokemonEntityToDomainList
 import com.example.completepokemondex.data.local.dao.PokemonDao
+import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,7 @@ import kotlinx.coroutines.withContext
  */
 class PokemonRepository(
     private val pokemonDao: PokemonDao,
+    private val pokemonDetailsDao: PokemonDetailsDao,
     private val remoteDataSource: PokemonRemoteDataSource
 ) {
     /**
@@ -195,7 +197,7 @@ class PokemonRepository(
             try {
                 // Intentar obtener datos de la base de datos local
                 Log.d("PokemonRepository", "Consultando base de datos local para detalles del Pokémon $id...")
-                val localPokemonDetails = pokemonDao.getPokemonById(id)
+                val localPokemonDetails = pokemonDetailsDao.getPokemonById(id)
 
                 if (localPokemonDetails != null) {
                     // Si hay datos en la base de datos local, devolverlos
@@ -216,9 +218,7 @@ class PokemonRepository(
                             withContext(Dispatchers.IO) {
                                 Log.d("PokemonRepository", "💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
                                 Log.d("PokemonRepository", "Insertando detalles del Pokémon $id en la base de datos")
-
-                                pokemonDao.insertPokemonDetails(apiResponse.data.pokemonDetailsDTOToEntity())
-
+                                pokemonDetailsDao.insertPokemonDetails(apiResponse.data.pokemonDetailsDTOToEntity())
                                 Log.d("PokemonRepository", "Datos guardados correctamente en la base de datos local")
                             }
 
