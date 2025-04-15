@@ -7,5 +7,6 @@ data class PokemonDomain(
     val id: Int,
     val name: String,
     val url: String,
-    val imageUrl: String? = null  // URL de la imagen del Pokémon (frontDefault sprite)
+    val imageUrl: String? = null,  // URL de la imagen del Pokémon (frontDefault sprite)
+    val favorite: Boolean = false  // Nuevo campo para favorito
 )

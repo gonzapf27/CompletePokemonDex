@@ -22,6 +22,7 @@ import com.example.completepokemondex.util.PokemonTypeUtil
  */
 class PokemonListAdapter(
     private val onItemClicked: (PokemonDomain) -> Unit,
+    private val onFavoriteClicked: (PokemonDomain) -> Unit, // Nuevo callback
     private var pokemonTypes: Map<Int, List<String>> = emptyMap()
 ) : 
     ListAdapter<PokemonDomain, PokemonListAdapter.PokemonViewHolder>(PokemonDiffCallback) {
@@ -34,7 +35,7 @@ class PokemonListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_pokemon, parent, false)
-        return PokemonViewHolder(view, onItemClicked)
+        return PokemonViewHolder(view, onItemClicked, onFavoriteClicked)
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
@@ -45,12 +46,14 @@ class PokemonListAdapter(
 
     class PokemonViewHolder(
         itemView: View,
-        private val onItemClicked: (PokemonDomain) -> Unit
+        private val onItemClicked: (PokemonDomain) -> Unit,
+        private val onFavoriteClicked: (PokemonDomain) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
         private val nameTextView: TextView = itemView.findViewById(R.id.pokemon_name)
         private val idTextView: TextView = itemView.findViewById(R.id.pokemon_id)
         private val imageView: ImageView = itemView.findViewById(R.id.pokemon_list_image)
         private val cardView: CardView = itemView as CardView
+        private val favoriteButton: ImageView = itemView.findViewById(R.id.favorite_button)
 
         fun bind(pokemon: PokemonDomain, types: List<String>?) {
             nameTextView.text = pokemon.name
@@ -83,6 +86,16 @@ class PokemonListAdapter(
             gradientDrawable.cornerRadius = cardView.radius
             cardView.background = gradientDrawable
             
+            // Estado del icono de favorito
+            if (pokemon.favorite) {
+                favoriteButton.setImageResource(R.drawable.ic_star_filled_red)
+            } else {
+                favoriteButton.setImageResource(R.drawable.ic_star_outline)
+            }
+            favoriteButton.setOnClickListener {
+                onFavoriteClicked(pokemon)
+            }
+
             itemView.setOnClickListener {
                 onItemClicked(pokemon)
             }

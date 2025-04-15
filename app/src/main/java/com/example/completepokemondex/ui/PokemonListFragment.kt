@@ -100,12 +100,15 @@ class PokemonListFragment : Fragment() {
     private fun setupPokemonRecyclerView() {
         pokemonAdapter = PokemonListAdapter(
             onItemClicked = { pokemon ->
-            val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView, fragmentoDetalles)
-                .addToBackStack(null)
-                .commit()
-        }
+                val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView, fragmentoDetalles)
+                    .addToBackStack(null)
+                    .commit()
+            },
+            onFavoriteClicked = { pokemon ->
+                viewModel.toggleFavorite(pokemon)
+            }
         )
 
         binding.pokemonListRecyclerView.adapter = pokemonAdapter

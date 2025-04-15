@@ -261,6 +261,19 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         }
     }
 
+    /** Marca o desmarca un Pokémon como favorito */
+    fun toggleFavorite(pokemon: PokemonDomain) {
+        viewModelScope.launch {
+            val newFavorite = !pokemon.favorite
+            repository.updatePokemonFavorite(pokemon.id, newFavorite)
+            // Actualizar la lista en memoria
+            allPokemonList = allPokemonList.map {
+                if (it.id == pokemon.id) it.copy(favorite = newFavorite) else it
+            }
+            applyFilters()
+        }
+    }
+
     /** Exponer el mapa de tipos de Pokémon */
     fun getPokemonTypesMap(): Map<Int, List<String>> = pokemonTypes.toMap()
 

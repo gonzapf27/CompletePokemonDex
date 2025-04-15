@@ -11,18 +11,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="12dp">
 
         <ImageView
             android:id="@+id/pokemon_list_image"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:scaleType="fitCenter"
             android:contentDescription="Pokémon sprite"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:src="@tools:sample/avatars" />
 
         <TextView
@@ -30,51 +30,54 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
             app:layout_constraintEnd_toStartOf="@id/pokemon_id"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Bulbasaur" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/type_chips_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/pokemon_name"
-            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
             android:layout_marginStart="12dp"
             android:layout_marginTop="4dp"
+            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
+            app:layout_constraintTop_toBottomOf="@id/pokemon_name"
             app:singleLine="true" />
 
         <TextView
             android:id="@+id/pokemon_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#80FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#80FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:text="#001" />
 
         <ImageButton
             android:id="@+id/favorite_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Favorite Button"
             android:src="@android:drawable/btn_star"
             android:tint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/pokemon_id"
             app:layout_constraintTop_toBottomOf="@id/pokemon_name"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Favorite Button" />
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

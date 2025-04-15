@@ -42,7 +42,8 @@ fun List<PokemonEntity>.pokemonEntityToDomainList(): List<PokemonDomain> {
             id = pokemonEntity.id,
             name = pokemonEntity.name.replaceFirstChar { it.uppercase() }, // Capitalizar primera letra
             url = pokemonEntity.url,
-            imageUrl = null // Se llenará después al cargar las imágenes
+            imageUrl = null, // Se llenará después al cargar las imágenes
+            favorite = pokemonEntity.favorite // Mapear el campo favorite
         )
     }
 }
@@ -56,9 +57,10 @@ fun List<PokemonDTO>.pokemonDTOToDomainList(): List<PokemonDomain> {
     return this.map { pokemonDTO ->
         PokemonDomain(
             id = pokemonDTO.extractId(),
-            name = pokemonDTO.name.replaceFirstChar { it.uppercase() }, // Capitalizar primera letra
+            name = pokemonDTO.name.replaceFirstChar { it.uppercase() },
             url = pokemonDTO.url,
-            imageUrl = null // Se llenará después al cargar las imágenes
+            imageUrl = null,
+            favorite = false // Por defecto, los de la API no son favoritos
         )
     }
 }
