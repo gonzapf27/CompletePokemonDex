@@ -95,19 +95,40 @@ class PokemonInfoFragment : Fragment() {
                 Triple(binding.habilidadCard2, binding.habilidadNombre2, binding.habilidadDesc2),
                 Triple(binding.habilidadCard3, binding.habilidadNombre3, binding.habilidadDesc3)
             )
-            habilidadCards.forEach { (card, nombre, desc) ->
-                card.visibility = View.GONE
+            habilidadCards.forEach { triple ->
+                triple.first.visibility = View.GONE
             }
             state.habilidades.take(3).forEachIndexed { idx, habilidad ->
-                val (card, nombre, desc) = habilidadCards[idx]
-                card.visibility = View.VISIBLE
-                nombre.text = habilidad.nombre
-                desc.text = habilidad.descripcion
-                desc.visibility = if (habilidad.descripcion.isNotBlank()) View.VISIBLE else View.GONE
+                val triple = habilidadCards[idx]
+                triple.first.visibility = View.VISIBLE
+                triple.second.text = habilidad.nombre
+                triple.third.text = habilidad.descripcion
+                triple.third.visibility = if (habilidad.descripcion.isNotBlank()) View.VISIBLE else View.GONE
             }
 
             // Descripción
             binding.pokemonDetailsDescription.text = state.descripcion
+
+            // Mostrar tasa de captura + dificultad
+            val captureRateText = state.captureRate?.toString() ?: "?"
+            val difficultyText = state.captureRate?.let {
+                com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain(
+                    capture_rate = it,
+                    base_happiness = null, color = null, egg_groups = null, evolution_chain = null,
+                    evolves_from_species = null, flavor_text_entries = null, form_descriptions = null,
+                    forms_switchable = null, gender_rate = null, genera = null, generation = null,
+                    growth_rate = null, habitat = null, has_gender_differences = null, hatch_counter = null,
+                    id = null, is_baby = null, is_legendary = null, is_mythical = null, name = null,
+                    names = null, order = null, pal_park_encounters = null, pokedex_numbers = null,
+                    shape = null, varieties = null
+                ).getCaptureDifficulty()
+            } ?: ""
+            binding.pokemonCaptureRate.text =
+                if (difficultyText.isNotBlank())
+                    "$captureRateText  •  $difficultyText"
+                else
+                    captureRateText
+
         }
         // Listener para marcar/desmarcar favorito
         binding.btnFavorite.setOnClickListener {

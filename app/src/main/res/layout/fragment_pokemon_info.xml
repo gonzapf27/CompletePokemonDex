@@ -191,6 +191,78 @@
                 android:gravity="start"
                 tools:text="Este Pokémon tiene una semilla en su lomo desde que nace. La semilla crece poco a poco." />
 
+            <!-- Card para ratio de captura (ahora igual que habilidades) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:strokeColor="@color/stroke_card_abilities"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <!-- Etiqueta de ratio de captura -->
+                    <TextView
+                        android:id="@+id/pokemon_capture_rate_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ratio de captura"
+                        android:textStyle="bold"
+                        android:textColor="@color/label_text"
+                        android:textSize="16sp"
+                        android:background="@android:color/transparent"
+                        />
+
+                    <!-- Explicación de ratio de captura -->
+                    <TextView
+                        android:id="@+id/pokemon_capture_rate_explanation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Indica la facilidad o dificultad para atrapar este Pokémon. Cuanto mayor es el número, más fácil es capturarlo."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp"
+                        android:background="@android:color/transparent"
+                        />
+
+                    <!-- Tasa de captura -->
+                    <LinearLayout
+                        android:id="@+id/pokemon_capture_rate_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="10dp"
+                        android:layout_gravity="center_horizontal">
+
+                        <ImageView
+                            android:id="@+id/pokeball_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_pokeball" />
+
+                        <TextView
+                            android:id="@+id/pokemon_capture_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="45 - Dificil"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="18sp"
+                            android:layout_marginStart="10dp"
+                            android:textStyle="italic"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Habilidades -->
             <TextView
                 android:id="@+id/pokemon_abilities_label"

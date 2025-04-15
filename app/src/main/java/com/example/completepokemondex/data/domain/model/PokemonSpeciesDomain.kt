@@ -4,10 +4,10 @@ data class PokemonSpeciesDomain(
     val base_happiness: Int?,
     val capture_rate: Int?,
     val color: Color?,
-    val egg_groups: List<EggGroup?>?,
-    val evolution_chain: EvolutionChain?,
-    val evolves_from_species: EvolvesFromSpecies?,
-    val flavor_text_entries: List<FlavorTextEntry?>?,
+    val egg_groups: List<PokemonSpeciesDomain.EggGroup?>?,
+    val evolution_chain: PokemonSpeciesDomain.EvolutionChain?,
+    val evolves_from_species: PokemonSpeciesDomain.EvolvesFromSpecies?,
+    val flavor_text_entries: List<PokemonSpeciesDomain.FlavorTextEntry?>?,
     val form_descriptions: List<Any?>?,
     val forms_switchable: Boolean?,
     val gender_rate: Int?,
@@ -29,6 +29,18 @@ data class PokemonSpeciesDomain(
     val shape: Shape?,
     val varieties: List<Variety?>?
 ) {
+    fun getCaptureDifficulty(): String {
+        return when {
+            capture_rate == 255 || capture_rate != null && capture_rate > 200 -> "Muy fácil"
+            capture_rate in 120..200 -> "Moderado"
+            capture_rate in 100..119 -> "Fácil"
+            capture_rate in 46..99 -> "Moderado"
+            capture_rate == 45 || capture_rate in 4..44 -> "Difícil"
+            capture_rate == 3 || capture_rate != null && capture_rate <= 3 -> "Extremadamente difícil"
+            else -> "Desconocida"
+        }
+    }
+
     data class Color(
         val name: String?,
         val url: String?

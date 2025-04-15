@@ -23,7 +23,8 @@ data class PokemonDetallesUiState(
     val types: List<PokemonTypeUi> = emptyList(),
     val descripcion: String = "",
     val isFavorite: Boolean = false,
-    val habilidades: List<HabilidadUi> = emptyList() // Nombres y descripciones de habilidades
+    val habilidades: List<HabilidadUi> = emptyList(), // Nombres y descripciones de habilidades
+    val captureRate: Int? = null // Tasa de captura
 )
 
 data class PokemonTypeUi(
@@ -67,8 +68,8 @@ class PokemonDetallesViewModel(
     private fun fetchPokemon(id: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
-            var descripcion = ""
-            var pokemon: PokemonDetailsDomain? = null
+            var descripcion: String
+            var pokemon: PokemonDetailsDomain
 
             pokemonRepository.getPokemonDetailsById(id).collect { result ->
                 when (result) {
@@ -81,9 +82,7 @@ class PokemonDetallesViewModel(
                                     val isFavorite = pokemonRepository.isPokemonFavorite(id)
                                     // Obtener nombres y descripciones localizadas de habilidades
                                     val habilidades = mutableListOf<HabilidadUi>()
-                                    val lang = Locale.getDefault().language
-                                    val isSpanish = lang == "es"
-                                    val abilityList = pokemon?.abilities?.mapNotNull { it?.ability } ?: emptyList()
+                                    val abilityList = pokemon.abilities?.mapNotNull { it?.ability } ?: emptyList()
                                     for (ability in abilityList) {
                                         val abilityId = ability.url?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
                                         if (abilityId != null) {
@@ -91,31 +90,27 @@ class PokemonDetallesViewModel(
                                             abilityResult.collect { abRes ->
                                                 if (abRes is Resource.Success) {
                                                     val abilityData = abRes.data
-                                                    val isSpanish = Locale.getDefault().language == "es"
-
                                                     val localizedName = abilityData.names?.firstOrNull { n ->
-                                                        if (isSpanish) n?.language?.name == "es" else n?.language?.name == "en"
+                                                        val langName = if (Locale.getDefault().language == "es") "es" else "en"
+                                                        n?.language?.name == langName
                                                     }?.name
                                                         ?: abilityData.names?.firstOrNull { n -> n?.language?.name == "en" }?.name
                                                         ?: ability.name?.replaceFirstChar { it.uppercase() }
-
-
                                                     // Buscamos flavor text
                                                     val localizedFlavor = abilityData.flavor_text_entries?.firstOrNull {
-                                                        if (isSpanish) it?.language?.name == "es" else it?.language?.name == "en"
+                                                        val langName = if (Locale.getDefault().language == "es") "es" else "en"
+                                                        it?.language?.name == langName
                                                     }?.flavor_text
                                                         ?: abilityData.flavor_text_entries?.firstOrNull { it?.language?.name == "en" }?.flavor_text
-
-                                                    val descripcion = (localizedFlavor ?: "")
+                                                    val descText = (localizedFlavor ?: "")
                                                         .replace("\n", " ")
                                                         .replace("\u000c", " ")
                                                         .trim()
-
                                                     if (localizedName != null) {
                                                         habilidades.add(
                                                             HabilidadUi(
                                                                 nombre = localizedName.replaceFirstChar { it.uppercase() },
-                                                                descripcion = descripcion
+                                                                descripcion = descText
                                                             )
                                                         )
                                                     }
@@ -127,7 +122,6 @@ class PokemonDetallesViewModel(
                                                         )
                                                     )
                                                 }
-                                                return@collect
                                             }
                                         } else {
                                             habilidades.add(
@@ -140,15 +134,15 @@ class PokemonDetallesViewModel(
                                     }
                                     _uiState.value = PokemonDetallesUiState(
                                         isLoading = false,
-                                        id = pokemon?.id?.toString() ?: "",
-                                        nombre = pokemon?.name?.replaceFirstChar { it.uppercase() } ?: "",
-                                        height = formatHeight(pokemon?.height),
-                                        weight = formatWeight(pokemon?.weight),
-                                        imageUrl = pokemon?.sprites?.other?.`official-artwork`?.front_default
-                                            ?: pokemon?.sprites?.front_default,
-                                        types = pokemon?.types?.mapNotNull { typeInfo ->
+                                        id = pokemon.id?.toString() ?: "",
+                                        nombre = pokemon.name?.replaceFirstChar { it.uppercase() } ?: "",
+                                        height = formatHeight(pokemon.height),
+                                        weight = formatWeight(pokemon.weight),
+                                        imageUrl = pokemon.sprites?.other?.`official-artwork`?.front_default
+                                            ?: pokemon.sprites?.front_default,
+                                        types = pokemon.types?.mapNotNull { typeInfo ->
                                             typeInfo?.type?.name?.let { typeName ->
-                                                val type = PokemonTypeUtil.getTypeByName(typeName)
+                                                val type = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(typeName)
                                                 PokemonTypeUi(
                                                     name = type.name,
                                                     color = type.colorRes,
@@ -158,13 +152,14 @@ class PokemonDetallesViewModel(
                                         } ?: emptyList(),
                                         descripcion = descripcion,
                                         isFavorite = isFavorite,
-                                        habilidades = habilidades
+                                        habilidades = habilidades,
+                                        captureRate = speciesResult.data.capture_rate
                                     )
                                 }
                                 is Resource.Error -> {
                                     _uiState.value = _uiState.value?.copy(
                                         isLoading = false,
-                                        error = speciesResult.message
+                                        error = speciesResult.message ?: "Error al cargar especie"
                                     )
                                 }
                                 is Resource.Loading -> {
@@ -176,7 +171,7 @@ class PokemonDetallesViewModel(
                     is Resource.Error -> {
                         _uiState.value = _uiState.value?.copy(
                             isLoading = false,
-                            error = result.message
+                            error = result.message ?: "Error al cargar Pokémon"
                         )
                     }
                     is Resource.Loading -> {
