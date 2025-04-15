@@ -21,13 +21,19 @@ data class PokemonDetallesUiState(
     val imageUrl: String? = null,
     val types: List<PokemonTypeUi> = emptyList(),
     val descripcion: String = "",
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val habilidades: List<HabilidadUi> = emptyList() // Nombres y descripciones de habilidades
 )
 
 data class PokemonTypeUi(
     val name: String,
     val color: Int,
     val stringRes: Int
+)
+
+data class HabilidadUi(
+    val nombre: String,
+    val descripcion: String
 )
 
 class PokemonDetallesViewModel(
@@ -63,18 +69,74 @@ class PokemonDetallesViewModel(
             var descripcion = ""
             var pokemon: PokemonDetailsDomain? = null
 
-            // Primero obtenemos detalles del Pokémon
             pokemonRepository.getPokemonDetailsById(id).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         pokemon = result.data
-                        // Ahora obtenemos la especie para la descripción
                         pokemonRepository.getPokemonSpeciesById(id).collect { speciesResult ->
                             when (speciesResult) {
                                 is Resource.Success -> {
                                     descripcion = extractFlavorText(speciesResult.data)
-                                    // Obtener si es favorito desde el repositorio/base de datos
                                     val isFavorite = pokemonRepository.isPokemonFavorite(id)
+                                    // Obtener nombres y descripciones localizadas de habilidades
+                                    val habilidades = mutableListOf<HabilidadUi>()
+                                    val lang = Locale.getDefault().language
+                                    val isSpanish = lang == "es"
+                                    val abilityList = pokemon?.abilities?.mapNotNull { it?.ability } ?: emptyList()
+                                    for (ability in abilityList) {
+                                        val abilityId = ability.url?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
+                                        if (abilityId != null) {
+                                            val abilityResult = pokemonRepository.getAbilityById(abilityId)
+                                            abilityResult.collect { abRes ->
+                                                if (abRes is Resource.Success) {
+                                                    val abilityData = abRes.data
+                                                    val isSpanish = Locale.getDefault().language == "es"
+
+                                                    val localizedName = abilityData.names?.firstOrNull { n ->
+                                                        if (isSpanish) n?.language?.name == "es" else n?.language?.name == "en"
+                                                    }?.name
+                                                        ?: abilityData.names?.firstOrNull { n -> n?.language?.name == "en" }?.name
+                                                        ?: ability.name?.replaceFirstChar { it.uppercase() }
+
+
+                                                    // Buscamos flavor text
+                                                    val localizedFlavor = abilityData.flavor_text_entries?.firstOrNull {
+                                                        if (isSpanish) it?.language?.name == "es" else it?.language?.name == "en"
+                                                    }?.flavor_text
+                                                        ?: abilityData.flavor_text_entries?.firstOrNull { it?.language?.name == "en" }?.flavor_text
+
+                                                    val descripcion = (localizedFlavor ?: "")
+                                                        .replace("\n", " ")
+                                                        .replace("\u000c", " ")
+                                                        .trim()
+
+                                                    if (localizedName != null) {
+                                                        habilidades.add(
+                                                            HabilidadUi(
+                                                                nombre = localizedName.replaceFirstChar { it.uppercase() },
+                                                                descripcion = descripcion
+                                                            )
+                                                        )
+                                                    }
+                                                } else if (abRes is Resource.Error) {
+                                                    habilidades.add(
+                                                        HabilidadUi(
+                                                            nombre = ability.name?.replaceFirstChar { it.uppercase() } ?: "",
+                                                            descripcion = ""
+                                                        )
+                                                    )
+                                                }
+                                                return@collect
+                                            }
+                                        } else {
+                                            habilidades.add(
+                                                HabilidadUi(
+                                                    nombre = ability.name?.replaceFirstChar { it.uppercase() } ?: "",
+                                                    descripcion = ""
+                                                )
+                                            )
+                                        }
+                                    }
                                     _uiState.value = PokemonDetallesUiState(
                                         isLoading = false,
                                         id = pokemon?.id?.toString() ?: "",
@@ -93,7 +155,8 @@ class PokemonDetallesViewModel(
                                             }
                                         } ?: emptyList(),
                                         descripcion = descripcion,
-                                        isFavorite = isFavorite
+                                        isFavorite = isFavorite,
+                                        habilidades = habilidades
                                     )
                                 }
                                 is Resource.Error -> {
