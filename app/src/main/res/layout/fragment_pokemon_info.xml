@@ -73,6 +73,18 @@
                     android:textStyle="bold"
                     android:background="@android:color/transparent"
                     tools:text="Bulbasaur" />
+
+                <ImageButton
+                    android:id="@+id/btn_favorite"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/btn_star"
+                    app:tint="@android:color/holo_red_dark"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:padding="12dp" />
             </LinearLayout>
 
             <com.google.android.material.chip.ChipGroup

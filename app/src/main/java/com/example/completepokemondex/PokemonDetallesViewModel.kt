@@ -20,7 +20,8 @@ data class PokemonDetallesUiState(
     val weight: String = "",
     val imageUrl: String? = null,
     val types: List<PokemonTypeUi> = emptyList(),
-    val descripcion: String = ""
+    val descripcion: String = "",
+    val isFavorite: Boolean = false
 )
 
 data class PokemonTypeUi(
@@ -72,6 +73,8 @@ class PokemonDetallesViewModel(
                             when (speciesResult) {
                                 is Resource.Success -> {
                                     descripcion = extractFlavorText(speciesResult.data)
+                                    // Obtener si es favorito desde el repositorio/base de datos
+                                    val isFavorite = pokemonRepository.isPokemonFavorite(id)
                                     _uiState.value = PokemonDetallesUiState(
                                         isLoading = false,
                                         id = pokemon?.id?.toString() ?: "",
@@ -89,7 +92,8 @@ class PokemonDetallesViewModel(
                                                 )
                                             }
                                         } ?: emptyList(),
-                                        descripcion = descripcion
+                                        descripcion = descripcion,
+                                        isFavorite = isFavorite
                                     )
                                 }
                                 is Resource.Error -> {
@@ -237,6 +241,20 @@ class PokemonDetallesViewModel(
     }
 
     /**
+     * Marca o desmarca un Pokémon como favorito.
+     *
+     * @param id El ID del Pokémon a modificar.
+     * @param isFavorite Si el Pokémon debe ser marcado como favorito (true) o no (false).
+     */
+    fun toggleFavorite(id: Int, isFavorite: Boolean) {
+        viewModelScope.launch {
+            pokemonRepository.updatePokemonFavorite(id, isFavorite)
+            // Actualiza el estado localmente para que la UI reaccione sin recargar todo
+            _uiState.value = _uiState.value?.copy(isFavorite = isFavorite)
+        }
+    }
+
+    /**
      * Factory para crear instancias de [PokemonDetallesViewModel].
      * Se encarga de la creación del ViewModel con sus dependencias.
      *
@@ -258,4 +276,6 @@ class PokemonDetallesViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+
+
 }

@@ -33,6 +33,8 @@ class PokemonInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var currentPokemonId: Int? = null
+        var currentIsFavorite: Boolean = false
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             binding.loadingIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
             binding.pokemonDetailsId.text = state.id
@@ -46,6 +48,19 @@ class PokemonInfoFragment : Fragment() {
                     .load(it)
                     .into(binding.pokemonImage)
             }
+            // Cambiar icono de favorito según el estado
+            if (state.isFavorite) {
+                binding.btnFavorite.setImageResource(R.drawable.ic_star_filled_red)
+            } else {
+                binding.btnFavorite.setImageResource(R.drawable.ic_star_outline)
+            }
+            // Animación al cambiar favorito
+            val context = binding.btnFavorite.context
+            val anim = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.favorite_pop)
+            binding.btnFavorite.startAnimation(anim)
+            // Guardar id y estado actual para el click
+            currentPokemonId = state.id.toIntOrNull()
+            currentIsFavorite = state.isFavorite
             // Fondo gradiente
             val gradientBg = binding.pokemonFragmentGradientBg
             val mainTypeColor = state.types.firstOrNull()?.color ?: android.graphics.Color.LTGRAY
@@ -71,6 +86,14 @@ class PokemonInfoFragment : Fragment() {
             }
             // Descripción
             binding.pokemonDetailsDescription.text = state.descripcion
+        }
+        // Listener para marcar/desmarcar favorito
+        binding.btnFavorite.setOnClickListener {
+            val id = currentPokemonId
+            if (id != null) {
+                viewModel.toggleFavorite(id, !currentIsFavorite)
+                // Opcional: puedes mostrar un feedback visual aquí
+            }
         }
     }
 

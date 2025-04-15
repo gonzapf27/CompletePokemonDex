@@ -71,19 +71,19 @@ class PokemonRepository(
                 } else {
                     // Si no hay suficientes datos, obtenerlos de la API
                     logDebug("Datos insuficientes en DB local, consultando API...")
-                    
+
                     handleApiResponse(
                         apiCall = { remoteDataSource.getPokemonList(limit, offset) },
                         onSuccess = { apiResponse ->
                             logDebug("📡 ORIGEN DE DATOS: API REMOTA")
                             logDebug("Recibidos ${apiResponse.size} Pokémon de la API")
-                            
+
                             // Guardar en la base de datos local
                             saveToDatabase {
                                 logDebug("Insertando ${apiResponse.size} Pokémon en la base de datos")
                                 pokemonDao.insertAllPokemon(apiResponse.PokemonDTOToEntityList())
                             }
-                            
+
                             logDebug("Devolviendo ${apiResponse.size} Pokémon obtenidos de la API")
                             emit(Resource.Success(apiResponse.pokemonDTOToDomainList()))
                         },
@@ -92,8 +92,8 @@ class PokemonRepository(
                                 errorMessage = errorMessage,
                                 localData = localPokemon,
                                 transformData = { it.pokemonEntityToDomainList() },
-                                emitResult = { data, message -> 
-                                    emit(Resource.Error(message = message, data = data)) 
+                                emitResult = { data, message ->
+                                    emit(Resource.Error(message = message, data = data))
                                 }
                             )
                         }
@@ -138,13 +138,13 @@ class PokemonRepository(
                             logDebug("📡 ORIGEN DE DATOS: API REMOTA")
                             logDebug("Recibidos detalles del Pokémon $id de la API")
                             logDebug("Datos del pokemon en la API: $apiResponse")
-                            
+
                             // Guardar en la base de datos local
                             saveToDatabase {
                                 logDebug("Insertando detalles del Pokémon $id en la base de datos")
                                 pokemonDetailsDao.insertPokemonDetails(apiResponse.pokemonDetailsDTOToEntity())
                             }
-                            
+
                             logDebug("Devolviendo detalles del Pokémon $id obtenidos de la API")
                             emit(Resource.Success(apiResponse.pokemonDetailsDTOToDomain()))
                         },
@@ -207,9 +207,9 @@ class PokemonRepository(
                 emit(Resource.Error(message = "Error: ${e.message}"))
             }
         }.flowOn(Dispatchers.IO)
-        
+
     // Funciones auxiliares para evitar código repetido
-    
+
     private suspend inline fun <T> handleApiResponse(
         crossinline apiCall: suspend () -> Resource<T>,
         crossinline onSuccess: suspend (T) -> Unit,
@@ -218,10 +218,11 @@ class PokemonRepository(
         when (val response = apiCall()) {
             is Resource.Success -> onSuccess(response.data)
             is Resource.Error -> onError(response.message)
-            is Resource.Loading -> { /* No action needed, already in loading state */ }
+            is Resource.Loading -> { /* No action needed, already in loading state */
+            }
         }
     }
-    
+
     private suspend inline fun <T, R> handleLocalFallback(
         errorMessage: String,
         localData: T,
@@ -242,7 +243,7 @@ class PokemonRepository(
             }
         }
     }
-    
+
     private suspend inline fun saveToDatabase(crossinline block: suspend () -> Unit) {
         withContext(Dispatchers.IO) {
             logDebug("💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
@@ -250,13 +251,33 @@ class PokemonRepository(
             logDebug("Datos guardados correctamente en la base de datos local")
         }
     }
-    
+
     // Funciones de logging para mantener consistencia
     private fun logDebug(message: String) {
         Log.d(tag, message)
     }
-    
+
     private fun logError(message: String) {
         Log.e(tag, message)
+    }
+
+    /**
+     * Actualiza el estado de favorito de un Pokémon en la base de datos local.
+     *
+     * @param pokemonId Identificador único del Pokémon
+     * @param isFavorite Estado de favorito a establecer
+     */
+    suspend fun updatePokemonFavorite(pokemonId: Int, isFavorite: Boolean) {
+        logDebug("Actualizando estado de favorito del Pokémon $pokemonId a $isFavorite")
+        pokemonDao.updatePokemonFavorite(pokemonId, isFavorite)
+        logDebug("Estado de favorito actualizado correctamente")
+    }
+
+    /**
+     * Devuelve si un Pokémon es favorito.
+     */
+    suspend fun isPokemonFavorite(pokemonId: Int): Boolean {
+        val entity = pokemonDao.getPokemonById(pokemonId)
+        return entity?.favorite ?: false
     }
 }

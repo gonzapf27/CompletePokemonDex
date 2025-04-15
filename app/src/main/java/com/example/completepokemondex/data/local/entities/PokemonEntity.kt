@@ -22,5 +22,8 @@ data class PokemonEntity(
     val name: String,
 
     @ColumnInfo(name = "pokemon_url")
-    val url: String
+    val url: String,
+
+    @ColumnInfo(name = "favorite")
+    val favorite: Boolean = false
 )

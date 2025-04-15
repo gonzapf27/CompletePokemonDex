@@ -33,4 +33,21 @@ interface PokemonDao {
     @Query("SELECT * FROM pokemon_table ORDER BY pokemon_id ASC")
     suspend fun getAllPokemon(): List<PokemonEntity>
 
+    /**
+     * Actualiza el estado de favorito de un Pokémon en la base de datos.
+     *
+     * @param pokemonId ID del Pokémon a actualizar.
+     * @param isFavorite Nuevo estado de favorito (true o false).
+     */
+    @Query("UPDATE pokemon_table SET favorite = :isFavorite WHERE pokemon_id = :pokemonId")
+    suspend fun updatePokemonFavorite(pokemonId: Int, isFavorite: Boolean)
+
+    /**
+     * Obtiene un Pokémon específico de la base de datos por su ID.
+     *
+     * @param pokemonId ID del Pokémon a obtener.
+     * @return El Pokémon correspondiente al ID proporcionado.
+     */
+    @Query("SELECT * FROM pokemon_table WHERE pokemon_id = :pokemonId")
+    suspend fun getPokemonById(pokemonId: Int): PokemonEntity?
 }
