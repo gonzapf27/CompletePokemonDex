@@ -50,7 +50,7 @@ class PokemonInfoFragment : Fragment() {
             }
             // Cambiar icono de favorito según el estado
             if (state.isFavorite) {
-                binding.btnFavorite.setImageResource(R.drawable.ic_star_filled_red)
+                binding.btnFavorite.setImageResource(R.drawable.ic_star_filled)
             } else {
                 binding.btnFavorite.setImageResource(R.drawable.ic_star_outline)
             }

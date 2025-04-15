@@ -88,7 +88,7 @@ class PokemonListAdapter(
             
             // Estado del icono de favorito
             if (pokemon.favorite) {
-                favoriteButton.setImageResource(R.drawable.ic_star_filled_red)
+                favoriteButton.setImageResource(R.drawable.ic_star_filled)
             } else {
                 favoriteButton.setImageResource(R.drawable.ic_star_outline)
             }
