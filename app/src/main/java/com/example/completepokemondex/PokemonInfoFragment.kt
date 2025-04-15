@@ -67,7 +67,8 @@ class PokemonInfoFragment : Fragment() {
                 androidx.core.content.ContextCompat.getColor(requireContext(), it.color)
             } ?: android.graphics.Color.LTGRAY
             val isDark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
-            val endColor = if (isDark) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+            // Usar gris claro u oscuro en vez de blanco/negro puro
+            val endColor = if (isDark) 0xFF222222.toInt() else 0xFFF0F0F0.toInt()
             val gradientDrawable = android.graphics.drawable.GradientDrawable(
                 android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
                 intArrayOf(mainTypeColor, endColor)

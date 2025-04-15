@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF101113</color> <!-- Negro moderno, más suave -->
     <color name="white">#FFEDEDED</color> <!-- Blanco moderno, menos brillante -->
-    
+
     <!-- Pokemon Types -->
     <color name="type_all">#A8A8A8</color>  <!-- Gray -->
     <color name="type_normal">#A8A8A8</color>
@@ -29,4 +29,6 @@
     <color name="text_secondary">#FFB0B3B8</color> <!-- Gris claro moderno para texto secundario -->
     <color name="label_text">#FFADB5BD</color> <!-- Gris claro para etiquetas -->
     <color name="title_text">#FFFFFFFF</color> <!-- Blanco puro para títulos -->
+    <color name="pokemon_list_name">#FF212529</color> <!-- Negro profundo para nombres en la lista -->
+    <color name="stroke_card_abilities">#666666</color> <!-- Gris medio para mayor contraste en el tema oscuro -->
 </resources>

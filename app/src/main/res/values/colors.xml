@@ -30,4 +30,5 @@
     <color name="label_text">#FF495057</color> <!-- Gris oscuro para etiquetas -->
     <color name="title_text">#FF212529</color> <!-- Negro profundo para títulos -->
     <color name="pokemon_list_name">#FFECEFF1</color> <!-- Casi blanco para nombres en la lista -->
-    </resources>
+    <color name="stroke_card_abilities">#AAAAAA</color> <!-- Gris medio para mayor contraste en los bordes de tarjetas -->
+</resources>
