@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -79,6 +80,7 @@ class PokemonListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupRecyclerView()
+        setupSearchView()
         observeViewModel()
     }
 
@@ -97,6 +99,28 @@ class PokemonListFragment : Fragment() {
 
         binding.pokemonListRecyclerView.adapter = adapter
         binding.pokemonListRecyclerView.layoutManager = LinearLayoutManager(context)
+    }
+    
+    /**
+     * Configura la barra de búsqueda para filtrar la lista de Pokémon por nombre.
+     */
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.updateSearchQuery(newText ?: "")
+                return true
+            }
+        })
+        
+        // Botón de cierre para limpiar la búsqueda
+        binding.searchView.setOnCloseListener {
+            viewModel.updateSearchQuery("")
+            false
+        }
     }
 
     /**
