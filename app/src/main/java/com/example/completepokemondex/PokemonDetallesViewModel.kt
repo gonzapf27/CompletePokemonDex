@@ -1,91 +1,205 @@
 package com.example.completepokemondex
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import kotlinx.coroutines.launch
+import java.util.Locale
 
-/**
- * ViewModel responsable de gestionar los datos para la vista de detalles de un Pokémon.
- * Maneja la carga de información detallada de un Pokémon específico y el estado de UI asociado.
- *
- * @property pokemonRepository Repositorio que proporciona acceso a los datos de Pokémon.
- */
+data class PokemonDetallesUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val id: String = "",
+    val nombre: String = "",
+    val height: String = "",
+    val weight: String = "",
+    val imageUrl: String? = null,
+    val types: List<PokemonTypeUi> = emptyList()
+)
+
+data class PokemonTypeUi(
+    val name: String,
+    val color: Int,
+    val stringRes: Int
+)
+
 class PokemonDetallesViewModel(
     private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
 
-    /**
-     * ID del Pokémon actual que se está visualizando.
-     * Expuesto como LiveData inmutable para observación externa.
-     */
-    private val _idPokemon = MutableLiveData<Int>()
-    val idPokemon: LiveData<Int> = _idPokemon
+    private val _pokemonId = MutableLiveData<Int>()
+
+    private val _uiState = MutableLiveData(PokemonDetallesUiState())
+    val uiState: LiveData<PokemonDetallesUiState> = _uiState
 
     /**
-     * Detalles del Pokémon cargados.
-     * Expuesto como LiveData inmutable para observación externa.
-     */
-    private val _pokemonDetails = MutableLiveData<PokemonDetailsDomain>()
-    val pokemonDetails: LiveData<PokemonDetailsDomain> = _pokemonDetails
-
-    /**
-     * Estado de carga para mostrar indicadores visuales al usuario.
-     * Expuesto como LiveData inmutable para observación externa.
-     */
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    /**
-     * Mensaje de error en caso de fallo en la carga.
-     * Expuesto como LiveData inmutable para observación externa.
-     */
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
-
-    /**
-     * Establece el ID del Pokémon del que se desean obtener los detalles.
+     * Establece el ID del Pokémon para buscar sus detalles.
      *
-     * @param id El identificador único del Pokémon.
+     * @param id El ID del Pokémon.
      */
     fun setPokemonId(id: Int) {
-        _idPokemon.value = id
+        if (_pokemonId.value == id) return
+        _pokemonId.value = id
+        fetchPokemon(id)
     }
 
     /**
-     * Obtiene los detalles del Pokémon actual desde el repositorio.
-     * Actualiza los estados de carga y error durante el proceso.
+     * Busca y recupera los detalles del Pokémon por su ID.
+     * Actualiza el estado de la UI con los detalles del Pokémon,
+     * incluyendo datos como el nombre, altura, peso, imagen y tipos.
+     *
+     * @param id El ID del Pokémon a buscar.
      */
-    fun fetchPokemon() {
-        val currentId = idPokemon.value ?: return
-
+    private fun fetchPokemon(id: Int) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-
-            pokemonRepository.getPokemonDetailsById(currentId).collect { result ->
+            _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
+            pokemonRepository.getPokemonDetailsById(id).collect { result ->
                 when (result) {
-                    is Resource.Success -> _pokemonDetails.value = result.data
-                    is Resource.Error -> _error.value = result.message
-                    is Resource.Loading -> _isLoading.value = true
+                    is Resource.Success -> {
+                        val pokemon = result.data
+                        _uiState.value = PokemonDetallesUiState(
+                            isLoading = false,
+                            id = pokemon.id.toString(),
+                            nombre = pokemon.name?.replaceFirstChar { it.uppercase() } ?: "",
+                            height = formatHeight(pokemon.height),
+                            weight = formatWeight(pokemon.weight),
+                            imageUrl = pokemon.sprites?.other?.`official-artwork`?.front_default
+                                ?: pokemon.sprites?.front_default,
+                            types = pokemon.types?.mapNotNull { typeInfo ->
+                                typeInfo?.type?.name?.let { typeName ->
+                                    PokemonTypeUi(
+                                        name = typeName,
+                                        color = getColorForPokemonType(typeName),
+                                        stringRes = getStringResourceForPokemonType(typeName)
+                                    )
+                                }
+                            } ?: emptyList()
+                        )
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = _uiState.value?.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _uiState.value = _uiState.value?.copy(isLoading = true)
+                    }
                 }
             }
-            _isLoading.value = false
         }
     }
 
     /**
-     * Factory para crear instancias del ViewModel con el repositorio necesario.
-     * Proporciona el contexto adecuado para la creación del ViewModel.
+     * Formatea la altura del Pokémon según el idioma del dispositivo.
+     * Si el idioma es inglés, la altura se muestra en pulgadas, de lo contrario, en metros.
      *
-     * @property database Base de datos local que se utilizará para acceder a los DAO.
+     * @param heightInDecimeters La altura en decímetros.
+     * @return La altura formateada como una cadena de texto.
+     */
+    private fun formatHeight(heightInDecimeters: Int?): String {
+        if (heightInDecimeters == null) return ""
+        val isEnglish = Locale.getDefault().language == "en"
+        return if (isEnglish) {
+            val heightInInches = heightInDecimeters * 3.93701
+            String.format("%.1f \"", heightInInches)
+        } else {
+            val heightInMeters = heightInDecimeters * 0.1
+            String.format("%.1f m", heightInMeters)
+        }
+    }
+
+    /**
+     * Formatea el peso del Pokémon según el idioma del dispositivo.
+     * Si el idioma es inglés, el peso se muestra en libras, de lo contrario, en kilogramos.
+     *
+     * @param weightInHectograms El peso en hectogramos.
+     * @return El peso formateado como una cadena de texto.
+     */
+    private fun formatWeight(weightInHectograms: Int?): String {
+        if (weightInHectograms == null) return ""
+        val isEnglish = Locale.getDefault().language == "en"
+        return if (isEnglish) {
+            val weightInPounds = weightInHectograms * 0.22046
+            String.format("%.1f lbs", weightInPounds)
+        } else {
+            val weightInKg = weightInHectograms * 0.1
+            String.format("%.1f kg", weightInKg)
+        }
+    }
+
+    /**
+     * Devuelve el recurso de cadena (String Resource) correspondiente al tipo de Pokémon.
+     * Se utiliza para mostrar el nombre del tipo en la UI.
+     *
+     * @param type El nombre del tipo de Pokémon (ej. "fire", "water").
+     * @return El ID del recurso de cadena correspondiente al tipo de Pokémon.
+     */
+    private fun getStringResourceForPokemonType(type: String): Int {
+        return when (type.lowercase()) {
+            "normal" -> R.string.type_normal
+            "fire" -> R.string.type_fire
+            "water" -> R.string.type_water
+            "electric" -> R.string.type_electric
+            "grass" -> R.string.type_grass
+            "ice" -> R.string.type_ice
+            "fighting" -> R.string.type_fighting
+            "poison" -> R.string.type_poison
+            "ground" -> R.string.type_ground
+            "flying" -> R.string.type_flying
+            "psychic" -> R.string.type_psychic
+            "bug" -> R.string.type_bug
+            "rock" -> R.string.type_rock
+            "ghost" -> R.string.type_ghost
+            "dragon" -> R.string.type_dragon
+            "dark" -> R.string.type_dark
+            "steel" -> R.string.type_steel
+            "fairy" -> R.string.type_fairy
+            else -> 0
+        }
+    }
+
+    /**
+     * Devuelve el color asociado al tipo de Pokémon.
+     * Se utiliza para mostrar el color del tipo en la UI.
+     *
+     * @param type El nombre del tipo de Pokémon (ej. "fire", "water").
+     * @return El color correspondiente al tipo de Pokémon.
+     */
+    private fun getColorForPokemonType(type: String): Int {
+        return when (type.lowercase()) {
+            "normal" -> android.graphics.Color.parseColor("#A8A878")
+            "fire" -> android.graphics.Color.parseColor("#F08030")
+            "water" -> android.graphics.Color.parseColor("#6890F0")
+            "electric" -> android.graphics.Color.parseColor("#F8D030")
+            "grass" -> android.graphics.Color.parseColor("#78C850")
+            "ice" -> android.graphics.Color.parseColor("#98D8D8")
+            "fighting" -> android.graphics.Color.parseColor("#C03028")
+            "poison" -> android.graphics.Color.parseColor("#A040A0")
+            "ground" -> android.graphics.Color.parseColor("#E0C068")
+            "flying" -> android.graphics.Color.parseColor("#A890F0")
+            "psychic" -> android.graphics.Color.parseColor("#F85888")
+            "bug" -> android.graphics.Color.parseColor("#A8B820")
+            "rock" -> android.graphics.Color.parseColor("#B8A038")
+            "ghost" -> android.graphics.Color.parseColor("#705898")
+            "dragon" -> android.graphics.Color.parseColor("#7038F8")
+            "dark" -> android.graphics.Color.parseColor("#705848")
+            "steel" -> android.graphics.Color.parseColor("#B8B8D0")
+            "fairy" -> android.graphics.Color.parseColor("#EE99AC")
+            else -> android.graphics.Color.GRAY
+        }
+    }
+
+    /**
+     * Factory para crear instancias de [PokemonDetallesViewModel].
+     * Se encarga de la creación del ViewModel con sus dependencias.
+     *
+     * @param database La base de datos de Pokedex.
+     * @property database La instancia de la base de datos [PokedexDatabase].
+     * @suppress UNCHECKED_CAST Para evitar advertencias de tipo durante la creación del ViewModel.
      */
     class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
