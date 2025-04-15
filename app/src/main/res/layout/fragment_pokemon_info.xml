@@ -59,7 +59,7 @@
                     android:id="@+id/pokemon_details_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
+                    android:textColor="@color/text_secondary"
                     android:textSize="20sp"
                     android:background="@android:color/transparent"
                     tools:text="#001" />
@@ -72,6 +72,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     android:background="@android:color/transparent"
+                    android:textColor="@color/title_text"
                     tools:text="Bulbasaur" />
 
                 <ImageButton
@@ -136,12 +137,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/pokemon_height"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/label_text" />
 
                     <TextView
                         android:id="@+id/pokemon_details_height"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
                         tools:text="0.7 m" />
                 </LinearLayout>
 
@@ -156,12 +159,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/pokemon_weight"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/label_text" />
 
                     <TextView
                         android:id="@+id/pokemon_details_weight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
                         tools:text="6.9 kg" />
                 </LinearLayout>
             </LinearLayout>
@@ -173,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary"
                 android:text=""
                 android:background="@android:color/transparent"
                 android:gravity="start"
@@ -188,7 +193,8 @@
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
                 android:background="@android:color/transparent"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/label_text" />
 
             <LinearLayout
                 android:id="@+id/pokemon_abilities_cards_container"
@@ -219,7 +225,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textAppearance="@android:style/TextAppearance.Material.Headline"
-                            android:textColor="#222222"
+                            android:textColor="@color/title_text"
                             android:text="" />
 
                         <TextView
@@ -227,7 +233,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@android:style/TextAppearance.Material.Body2"
-                            android:textColor="#444444"
+                            android:textColor="@color/text_primary"
                             android:paddingTop="8dp"
                             android:text=""
                             android:visibility="gone" />
@@ -256,7 +262,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textAppearance="@android:style/TextAppearance.Material.Headline"
-                            android:textColor="#222222"
+                            android:textColor="@color/title_text"
                             android:text="" />
 
                         <TextView
@@ -264,7 +270,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@android:style/TextAppearance.Material.Body2"
-                            android:textColor="#444444"
+                            android:textColor="@color/text_primary"
                             android:paddingTop="8dp"
                             android:text=""
                             android:visibility="gone" />
@@ -293,7 +299,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textAppearance="@android:style/TextAppearance.Material.Headline"
-                            android:textColor="#222222"
+                            android:textColor="@color/title_text"
                             android:text="" />
 
                         <TextView
@@ -301,7 +307,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@android:style/TextAppearance.Material.Body2"
-                            android:textColor="#444444"
+                            android:textColor="@color/text_primary"
                             android:paddingTop="8dp"
                             android:text=""
                             android:visibility="gone" />
