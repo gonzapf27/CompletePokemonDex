@@ -151,7 +151,7 @@ class PokemonDetallesViewModel(
                                                 val type = PokemonTypeUtil.getTypeByName(typeName)
                                                 PokemonTypeUi(
                                                     name = type.name,
-                                                    color = type.color,
+                                                    color = type.colorRes,
                                                     stringRes = type.stringRes
                                                 )
                                             }

@@ -1,47 +1,47 @@
 package com.example.completepokemondex.util
 
-import android.graphics.Color
 import com.example.completepokemondex.R
 
 /**
  * Clase de utilidad para manejar información relacionada con tipos de Pokémon.
  */
 object PokemonTypeUtil {
-    
+
     /**
-     * Representa un tipo de Pokémon con su nombre, color y recurso de cadena.
+     * Representa un tipo de Pokémon con su nombre, recurso de color y recurso de cadena.
      */
     data class PokemonType(
         val name: String,
-        val color: Int,
+        val colorRes: Int,
         val stringRes: Int = 0
     )
-    
+
     /**
      * Lista de todos los tipos de Pokémon disponibles.
+     * Usa los recursos de color definidos en colors.xml.
      */
     val allTypes = listOf(
-        PokemonType("all", Color.GRAY, R.string.type_all),
-        PokemonType("normal", Color.parseColor("#A8A878"), R.string.type_normal),
-        PokemonType("fire", Color.parseColor("#F08030"), R.string.type_fire),
-        PokemonType("water", Color.parseColor("#6890F0"), R.string.type_water),
-        PokemonType("electric", Color.parseColor("#F8D030"), R.string.type_electric),
-        PokemonType("grass", Color.parseColor("#78C850"), R.string.type_grass),
-        PokemonType("ice", Color.parseColor("#98D8D8"), R.string.type_ice),
-        PokemonType("fighting", Color.parseColor("#C03028"), R.string.type_fighting),
-        PokemonType("poison", Color.parseColor("#A040A0"), R.string.type_poison),
-        PokemonType("ground", Color.parseColor("#E0C068"), R.string.type_ground),
-        PokemonType("flying", Color.parseColor("#A890F0"), R.string.type_flying),
-        PokemonType("psychic", Color.parseColor("#F85888"), R.string.type_psychic),
-        PokemonType("bug", Color.parseColor("#A8B820"), R.string.type_bug),
-        PokemonType("rock", Color.parseColor("#B8A038"), R.string.type_rock),
-        PokemonType("ghost", Color.parseColor("#705898"), R.string.type_ghost),
-        PokemonType("dragon", Color.parseColor("#7038F8"), R.string.type_dragon),
-        PokemonType("dark", Color.parseColor("#705848"), R.string.type_dark),
-        PokemonType("steel", Color.parseColor("#B8B8D0"), R.string.type_steel),
-        PokemonType("fairy", Color.parseColor("#EE99AC"), R.string.type_fairy)
+        PokemonType("all", R.color.type_all, R.string.type_all),
+        PokemonType("normal", R.color.type_normal, R.string.type_normal),
+        PokemonType("fire", R.color.type_fire, R.string.type_fire),
+        PokemonType("water", R.color.type_water, R.string.type_water),
+        PokemonType("electric", R.color.type_electric, R.string.type_electric),
+        PokemonType("grass", R.color.type_grass, R.string.type_grass),
+        PokemonType("ice", R.color.type_ice, R.string.type_ice),
+        PokemonType("fighting", R.color.type_fighting, R.string.type_fighting),
+        PokemonType("poison", R.color.type_poison, R.string.type_poison),
+        PokemonType("ground", R.color.type_ground, R.string.type_ground),
+        PokemonType("flying", R.color.type_flying, R.string.type_flying),
+        PokemonType("psychic", R.color.type_psychic, R.string.type_psychic),
+        PokemonType("bug", R.color.type_bug, R.string.type_bug),
+        PokemonType("rock", R.color.type_rock, R.string.type_rock),
+        PokemonType("ghost", R.color.type_ghost, R.string.type_ghost),
+        PokemonType("dragon", R.color.type_dragon, R.string.type_dragon),
+        PokemonType("dark", R.color.type_dark, R.string.type_dark),
+        PokemonType("steel", R.color.type_steel, R.string.type_steel),
+        PokemonType("fairy", R.color.type_fairy, R.string.type_fairy)
     )
-    
+
     /**
      * Encuentra el PokemonType correspondiente al nombre del tipo proporcionado.
      *

@@ -63,7 +63,9 @@ class PokemonInfoFragment : Fragment() {
             currentIsFavorite = state.isFavorite
             // Fondo gradiente
             val gradientBg = binding.pokemonFragmentGradientBg
-            val mainTypeColor = state.types.firstOrNull()?.color ?: android.graphics.Color.LTGRAY
+            val mainTypeColor = state.types.firstOrNull()?.let { 
+                androidx.core.content.ContextCompat.getColor(requireContext(), it.color)
+            } ?: android.graphics.Color.LTGRAY
             val isDark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
             val endColor = if (isDark) android.graphics.Color.BLACK else android.graphics.Color.WHITE
             val gradientDrawable = android.graphics.drawable.GradientDrawable(
@@ -81,7 +83,8 @@ class PokemonInfoFragment : Fragment() {
                 chip.visibility = View.VISIBLE
                 chip.text = if (typeUi.stringRes != 0) getString(typeUi.stringRes)
                     else typeUi.name.replaceFirstChar { it.uppercase() }
-                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(typeUi.color)
+                val realColor = androidx.core.content.ContextCompat.getColor(requireContext(), typeUi.color)
+                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(realColor)
                 chip.setTextColor(android.graphics.Color.WHITE)
             }
 
