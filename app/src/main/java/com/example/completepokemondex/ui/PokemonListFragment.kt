@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.completepokemondex.PokemonDetallesMainFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.local.database.PokedexDatabase
@@ -106,7 +107,32 @@ class PokemonListFragment : Fragment() {
         }
 
         binding.pokemonListRecyclerView.adapter = pokemonAdapter
-        binding.pokemonListRecyclerView.layoutManager = LinearLayoutManager(context)
+        val layoutManager = LinearLayoutManager(context)
+        binding.pokemonListRecyclerView.layoutManager = layoutManager
+        
+        // Añadir listener para detectar el scroll al final de la lista
+        binding.pokemonListRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                
+                // Si está scrolleando hacia abajo (dy > 0)
+                if (dy > 0) {
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
+                    
+                    // Si está cerca del final de la lista (últimos 5 elementos)
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 5) {
+                        // Verificar que no esté actualmente cargando y que pueda cargar más
+                        lifecycleScope.launch {
+                            if (!viewModel.isLoadingMore.value && viewModel.canLoadMore.value) {
+                                viewModel.loadMorePokemon()
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
     
     /**
@@ -171,6 +197,16 @@ class PokemonListFragment : Fragment() {
                             }
                         }
                     }
+                }
+            }
+        }
+        
+        // Observar el estado de carga de más pokémon
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isLoadingMore.collect { isLoading ->
+                    // Mostrar/ocultar indicador de carga en la parte inferior
+                    binding.loadMoreProgressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
                 }
             }
         }

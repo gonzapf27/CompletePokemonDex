@@ -41,17 +41,34 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
     // Mapeo de cada pokémon a sus tipos
     private val pokemonTypes = mutableMapOf<Int, List<String>>()
 
-    // Límite fijo para la cantidad de Pokémon a cargar
-    private val limit = 150 // Cargar 150 Pokémon de una vez
+    // Parámetros de paginación
+    private val pageSize = 30 // Tamaño de página
+    private var currentOffset = 0 // Offset actual
+    private val maxPokemonCount = 150 // Máximo número de Pokémon a cargar
+    private var isLoading = false // Flag para controlar múltiples cargas
+    private val _isLoadingMore = MutableStateFlow(false) // Estado específico para cargas adicionales
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+    private val _canLoadMore = MutableStateFlow(true) // Indica si se pueden cargar más Pokémon
+    val canLoadMore: StateFlow<Boolean> = _canLoadMore.asStateFlow()
 
     init {
         loadPokemonList()
     }
 
-    /** Carga la lista de Pokémon */
+    /** Carga la lista inicial de Pokémon */
     fun loadPokemonList() {
         _uiState.value = UiState.Loading
-        fetchPokemonList(limit, 0)
+        fetchPokemonList(pageSize, currentOffset)
+    }
+
+    /** Carga más Pokémon si es posible */
+    fun loadMorePokemon() {
+        if (isLoading || currentOffset >= maxPokemonCount || !_canLoadMore.value) return
+        
+        Log.d("PokemonListViewModel", "Cargando más pokémon desde offset: $currentOffset")
+        isLoading = true
+        _isLoadingMore.value = true
+        fetchPokemonList(pageSize, currentOffset)
     }
 
     /** Actualiza el término de búsqueda y filtra la lista */
@@ -89,12 +106,12 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
             }
         }
         
+        // Si la lista filtrada está casi vacía y podemos cargar más Pokémon, intentar cargar más
+        if (filteredList.size < 10 && _canLoadMore.value && !isLoading && currentOffset < maxPokemonCount) {
+            loadMorePokemon()
+        }
+        
         _uiState.value = UiState.Success(filteredList)
-    }
-
-    // Método antiguo de filtrado solo por nombre (obsoleto)
-    private fun filterPokemon(query: String) {
-        updateSearchQuery(query)
     }
 
     /** Obtiene la lista de Pokémon del repositorio */
@@ -103,16 +120,32 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
             repository.getPokemonList(limit, offset).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                        _uiState.value = UiState.Loading
+                        if (offset == 0) {
+                            _uiState.value = UiState.Loading
+                        }
                     }
 
                     is Resource.Success -> {
                         val pokemonList = result.data
+                        Log.d("PokemonListViewModel", "Obtenidos ${pokemonList.size} pokémon desde offset: $offset")
+                        
+                        // Actualizar el offset para la próxima carga
+                        currentOffset += pokemonList.size
+                        
+                        // Verificar si se ha alcanzado el límite máximo
+                        if (currentOffset >= maxPokemonCount || pokemonList.isEmpty()) {
+                            _canLoadMore.value = false
+                            Log.d("PokemonListViewModel", "No se pueden cargar más pokémon: offset=$currentOffset, max=$maxPokemonCount")
+                        }
+                        
                         loadPokemonImages(pokemonList)
                     }
 
                     is Resource.Error -> {
                         _uiState.value = UiState.Error(result.message, result.data)
+                        isLoading = false
+                        _isLoadingMore.value = false
+                        Log.e("PokemonListViewModel", "Error al cargar pokémon: ${result.message}")
                     }
                 }
             }
@@ -124,6 +157,12 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         viewModelScope.launch {
             val pokemonWithImages = mutableListOf<PokemonDomain>()
             var loadedCount = 0
+            
+            if (pokemons.isEmpty()) {
+                isLoading = false
+                _isLoadingMore.value = false
+                return@launch
+            }
             
             for (pokemon in pokemons) {
                 viewModelScope.launch {
@@ -154,10 +193,17 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                         if (loadedCount == pokemons.size) {
                                             // Ordenar por ID para mantener el orden correcto
                                             val sortedList = pokemonWithImages.sortedBy { it.id }
-                                            allPokemonList = sortedList
+                                            
+                                            // Agregar los nuevos pokémon a la lista existente
+                                            allPokemonList = (allPokemonList + sortedList).distinctBy { it.id }
+                                            Log.d("PokemonListViewModel", "Pokémon totales cargados: ${allPokemonList.size}")
                                             
                                             // Aplicar los filtros actuales
                                             applyFilters()
+                                            
+                                            // Indicar que la carga ha terminado
+                                            isLoading = false
+                                            _isLoadingMore.value = false
                                         }
                                     }
                                 }
@@ -171,10 +217,14 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                         
                                         if (loadedCount == pokemons.size) {
                                             val sortedList = pokemonWithImages.sortedBy { it.id }
-                                            allPokemonList = sortedList
+                                            allPokemonList = (allPokemonList + sortedList).distinctBy { it.id }
                                             
                                             // Aplicar los filtros actuales
                                             applyFilters()
+                                            
+                                            // Indicar que la carga ha terminado
+                                            isLoading = false
+                                            _isLoadingMore.value = false
                                         }
                                     }
                                     Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${detailsResource.message}")
@@ -194,10 +244,14 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                             
                             if (loadedCount == pokemons.size) {
                                 val sortedList = pokemonWithImages.sortedBy { it.id }
-                                allPokemonList = sortedList
+                                allPokemonList = (allPokemonList + sortedList).distinctBy { it.id }
                                 
                                 // Aplicar los filtros actuales
                                 applyFilters()
+                                
+                                // Indicar que la carga ha terminado
+                                isLoading = false
+                                _isLoadingMore.value = false
                             }
                         }
                         Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${e.message}")
