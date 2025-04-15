@@ -261,6 +261,9 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
         }
     }
 
+    /** Exponer el mapa de tipos de Pokémon */
+    fun getPokemonTypesMap(): Map<Int, List<String>> = pokemonTypes.toMap()
+
     /** Factory para crear instancias del ViewModel con el repositorio necesario */
     class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")

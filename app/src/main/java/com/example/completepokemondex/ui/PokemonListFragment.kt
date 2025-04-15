@@ -98,13 +98,15 @@ class PokemonListFragment : Fragment() {
      * Define el comportamiento cuando se selecciona un Pokémon.
      */
     private fun setupPokemonRecyclerView() {
-        pokemonAdapter = PokemonListAdapter { pokemon ->
+        pokemonAdapter = PokemonListAdapter(
+            onItemClicked = { pokemon ->
             val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
                 .addToBackStack(null)
                 .commit()
         }
+        )
 
         binding.pokemonListRecyclerView.adapter = pokemonAdapter
         val layoutManager = LinearLayoutManager(context)
@@ -139,9 +141,12 @@ class PokemonListFragment : Fragment() {
      * Configura el RecyclerView de tipos de Pokémon.
      */
     private fun setupTypeRecyclerView() {
-        typeAdapter = PokemonTypeAdapter(PokemonTypeUtil.allTypes) { typeName ->
+        typeAdapter = PokemonTypeAdapter(
+            types = PokemonTypeUtil.allTypes,
+            onTypeSelected = { typeName ->
             viewModel.updateSelectedType(typeName)
-        }
+            }
+        )
         binding.typeFilterRecyclerView.adapter = typeAdapter
     }
     
@@ -184,6 +189,9 @@ class PokemonListFragment : Fragment() {
                             binding.progressBar.visibility = View.GONE
                             binding.pokemonListRecyclerView.visibility = View.VISIBLE
                             pokemonAdapter.submitList(state.pokemons)
+                            // Actualizar tipos en el adaptador
+                            val typesMap = viewModel.getPokemonTypesMap()
+                            pokemonAdapter.updatePokemonTypes(typesMap)
                         }
                         is PokemonListViewModel.UiState.Error -> {
                             binding.progressBar.visibility = View.GONE
@@ -193,6 +201,8 @@ class PokemonListFragment : Fragment() {
                             state.pokemons?.let {
                                 if (it.isNotEmpty()) {
                                     pokemonAdapter.submitList(it)
+                                    val typesMap = viewModel.getPokemonTypesMap()
+                                    pokemonAdapter.updatePokemonTypes(typesMap)
                                 }
                             }
                         }

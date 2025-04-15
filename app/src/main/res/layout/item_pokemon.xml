@@ -4,53 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_margin="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    android:id="@+id/pokemon_card">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-    
+        android:padding="12dp">
+
         <ImageView
             android:id="@+id/pokemon_list_image"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             android:contentDescription="Pokémon sprite"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:src="@tools:sample/avatars" />
-    
-        <LinearLayout
-            android:layout_width="match_parent"
+
+        <TextView
+            android:id="@+id/pokemon_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
+            app:layout_constraintEnd_toStartOf="@id/pokemon_id"
+            tools:text="Bulbasaur" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/type_chips_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/pokemon_name"
+            app:layout_constraintStart_toEndOf="@id/pokemon_list_image"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            app:singleLine="true" />
 
-                <TextView
-                    android:id="@+id/pokemon_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="#001" />
+        <TextView
+            android:id="@+id/pokemon_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#80FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="#001" />
 
-                <TextView
-                    android:id="@+id/pokemon_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    tools:text="Bulbasaur" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/favorite_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/btn_star"
+            android:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pokemon_id"
+            app:layout_constraintTop_toBottomOf="@id/pokemon_name"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Favorite Button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.cardview.widget.CardView>

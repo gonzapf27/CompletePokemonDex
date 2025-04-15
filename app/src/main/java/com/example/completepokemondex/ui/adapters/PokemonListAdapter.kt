@@ -1,10 +1,13 @@
 package com.example.completepokemondex.ui.adapters
 
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,12 +15,21 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDomain
+import com.example.completepokemondex.util.PokemonTypeUtil
 
 /**
  * Adaptador para mostrar la lista de Pokémon en un RecyclerView
  */
-class PokemonListAdapter(private val onItemClicked: (PokemonDomain) -> Unit) : 
+class PokemonListAdapter(
+    private val onItemClicked: (PokemonDomain) -> Unit,
+    private var pokemonTypes: Map<Int, List<String>> = emptyMap()
+) : 
     ListAdapter<PokemonDomain, PokemonListAdapter.PokemonViewHolder>(PokemonDiffCallback) {
+
+    fun updatePokemonTypes(newTypes: Map<Int, List<String>>) {
+        pokemonTypes = newTypes
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -26,7 +38,9 @@ class PokemonListAdapter(private val onItemClicked: (PokemonDomain) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val pokemon = getItem(position)
+        val types = pokemonTypes[pokemon.id] ?: emptyList()
+        holder.bind(pokemon, types)
     }
 
     class PokemonViewHolder(
@@ -36,8 +50,9 @@ class PokemonListAdapter(private val onItemClicked: (PokemonDomain) -> Unit) :
         private val nameTextView: TextView = itemView.findViewById(R.id.pokemon_name)
         private val idTextView: TextView = itemView.findViewById(R.id.pokemon_id)
         private val imageView: ImageView = itemView.findViewById(R.id.pokemon_list_image)
+        private val cardView: CardView = itemView as CardView
 
-        fun bind(pokemon: PokemonDomain) {
+        fun bind(pokemon: PokemonDomain, types: List<String>?) {
             nameTextView.text = pokemon.name
             idTextView.text = "#${pokemon.id.toString().padStart(3, '0')}"
             
@@ -53,6 +68,20 @@ class PokemonListAdapter(private val onItemClicked: (PokemonDomain) -> Unit) :
                 // Si no hay URL de imagen, mostrar un placeholder
                 imageView.setImageResource(R.drawable.ic_launcher_foreground)
             }
+
+            // Fondo gradiente según tipos
+            val context = itemView.context
+            val colors = types?.map {
+                val type = PokemonTypeUtil.getTypeByName(it)
+                ContextCompat.getColor(context, type.colorRes)
+            } ?: listOf(ContextCompat.getColor(context, R.color.type_normal))
+            val gradientColors = if (colors.size == 1) intArrayOf(colors[0], colors[0]) else colors.toIntArray()
+            val gradientDrawable = GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                gradientColors
+            )
+            gradientDrawable.cornerRadius = cardView.radius
+            cardView.background = gradientDrawable
             
             itemView.setOnClickListener {
                 onItemClicked(pokemon)
