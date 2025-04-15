@@ -33,6 +33,13 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
     // Término de búsqueda actual
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    
+    // Filtro de tipo actual
+    private val _selectedType = MutableStateFlow("all")
+    val selectedType: StateFlow<String> = _selectedType.asStateFlow()
+    
+    // Mapeo de cada pokémon a sus tipos
+    private val pokemonTypes = mutableMapOf<Int, List<String>>()
 
     // Límite fijo para la cantidad de Pokémon a cargar
     private val limit = 150 // Cargar 150 Pokémon de una vez
@@ -50,23 +57,44 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
     /** Actualiza el término de búsqueda y filtra la lista */
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-        filterPokemon(query)
+        applyFilters()
     }
     
-    /** Filtra la lista de Pokémon según el término de búsqueda */
-    private fun filterPokemon(query: String) {
+    /** Actualiza el tipo seleccionado y filtra la lista */
+    fun updateSelectedType(type: String) {
+        _selectedType.value = type
+        applyFilters()
+    }
+    
+    /** Aplica los filtros actuales (búsqueda y tipo) a la lista de Pokémon */
+    private fun applyFilters() {
         if (allPokemonList.isEmpty()) return
         
-        if (query.isEmpty()) {
-            _uiState.value = UiState.Success(allPokemonList)
-            return
+        val searchQuery = _searchQuery.value
+        val selectedType = _selectedType.value
+        
+        // Filtrar por nombre
+        var filteredList = if (searchQuery.isEmpty()) {
+            allPokemonList
+        } else {
+            allPokemonList.filter { 
+                it.name.contains(searchQuery, ignoreCase = true) 
+            }
         }
         
-        val filteredList = allPokemonList.filter { 
-            it.name.contains(query, ignoreCase = true) 
+        // Filtrar por tipo si no es "all"
+        if (selectedType != "all") {
+            filteredList = filteredList.filter { pokemon ->
+                pokemonTypes[pokemon.id]?.contains(selectedType) == true
+            }
         }
         
         _uiState.value = UiState.Success(filteredList)
+    }
+
+    // Método antiguo de filtrado solo por nombre (obsoleto)
+    private fun filterPokemon(query: String) {
+        updateSearchQuery(query)
     }
 
     /** Obtiene la lista de Pokémon del repositorio */
@@ -107,6 +135,14 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                     // Usar el sprite front_default de manera segura con Elvis operator
                                     val imageUrl = detailsResource.data.sprites?.front_default ?: ""
                                     
+                                    // Extraer los tipos del pokémon
+                                    val types = detailsResource.data.types?.mapNotNull { 
+                                        it?.type?.name 
+                                    } ?: emptyList()
+                                    
+                                    // Guardar los tipos en el mapa
+                                    pokemonTypes[pokemon.id] = types
+                                    
                                     // Crear un nuevo objeto PokemonDomain con la URL de la imagen
                                     val pokemonWithImage = pokemon.copy(imageUrl = imageUrl)
                                     
@@ -120,12 +156,8 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                             val sortedList = pokemonWithImages.sortedBy { it.id }
                                             allPokemonList = sortedList
                                             
-                                            // Aplicar el filtro actual si existe
-                                            if (_searchQuery.value.isNotEmpty()) {
-                                                filterPokemon(_searchQuery.value)
-                                            } else {
-                                                _uiState.value = UiState.Success(sortedList)
-                                            }
+                                            // Aplicar los filtros actuales
+                                            applyFilters()
                                         }
                                     }
                                 }
@@ -141,12 +173,8 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                             val sortedList = pokemonWithImages.sortedBy { it.id }
                                             allPokemonList = sortedList
                                             
-                                            // Aplicar el filtro actual si existe
-                                            if (_searchQuery.value.isNotEmpty()) {
-                                                filterPokemon(_searchQuery.value)
-                                            } else {
-                                                _uiState.value = UiState.Success(sortedList)
-                                            }
+                                            // Aplicar los filtros actuales
+                                            applyFilters()
                                         }
                                     }
                                     Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${detailsResource.message}")
@@ -168,12 +196,8 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                                 val sortedList = pokemonWithImages.sortedBy { it.id }
                                 allPokemonList = sortedList
                                 
-                                // Aplicar el filtro actual si existe
-                                if (_searchQuery.value.isNotEmpty()) {
-                                    filterPokemon(_searchQuery.value)
-                                } else {
-                                    _uiState.value = UiState.Success(sortedList)
-                                }
+                                // Aplicar los filtros actuales
+                                applyFilters()
                             }
                         }
                         Log.e("PokemonListViewModel", "Error al cargar detalles para ${pokemon.name}: ${e.message}")

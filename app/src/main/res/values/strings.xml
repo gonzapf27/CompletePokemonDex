@@ -24,6 +24,7 @@
     <string name="type_dark">Dark</string>
     <string name="type_steel">Steel</string>
     <string name="type_fairy">Fairy</string>
+    <string name="type_all">Todos</string>
     
     <!-- Search hint -->
     <string name="search_pokemon_hint">Buscar Pokémon</string>

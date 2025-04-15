@@ -1,0 +1,70 @@
+package com.example.completepokemondex.ui.adapters
+
+import android.content.res.ColorStateList
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.example.completepokemondex.databinding.ItemPokemonTypeBinding
+import com.example.completepokemondex.util.PokemonTypeUtil.PokemonType
+import com.google.android.material.chip.Chip
+
+/**
+ * Adaptador para mostrar y manejar chips selectores de tipo de Pokémon
+ */
+class PokemonTypeAdapter(
+    private val types: List<PokemonType>,
+    private val onTypeSelected: (String) -> Unit
+) : RecyclerView.Adapter<PokemonTypeAdapter.TypeViewHolder>() {
+    
+    // Posición del tipo seleccionado, por defecto "all" (posición 0)
+    private var selectedPosition = 0
+    
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TypeViewHolder {
+        val binding = ItemPokemonTypeBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return TypeViewHolder(binding)
+    }
+    
+    override fun onBindViewHolder(holder: TypeViewHolder, position: Int) {
+        holder.bind(types[position], position == selectedPosition)
+    }
+    
+    override fun getItemCount() = types.size
+    
+    /**
+     * Actualiza qué tipo está seleccionado y notifica al adaptador para reflejar los cambios
+     */
+    fun selectType(position: Int) {
+        if (position != selectedPosition && position in types.indices) {
+            val oldPosition = selectedPosition
+            selectedPosition = position
+            notifyItemChanged(oldPosition)
+            notifyItemChanged(selectedPosition)
+            onTypeSelected(types[position].name)
+        }
+    }
+    
+    inner class TypeViewHolder(private val binding: ItemPokemonTypeBinding) : 
+        RecyclerView.ViewHolder(binding.root) {
+        
+        init {
+            binding.typeChip.setOnClickListener {
+                selectType(adapterPosition)
+            }
+        }
+        
+        fun bind(type: PokemonType, isSelected: Boolean) {
+            binding.typeChip.apply {
+                text = if (type.stringRes != 0) {
+                    context.getString(type.stringRes)
+                } else {
+                    type.name.replaceFirstChar { it.uppercase() }
+                }
+                
+                chipBackgroundColor = ColorStateList.valueOf(type.color)
+                isChecked = isSelected
+            }
+        }
+    }
+}

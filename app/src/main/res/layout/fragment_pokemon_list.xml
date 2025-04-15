@@ -16,6 +16,16 @@
         app:iconifiedByDefault="false"
         app:queryHint="@string/search_pokemon_hint" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/type_filter_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

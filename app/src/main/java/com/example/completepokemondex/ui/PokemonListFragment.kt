@@ -17,6 +17,8 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonListBinding
 import com.example.completepokemondex.ui.adapters.PokemonListAdapter
+import com.example.completepokemondex.ui.adapters.PokemonTypeAdapter
+import com.example.completepokemondex.util.PokemonTypeUtil
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -53,7 +55,12 @@ class PokemonListFragment : Fragment() {
     /**
      * Adaptador para el RecyclerView que muestra la lista de Pokémon.
      */
-    private lateinit var adapter: PokemonListAdapter
+    private lateinit var pokemonAdapter: PokemonListAdapter
+    
+    /**
+     * Adaptador para el RecyclerView que muestra los tipos de Pokémon.
+     */
+    private lateinit var typeAdapter: PokemonTypeAdapter
 
     /**
      * Infla el layout del fragmento y configura el binding.
@@ -79,7 +86,8 @@ class PokemonListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        setupRecyclerView()
+        setupPokemonRecyclerView()
+        setupTypeRecyclerView()
         setupSearchView()
         observeViewModel()
     }
@@ -88,8 +96,8 @@ class PokemonListFragment : Fragment() {
      * Configura el RecyclerView con el adaptador y el layout manager.
      * Define el comportamiento cuando se selecciona un Pokémon.
      */
-    private fun setupRecyclerView() {
-        adapter = PokemonListAdapter { pokemon ->
+    private fun setupPokemonRecyclerView() {
+        pokemonAdapter = PokemonListAdapter { pokemon ->
             val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
@@ -97,8 +105,18 @@ class PokemonListFragment : Fragment() {
                 .commit()
         }
 
-        binding.pokemonListRecyclerView.adapter = adapter
+        binding.pokemonListRecyclerView.adapter = pokemonAdapter
         binding.pokemonListRecyclerView.layoutManager = LinearLayoutManager(context)
+    }
+    
+    /**
+     * Configura el RecyclerView de tipos de Pokémon.
+     */
+    private fun setupTypeRecyclerView() {
+        typeAdapter = PokemonTypeAdapter(PokemonTypeUtil.allTypes) { typeName ->
+            viewModel.updateSelectedType(typeName)
+        }
+        binding.typeFilterRecyclerView.adapter = typeAdapter
     }
     
     /**
@@ -139,7 +157,7 @@ class PokemonListFragment : Fragment() {
                         is PokemonListViewModel.UiState.Success -> {
                             binding.progressBar.visibility = View.GONE
                             binding.pokemonListRecyclerView.visibility = View.VISIBLE
-                            adapter.submitList(state.pokemons)
+                            pokemonAdapter.submitList(state.pokemons)
                         }
                         is PokemonListViewModel.UiState.Error -> {
                             binding.progressBar.visibility = View.GONE
@@ -148,7 +166,7 @@ class PokemonListFragment : Fragment() {
                             // Si hay datos en caché, los mostramos
                             state.pokemons?.let {
                                 if (it.isNotEmpty()) {
-                                    adapter.submitList(it)
+                                    pokemonAdapter.submitList(it)
                                 }
                             }
                         }
