@@ -61,9 +61,30 @@ class PokemonTypeAdapter(
                 } else {
                     type.name.replaceFirstChar { it.uppercase() }
                 }
-                
+
                 chipBackgroundColor = ColorStateList.valueOf(type.color)
                 isChecked = isSelected
+
+                // Cambia el color del texto y el borde si está seleccionado
+                if (isSelected) {
+                    setTextColor(android.graphics.Color.WHITE)
+                    chipStrokeWidth = 6f
+                    chipStrokeColor = ColorStateList.valueOf(android.graphics.Color.WHITE)
+                    // Animación de escala
+                    animate().scaleX(1.15f).scaleY(1.15f).setDuration(150).start()
+                    // Icono de check
+                    chipIcon = context.getDrawable(android.R.drawable.checkbox_on_background)
+                    isChipIconVisible = true
+                } else {
+                    setTextColor(android.graphics.Color.BLACK)
+                    chipStrokeWidth = 0f
+                    chipStrokeColor = ColorStateList.valueOf(type.color)
+                    // Vuelve a escala normal
+                    animate().scaleX(1f).scaleY(1f).setDuration(150).start()
+                    // Sin icono
+                    chipIcon = null
+                    isChipIconVisible = false
+                }
             }
         }
     }
