@@ -113,6 +113,73 @@
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/darker_gray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pokemon_height"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/pokemon_details_height"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="0.7 m" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pokemon_weight"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/pokemon_details_weight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="6.9 kg" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Descripción del Pokémon -->
+            <TextView
+                android:id="@+id/pokemon_details_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/black"
+                android:text=""
+                android:background="@android:color/transparent"
+                android:gravity="start"
+                tools:text="Este Pokémon tiene una semilla en su lomo desde que nace. La semilla crece poco a poco." />
+
+            <!-- Lista de habilidades -->
             <TextView
                 android:id="@+id/pokemon_abilities_label"
                 android:layout_width="wrap_content"
@@ -123,7 +190,6 @@
                 android:background="@android:color/transparent"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-            <!-- Tarjetas de habilidades (máximo 3) -->
             <LinearLayout
                 android:id="@+id/pokemon_abilities_cards_container"
                 android:layout_width="match_parent"
@@ -242,72 +308,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/darker_gray" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pokemon_height"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/pokemon_details_height"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="0.7 m" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pokemon_weight"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/pokemon_details_weight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="6.9 kg" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Descripción del Pokémon -->
-            <TextView
-                android:id="@+id/pokemon_details_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@android:color/black"
-                android:text=""
-                android:background="@android:color/transparent"
-                android:gravity="start"
-                tools:text="Este Pokémon tiene una semilla en su lomo desde que nace. La semilla crece poco a poco." />
         </LinearLayout>
 
         <ProgressBar
