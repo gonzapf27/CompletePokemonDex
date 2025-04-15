@@ -93,7 +93,6 @@ class PokemonListFragment : Fragment() {
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
                 .addToBackStack(null)
                 .commit()
-            Toast.makeText(context, "Pokémon seleccionado: ${pokemon.name}, ID: ${pokemon.id}", Toast.LENGTH_SHORT).show()
         }
 
         binding.pokemonListRecyclerView.adapter = adapter
