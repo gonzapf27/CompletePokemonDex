@@ -1,14 +1,14 @@
 package com.example.completepokemondex.data.repository
 
 import android.util.Log
-import com.example.completepokemondex.data.PokemonDTOToEntityList
+import com.example.completepokemondex.data.mapping.PokemonDTOToEntityList
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
-import com.example.completepokemondex.data.pokemonDTOToDomainList
-import com.example.completepokemondex.data.pokemonDetailsDTOToDomain
-import com.example.completepokemondex.data.pokemonDetailsDTOToEntity
-import com.example.completepokemondex.data.pokemonDetailsEntityToDomain
-import com.example.completepokemondex.data.pokemonEntityToDomainList
+import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
+import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
+import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToEntity
+import com.example.completepokemondex.data.mapping.pokemonDetailsEntityToDomain
+import com.example.completepokemondex.data.mapping.pokemonEntityToDomainList
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
@@ -27,8 +27,8 @@ import kotlinx.coroutines.withContext
  * @property remoteDataSource Fuente de datos remota para obtener datos de la API de Pokémon
  */
 class PokemonRepository(
-        private val pokemonDao: PokemonDao,
-        private val remoteDataSource: PokemonRemoteDataSource
+    private val pokemonDao: PokemonDao,
+    private val remoteDataSource: PokemonRemoteDataSource
 ) {
     /**
      * Obtiene una lista de Pokémon. Primero intenta obtener los datos de la base de datos local. Si
