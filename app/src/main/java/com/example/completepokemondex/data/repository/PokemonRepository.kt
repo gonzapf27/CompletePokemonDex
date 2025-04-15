@@ -5,6 +5,7 @@ import com.example.completepokemondex.data.mapping.PokemonDTOToEntityList
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
+import com.example.completepokemondex.data.domain.model.AbilityDomain
 import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToEntity
@@ -13,9 +14,13 @@ import com.example.completepokemondex.data.mapping.pokemonEntityToDomainList
 import com.example.completepokemondex.data.mapping.pokemonSpeciesDTOToDomain
 import com.example.completepokemondex.data.mapping.pokemonSpeciesDTOToEntity
 import com.example.completepokemondex.data.mapping.pokemonSpeciesEntityToDomain
+import com.example.completepokemondex.data.mapping.toDomain as abilityDTOToDomain
+import com.example.completepokemondex.data.mapping.toEntity as abilityDTOToEntity
+import com.example.completepokemondex.data.mapping.toDomain as abilityEntityToDomain
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
+import com.example.completepokemondex.data.local.dao.AbilityDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +42,7 @@ class PokemonRepository(
     private val pokemonDetailsDao: PokemonDetailsDao,
     private val pokemonSpeciesDao: PokemonSpeciesDao,
     private val remoteDataSource: PokemonRemoteDataSource,
+    private val abilityDao: AbilityDao // <-- Añadir AbilityDao
 ) {
     private val tag = "PokemonRepository"
 
@@ -208,6 +214,53 @@ class PokemonRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+    /**
+     * Obtiene una habilidad por su ID, usando caché local y API remota.
+     *
+     * @param id Identificador único de la habilidad
+     * @return Flow que emite la habilidad y el estado de carga
+     */
+    fun getAbilityById(id: Int): Flow<Resource<AbilityDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de habilidad [id=$id]")
+
+            try {
+                // Consultar caché local
+                logDebug("Consultando base de datos local para habilidad $id...")
+                val localAbility = abilityDao.getAbilityById(id)
+
+                if (localAbility != null) {
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo habilidad $id de la base de datos local")
+                    emit(Resource.Success(localAbility.abilityEntityToDomain()))
+                } else {
+                    logDebug("No se encontró habilidad $id en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getAbilityById(id) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibida habilidad $id de la API")
+                            saveToDatabase {
+                                logDebug("Insertando habilidad $id en la base de datos")
+                                abilityDao.insertAbility(apiResponse.abilityDTOToEntity())
+                            }
+                            logDebug("Devolviendo habilidad $id obtenida de la API")
+                            emit(Resource.Success(apiResponse.abilityDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener habilidad $id de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener habilidad: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
     // Funciones auxiliares para evitar código repetido
 
     private suspend inline fun <T> handleApiResponse(
@@ -280,4 +333,6 @@ class PokemonRepository(
         val entity = pokemonDao.getPokemonById(pokemonId)
         return entity?.favorite ?: false
     }
+
+
 }

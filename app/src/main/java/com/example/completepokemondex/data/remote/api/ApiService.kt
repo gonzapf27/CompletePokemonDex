@@ -1,5 +1,6 @@
 package com.example.completepokemondex.data.remote.api
 
+import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
@@ -33,8 +34,12 @@ interface ApiService {
     suspend fun getPokemonSpeciesById(
         @Path("id") id: Int
     ): Response<PokemonSpeciesDTO>
-}
 
+    @GET("ability/{id}")
+    suspend fun getAbilityById(
+        @Path("id") id: Int
+    ): Response<AbilityDTO>
+}
 
 /**
  * Clase que representa la respuesta de la API para una lista de Pokémon

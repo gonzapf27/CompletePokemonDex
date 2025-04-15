@@ -3,14 +3,15 @@ package com.example.completepokemondex.data.remote.datasource
 import android.util.Log
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.api.Resource
+import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
-import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.io.IOException
 
 /**
  * `PokemonRemoteDataSource` es responsable de abstraer el uso de la Api de Pokémon.
@@ -37,7 +38,10 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
                         Resource.Success(it.results)
                     } ?: Resource.Error("Respuesta vacía", emptyList())
                 } else {
-                    Resource.Error("Error HTTP ${response.code()}: ${response.message()}", emptyList())
+                    Resource.Error(
+                        "Error HTTP ${response.code()}: ${response.message()}",
+                        emptyList()
+                    )
                 }
             } catch (e: IOException) {
                 Resource.Error("Error de red: ${e.message}", emptyList())
@@ -48,7 +52,7 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             }
         }
     }
-    
+
     /**
      * Obtiene los detalles de un Pokémon específico por su ID desde la API.
      *
@@ -97,6 +101,32 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             }
         } catch (e: Exception) {
             Log.e("PokemonRemoteDataSource", "Error obteniendo especie del pokemon: ${e.message}")
+            Resource.Error("Error de red: ${e.message}")
+        }
+    }
+
+    /**
+     * Obtiene una habilidad Pokémon específica por su ID desde la API.
+     *
+     * @param id Identificador único de la habilidad
+     * @return Un objeto Resource que contiene los detalles de la habilidad o un mensaje de error
+     */
+    suspend fun getAbilityById(id: Int): Resource<AbilityDTO> {
+        return try {
+            val response = apiService.getAbilityById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Habilidad obtenida: $body")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo habilidad: ${e.message}")
             Resource.Error("Error de red: ${e.message}")
         }
     }
