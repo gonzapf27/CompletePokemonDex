@@ -37,7 +37,7 @@ class PokemonInfoFragment : Fragment() {
         var currentIsFavorite: Boolean = false
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             binding.loadingIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
-            binding.pokemonDetailsId.text = state.id
+            binding.pokemonDetailsId.text = "#" + state.id
             binding.pokemonDetailsNombre.text = state.nombre
             binding.pokemonDetailsHeight.text = state.height
             binding.pokemonDetailsWeight.text = state.weight

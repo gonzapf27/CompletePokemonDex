@@ -39,7 +39,7 @@ class PokemonListAdapter(private val onItemClicked: (PokemonDomain) -> Unit) :
 
         fun bind(pokemon: PokemonDomain) {
             nameTextView.text = pokemon.name
-            idTextView.text = "#${pokemon.id}"
+            idTextView.text = "#${pokemon.id.toString().padStart(3, '0')}"
             
             // Cargar la imagen del Pokémon si está disponible
             pokemon.imageUrl?.let { url ->
