@@ -40,8 +40,10 @@ class MainActivity : AppCompatActivity() {
         val remoteDataSource = PokemonRemoteDataSource()
         val pokemonSpeciesDao =
             PokedexDatabase.Companion.getDatabase(applicationContext).pokemonSpeciesDao()
+        val abilityDao =
+            PokedexDatabase.Companion.getDatabase(applicationContext).abilityDao()
         pokemonRepository =
-            PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, remoteDataSource)
+            PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, abilityDao, remoteDataSource)
     }
 
     /**

@@ -41,8 +41,8 @@ class PokemonRepository(
     private val pokemonDao: PokemonDao,
     private val pokemonDetailsDao: PokemonDetailsDao,
     private val pokemonSpeciesDao: PokemonSpeciesDao,
+    private val abilityDao: AbilityDao,
     private val remoteDataSource: PokemonRemoteDataSource,
-    private val abilityDao: AbilityDao // <-- Añadir AbilityDao
 ) {
     private val tag = "PokemonRepository"
 
