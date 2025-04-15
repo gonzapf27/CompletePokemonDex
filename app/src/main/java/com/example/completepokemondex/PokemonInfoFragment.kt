@@ -72,58 +72,36 @@ class PokemonInfoFragment : Fragment() {
             )
             gradientDrawable.cornerRadius = 0f
             gradientBg.background = gradientDrawable
-            // Chips de tipos
-            binding.pokemonTypeChips.removeAllViews()
-            state.types.forEach { typeUi ->
-                val chip = Chip(context).apply {
-                    text = if (typeUi.stringRes != 0) getString(typeUi.stringRes)
+
+            // Mostrar tipos (máximo 2 chips)
+            val chips = listOf(binding.pokemonTypeChip1, binding.pokemonTypeChip2)
+            chips.forEach { it.visibility = View.GONE }
+            state.types.take(2).forEachIndexed { idx, typeUi ->
+                val chip = chips[idx]
+                chip.visibility = View.VISIBLE
+                chip.text = if (typeUi.stringRes != 0) getString(typeUi.stringRes)
                     else typeUi.name.replaceFirstChar { it.uppercase() }
-                    isCheckable = false
-                    chipBackgroundColor = android.content.res.ColorStateList.valueOf(typeUi.color)
-                    setTextColor(android.graphics.Color.WHITE)
-                }
-                binding.pokemonTypeChips.addView(chip)
+                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(typeUi.color)
+                chip.setTextColor(android.graphics.Color.WHITE)
             }
-            // Habilidades
-            val abilitiesContainer = binding.pokemonAbilitiesContainer
-            abilitiesContainer.removeAllViews()
-            state.habilidades.forEach { habilidad ->
-                val card = com.google.android.material.card.MaterialCardView(context).apply {
-                    val params = android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    params.setMargins(0, 8, 0, 16)
-                    layoutParams = params
-                    radius = 16f
-                    cardElevation = 4f
-                    setCardBackgroundColor(android.graphics.Color.parseColor("#FAFAFA"))
-                    preventCornerOverlap = true
-                    useCompatPadding = true
-                }
-                val verticalLayout = android.widget.LinearLayout(context).apply {
-                    orientation = android.widget.LinearLayout.VERTICAL
-                    setPadding(24, 16, 24, 16)
-                }
-                val nombreView = android.widget.TextView(context).apply {
-                    text = habilidad.nombre
-                    setTextAppearance(android.R.style.TextAppearance_Material_Headline)
-                    setTypeface(typeface, android.graphics.Typeface.BOLD)
-                    setTextColor(android.graphics.Color.parseColor("#222222"))
-                }
-                verticalLayout.addView(nombreView)
-                if (habilidad.descripcion.isNotBlank()) {
-                    val descripcionView = android.widget.TextView(context).apply {
-                        text = habilidad.descripcion
-                        setTextAppearance(android.R.style.TextAppearance_Material_Body2)
-                        setTextColor(android.graphics.Color.parseColor("#444444"))
-                        setPadding(0, 8, 0, 0)
-                    }
-                    verticalLayout.addView(descripcionView)
-                }
-                card.addView(verticalLayout)
-                abilitiesContainer.addView(card)
+
+            // Mostrar habilidades (máximo 3)
+            val habilidadCards = listOf(
+                Triple(binding.habilidadCard1, binding.habilidadNombre1, binding.habilidadDesc1),
+                Triple(binding.habilidadCard2, binding.habilidadNombre2, binding.habilidadDesc2),
+                Triple(binding.habilidadCard3, binding.habilidadNombre3, binding.habilidadDesc3)
+            )
+            habilidadCards.forEach { (card, nombre, desc) ->
+                card.visibility = View.GONE
             }
+            state.habilidades.take(3).forEachIndexed { idx, habilidad ->
+                val (card, nombre, desc) = habilidadCards[idx]
+                card.visibility = View.VISIBLE
+                nombre.text = habilidad.nombre
+                desc.text = habilidad.descripcion
+                desc.visibility = if (habilidad.descripcion.isNotBlank()) View.VISIBLE else View.GONE
+            }
+
             // Descripción
             binding.pokemonDetailsDescription.text = state.descripcion
         }
@@ -132,7 +110,6 @@ class PokemonInfoFragment : Fragment() {
             val id = currentPokemonId
             if (id != null) {
                 viewModel.toggleFavorite(id, !currentIsFavorite)
-                // Opcional: puedes mostrar un feedback visual aquí
             }
         }
     }
