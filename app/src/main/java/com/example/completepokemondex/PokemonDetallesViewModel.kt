@@ -6,6 +6,7 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -18,7 +19,8 @@ data class PokemonDetallesUiState(
     val height: String = "",
     val weight: String = "",
     val imageUrl: String? = null,
-    val types: List<PokemonTypeUi> = emptyList()
+    val types: List<PokemonTypeUi> = emptyList(),
+    val descripcion: String = ""
 )
 
 data class PokemonTypeUi(
@@ -50,35 +52,57 @@ class PokemonDetallesViewModel(
     /**
      * Busca y recupera los detalles del Pokémon por su ID.
      * Actualiza el estado de la UI con los detalles del Pokémon,
-     * incluyendo datos como el nombre, altura, peso, imagen y tipos.
+     * incluyendo datos como el nombre, altura, peso, imagen, tipos y descripción.
      *
      * @param id El ID del Pokémon a buscar.
      */
     private fun fetchPokemon(id: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
+            var descripcion = ""
+            var pokemon: PokemonDetailsDomain? = null
+
+            // Primero obtenemos detalles del Pokémon
             pokemonRepository.getPokemonDetailsById(id).collect { result ->
                 when (result) {
                     is Resource.Success -> {
-                        val pokemon = result.data
-                        _uiState.value = PokemonDetallesUiState(
-                            isLoading = false,
-                            id = pokemon.id.toString(),
-                            nombre = pokemon.name?.replaceFirstChar { it.uppercase() } ?: "",
-                            height = formatHeight(pokemon.height),
-                            weight = formatWeight(pokemon.weight),
-                            imageUrl = pokemon.sprites?.other?.`official-artwork`?.front_default
-                                ?: pokemon.sprites?.front_default,
-                            types = pokemon.types?.mapNotNull { typeInfo ->
-                                typeInfo?.type?.name?.let { typeName ->
-                                    PokemonTypeUi(
-                                        name = typeName,
-                                        color = getColorForPokemonType(typeName),
-                                        stringRes = getStringResourceForPokemonType(typeName)
+                        pokemon = result.data
+                        // Ahora obtenemos la especie para la descripción
+                        pokemonRepository.getPokemonSpeciesById(id).collect { speciesResult ->
+                            when (speciesResult) {
+                                is Resource.Success -> {
+                                    descripcion = extractFlavorText(speciesResult.data)
+                                    _uiState.value = PokemonDetallesUiState(
+                                        isLoading = false,
+                                        id = pokemon?.id?.toString() ?: "",
+                                        nombre = pokemon?.name?.replaceFirstChar { it.uppercase() } ?: "",
+                                        height = formatHeight(pokemon?.height),
+                                        weight = formatWeight(pokemon?.weight),
+                                        imageUrl = pokemon?.sprites?.other?.`official-artwork`?.front_default
+                                            ?: pokemon?.sprites?.front_default,
+                                        types = pokemon?.types?.mapNotNull { typeInfo ->
+                                            typeInfo?.type?.name?.let { typeName ->
+                                                PokemonTypeUi(
+                                                    name = typeName,
+                                                    color = getColorForPokemonType(typeName),
+                                                    stringRes = getStringResourceForPokemonType(typeName)
+                                                )
+                                            }
+                                        } ?: emptyList(),
+                                        descripcion = descripcion
                                     )
                                 }
-                            } ?: emptyList()
-                        )
+                                is Resource.Error -> {
+                                    _uiState.value = _uiState.value?.copy(
+                                        isLoading = false,
+                                        error = speciesResult.message
+                                    )
+                                }
+                                is Resource.Loading -> {
+                                    _uiState.value = _uiState.value?.copy(isLoading = true)
+                                }
+                            }
+                        }
                     }
                     is Resource.Error -> {
                         _uiState.value = _uiState.value?.copy(
@@ -92,6 +116,24 @@ class PokemonDetallesViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * Extrae el flavor text en el idioma del sistema (es, en, o en por defecto).
+     */
+    private fun extractFlavorText(species: PokemonSpeciesDomain?): String {
+        if (species == null) return ""
+        val lang = Locale.getDefault().language
+        val entries = species.flavor_text_entries ?: return ""
+        // Buscar primero en el idioma del sistema
+        val flavor = entries.firstOrNull { 
+            val l = it?.language?.name
+            l == lang
+        }?.flavor_text
+        // Si no hay en el idioma del sistema, buscar en inglés
+        val fallback = entries.firstOrNull { it?.language?.name == "en" }?.flavor_text
+        // Si no hay ninguno, devolver vacío
+        return (flavor ?: fallback ?: "").replace("\n", " ").replace("\u000c", " ").trim()
     }
 
     /**

@@ -69,6 +69,8 @@ class PokemonInfoFragment : Fragment() {
                 }
                 binding.pokemonTypeChips.addView(chip)
             }
+            // Descripción
+            binding.pokemonDetailsDescription.text = state.descripcion
         }
     }
 
