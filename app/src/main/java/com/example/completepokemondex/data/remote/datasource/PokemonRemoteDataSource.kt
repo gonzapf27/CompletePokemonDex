@@ -5,6 +5,7 @@ import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
 import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +71,32 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             }
         } catch (e: Exception) {
             Log.e("PokemonRemoteDataSource", "Error obteniendo detalles del pokemon: ${e.message}")
+            Resource.Error("Error de red: ${e.message}")
+        }
+    }
+
+    /**
+     * Obtiene la especie de un Pokémon específico por su ID desde la API.
+     *
+     * @param id Identificador único de la especie Pokémon
+     * @return Un objeto Resource que contiene la especie del Pokémon o un mensaje de error
+     */
+    suspend fun getPokemonSpeciesById(id: Int): Resource<PokemonSpeciesDTO> {
+        return try {
+            val response = apiService.getPokemonSpeciesById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Especie del pokemon obtenida: $body")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo especie del pokemon: ${e.message}")
             Resource.Error("Error de red: ${e.message}")
         }
     }

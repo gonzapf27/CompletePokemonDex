@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
+import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
@@ -32,6 +33,11 @@ abstract class PokedexDatabase : RoomDatabase() {
      * Proporciona acceso al DAO de detalles de Pokémon.
      */
     abstract fun pokemonDetailsDao(): PokemonDetailsDao
+
+    /**
+     * Proporciona acceso al DAO de especies de Pokémon.
+     */
+    abstract fun pokemonSpeciesDao(): PokemonSpeciesDao
 
     companion object {
         // Singleton para prevenir múltiples instancias de la base de datos

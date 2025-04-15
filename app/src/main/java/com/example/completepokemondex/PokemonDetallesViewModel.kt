@@ -6,6 +6,7 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -208,7 +209,8 @@ class PokemonDetallesViewModel(
                 val pokemonDao = database.pokemonDao()
                 val remoteDataSource = PokemonRemoteDataSource()
                 val pokemonDetailsDao = database.pokemonDetailsDao()
-                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, remoteDataSource)
+                val pokemonSpeciesDao = database.pokemonSpeciesDao()
+                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, remoteDataSource)
                 return PokemonDetallesViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

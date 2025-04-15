@@ -2,6 +2,7 @@ package com.example.completepokemondex.data.remote.api
 
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -27,6 +28,11 @@ interface ApiService {
     suspend fun getPokemonDetailsById(
         @Path("id") id: Int
     ): Response<PokemonDetailsDTO>
+
+    @GET("pokemon-species/{id}")
+    suspend fun getPokemonSpeciesById(
+        @Path("id") id: Int
+    ): Response<PokemonSpeciesDTO>
 }
 
 

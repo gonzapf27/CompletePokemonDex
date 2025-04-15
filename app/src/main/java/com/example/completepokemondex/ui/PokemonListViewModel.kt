@@ -141,7 +141,8 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                 val pokemonDao = database.pokemonDao()
                 val pokemonDetailsDao = database.pokemonDetailsDao()
                 val remoteDataSource = PokemonRemoteDataSource()
-                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, remoteDataSource)
+                val pokemonSpeciesDao = database.pokemonSpeciesDao()
+                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao,  pokemonSpeciesDao, remoteDataSource)
                 return PokemonListViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
