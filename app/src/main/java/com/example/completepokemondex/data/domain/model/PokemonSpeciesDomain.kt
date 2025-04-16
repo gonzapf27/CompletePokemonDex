@@ -1,5 +1,7 @@
 package com.example.completepokemondex.data.domain.model
 
+import com.example.completepokemondex.R
+
 data class PokemonSpeciesDomain(
     val base_happiness: Int?,
     val capture_rate: Int?,

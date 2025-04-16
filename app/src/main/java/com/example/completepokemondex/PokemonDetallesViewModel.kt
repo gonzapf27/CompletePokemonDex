@@ -35,7 +35,8 @@ data class PokemonTypeUi(
 
 data class HabilidadUi(
     val nombre: String,
-    val descripcion: String
+    val descripcion: String,
+    val isOculta: Boolean? = false
 )
 
 class PokemonDetallesViewModel(
@@ -83,7 +84,9 @@ class PokemonDetallesViewModel(
                                     // Obtener nombres y descripciones localizadas de habilidades
                                     val habilidades = mutableListOf<HabilidadUi>()
                                     val abilityList = pokemon.abilities?.mapNotNull { it?.ability } ?: emptyList()
-                                    for (ability in abilityList) {
+                                    val abilitySlotList = pokemon.abilities ?: emptyList()
+                                    for ((idx, ability) in abilityList.withIndex()) {
+                                        val isOculta = abilitySlotList.getOrNull(idx)?.is_hidden ?: false
                                         val abilityId = ability.url?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
                                         if (abilityId != null) {
                                             val abilityResult = pokemonRepository.getAbilityById(abilityId)
@@ -110,7 +113,8 @@ class PokemonDetallesViewModel(
                                                         habilidades.add(
                                                             HabilidadUi(
                                                                 nombre = localizedName.replaceFirstChar { it.uppercase() },
-                                                                descripcion = descText
+                                                                descripcion = descText,
+                                                                isOculta = isOculta
                                                             )
                                                         )
                                                     }
@@ -118,7 +122,8 @@ class PokemonDetallesViewModel(
                                                     habilidades.add(
                                                         HabilidadUi(
                                                             nombre = ability.name?.replaceFirstChar { it.uppercase() } ?: "",
-                                                            descripcion = ""
+                                                            descripcion = "",
+                                                            isOculta = isOculta
                                                         )
                                                     )
                                                 }
@@ -127,7 +132,8 @@ class PokemonDetallesViewModel(
                                             habilidades.add(
                                                 HabilidadUi(
                                                     nombre = ability.name?.replaceFirstChar { it.uppercase() } ?: "",
-                                                    descripcion = ""
+                                                    descripcion = "",
+                                                    isOculta = isOculta
                                                 )
                                             )
                                         }

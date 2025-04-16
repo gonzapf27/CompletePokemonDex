@@ -6,6 +6,7 @@
     <string name="pokemon_weight">Peso</string>
     <string name="pokemon_base_stats">Estadísticas Base</string>
     <string name="pokemon_abilities">Habilidades</string>
+    <string name="hidden_ability">Habilidad oculta</string>
     <!-- Pokemon Types -->
     <string name="type_normal">Normal</string>
     <string name="type_fire">Fuego</string>

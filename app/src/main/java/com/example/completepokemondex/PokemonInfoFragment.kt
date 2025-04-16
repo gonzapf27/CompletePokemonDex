@@ -101,7 +101,12 @@ class PokemonInfoFragment : Fragment() {
             state.habilidades.take(3).forEachIndexed { idx, habilidad ->
                 val triple = habilidadCards[idx]
                 triple.first.visibility = View.VISIBLE
-                triple.second.text = habilidad.nombre
+                // Si la habilidad es oculta, mostrar el texto correspondiente
+                if (habilidad.isOculta == true) {
+                    triple.second.text = "${habilidad.nombre} (${getString(R.string.hidden_ability)})"
+                } else {
+                    triple.second.text = habilidad.nombre
+                }
                 triple.third.text = habilidad.descripcion
                 triple.third.visibility = if (habilidad.descripcion.isNotBlank()) View.VISIBLE else View.GONE
             }
