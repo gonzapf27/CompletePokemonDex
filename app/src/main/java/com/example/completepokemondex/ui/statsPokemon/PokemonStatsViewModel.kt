@@ -1,4 +1,4 @@
-package com.example.completepokemondex
+package com.example.completepokemondex.ui.statsPokemon
 
 import androidx.lifecycle.*
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain

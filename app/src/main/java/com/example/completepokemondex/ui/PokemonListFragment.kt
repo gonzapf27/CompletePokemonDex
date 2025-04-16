@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.completepokemondex.PokemonDetallesMainFragment
+import com.example.completepokemondex.ui.pokemonSeleccionado.PokemonDetallesMainFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonListBinding

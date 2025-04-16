@@ -1,4 +1,4 @@
-package com.example.completepokemondex
+package com.example.completepokemondex.ui.infoPokemon
 
 import androidx.lifecycle.*
 import com.example.completepokemondex.data.local.database.PokedexDatabase
@@ -146,7 +146,7 @@ class PokemonInfoViewModel(
                                             ?: pokemon.sprites?.front_default,
                                         types = pokemon.types?.mapNotNull { typeInfo ->
                                             typeInfo?.type?.name?.let { typeName ->
-                                                val type = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(typeName)
+                                                val type = PokemonTypeUtil.getTypeByName(typeName)
                                                 PokemonTypeUi(
                                                     name = type.name,
                                                     color = type.colorRes,
@@ -216,7 +216,7 @@ class PokemonInfoViewModel(
 
 fun extractFlavorText(species: PokemonSpeciesDomain?): String {
     if (species == null) return ""
-    val lang = java.util.Locale.getDefault().language
+    val lang = Locale.getDefault().language
     val entries = species.flavor_text_entries ?: return ""
     val flavor = entries.firstOrNull {
         val l = it?.language?.name
@@ -228,7 +228,7 @@ fun extractFlavorText(species: PokemonSpeciesDomain?): String {
 
 fun formatHeight(heightInDecimeters: Int?): String {
     if (heightInDecimeters == null) return ""
-    val isEnglish = java.util.Locale.getDefault().language == "en"
+    val isEnglish = Locale.getDefault().language == "en"
     return if (isEnglish) {
         val heightInInches = heightInDecimeters * 3.93701
         String.format("%.1f \"", heightInInches)
@@ -240,7 +240,7 @@ fun formatHeight(heightInDecimeters: Int?): String {
 
 fun formatWeight(weightInHectograms: Int?): String {
     if (weightInHectograms == null) return ""
-    val isEnglish = java.util.Locale.getDefault().language == "en"
+    val isEnglish = Locale.getDefault().language == "en"
     return if (isEnglish) {
         val weightInPounds = weightInHectograms * 0.22046
         String.format("%.1f lbs", weightInPounds)

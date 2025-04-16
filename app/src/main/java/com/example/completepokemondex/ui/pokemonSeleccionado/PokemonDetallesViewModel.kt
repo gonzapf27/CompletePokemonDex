@@ -1,4 +1,4 @@
-package com.example.completepokemondex
+package com.example.completepokemondex.ui.pokemonSeleccionado
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
