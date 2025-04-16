@@ -24,7 +24,10 @@ data class PokemonDetallesUiState(
     val descripcion: String = "",
     val isFavorite: Boolean = false,
     val habilidades: List<HabilidadUi> = emptyList(), // Nombres y descripciones de habilidades
-    val captureRate: Int? = null // Tasa de captura
+    val captureRate: Int? = null, // Tasa de captura
+    val genderRate: Int? = null, // Nuevo: gender_rate crudo
+    val genderMalePercent: Double? = null, // Nuevo: % macho
+    val genderFemalePercent: Double? = null // Nuevo: % hembra
 )
 
 data class PokemonTypeUi(
@@ -66,7 +69,7 @@ class PokemonDetallesViewModel(
      *
      * @param id El ID del Pokémon a buscar.
      */
-    private fun fetchPokemon(id: Int) {
+    fun fetchPokemon(id: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
             var descripcion: String
@@ -138,6 +141,9 @@ class PokemonDetallesViewModel(
                                             )
                                         }
                                     }
+                                    // Calcular porcentajes de género
+                                    val genderRate = speciesResult.data.gender_rate
+                                    val (malePercent, femalePercent) = calculateGenderPercents(genderRate)
                                     _uiState.value = PokemonDetallesUiState(
                                         isLoading = false,
                                         id = pokemon.id?.toString() ?: "",
@@ -159,7 +165,10 @@ class PokemonDetallesViewModel(
                                         descripcion = descripcion,
                                         isFavorite = isFavorite,
                                         habilidades = habilidades,
-                                        captureRate = speciesResult.data.capture_rate
+                                        captureRate = speciesResult.data.capture_rate,
+                                        genderRate = genderRate,
+                                        genderMalePercent = malePercent,
+                                        genderFemalePercent = femalePercent
                                     )
                                 }
                                 is Resource.Error -> {
@@ -185,62 +194,6 @@ class PokemonDetallesViewModel(
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Extrae el flavor text en el idioma del sistema (es, en, o en por defecto).
-     */
-    private fun extractFlavorText(species: PokemonSpeciesDomain?): String {
-        if (species == null) return ""
-        val lang = Locale.getDefault().language
-        val entries = species.flavor_text_entries ?: return ""
-        // Buscar primero en el idioma del sistema
-        val flavor = entries.firstOrNull { 
-            val l = it?.language?.name
-            l == lang
-        }?.flavor_text
-        // Si no hay en el idioma del sistema, buscar en inglés
-        val fallback = entries.firstOrNull { it?.language?.name == "en" }?.flavor_text
-        // Si no hay ninguno, devolver vacío
-        return (flavor ?: fallback ?: "").replace("\n", " ").replace("\u000c", " ").trim()
-    }
-
-    /**
-     * Formatea la altura del Pokémon según el idioma del dispositivo.
-     * Si el idioma es inglés, la altura se muestra en pulgadas, de lo contrario, en metros.
-     *
-     * @param heightInDecimeters La altura en decímetros.
-     * @return La altura formateada como una cadena de texto.
-     */
-    private fun formatHeight(heightInDecimeters: Int?): String {
-        if (heightInDecimeters == null) return ""
-        val isEnglish = Locale.getDefault().language == "en"
-        return if (isEnglish) {
-            val heightInInches = heightInDecimeters * 3.93701
-            String.format("%.1f \"", heightInInches)
-        } else {
-            val heightInMeters = heightInDecimeters * 0.1
-            String.format("%.1f m", heightInMeters)
-        }
-    }
-
-    /**
-     * Formatea el peso del Pokémon según el idioma del dispositivo.
-     * Si el idioma es inglés, el peso se muestra en libras, de lo contrario, en kilogramos.
-     *
-     * @param weightInHectograms El peso en hectogramos.
-     * @return El peso formateado como una cadena de texto.
-     */
-    private fun formatWeight(weightInHectograms: Int?): String {
-        if (weightInHectograms == null) return ""
-        val isEnglish = Locale.getDefault().language == "en"
-        return if (isEnglish) {
-            val weightInPounds = weightInHectograms * 0.22046
-            String.format("%.1f lbs", weightInPounds)
-        } else {
-            val weightInKg = weightInHectograms * 0.1
-            String.format("%.1f kg", weightInKg)
         }
     }
 
@@ -280,5 +233,58 @@ class PokemonDetallesViewModel(
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
+    }
+}
+
+// --- FUNCIONES AUXILIARES FUERA DE LA CLASE ---
+
+fun extractFlavorText(species: PokemonSpeciesDomain?): String {
+    if (species == null) return ""
+    val lang = Locale.getDefault().language
+    val entries = species.flavor_text_entries ?: return ""
+    val flavor = entries.firstOrNull {
+        val l = it?.language?.name
+        l == lang
+    }?.flavor_text
+    val fallback = entries.firstOrNull { it?.language?.name == "en" }?.flavor_text
+    return (flavor ?: fallback ?: "").replace("\n", " ").replace("\u000c", " ").trim()
+}
+
+fun formatHeight(heightInDecimeters: Int?): String {
+    if (heightInDecimeters == null) return ""
+    val isEnglish = Locale.getDefault().language == "en"
+    return if (isEnglish) {
+        val heightInInches = heightInDecimeters * 3.93701
+        String.format("%.1f \"", heightInInches)
+    } else {
+        val heightInMeters = heightInDecimeters * 0.1
+        String.format("%.1f m", heightInMeters)
+    }
+}
+
+fun formatWeight(weightInHectograms: Int?): String {
+    if (weightInHectograms == null) return ""
+    val isEnglish = Locale.getDefault().language == "en"
+    return if (isEnglish) {
+        val weightInPounds = weightInHectograms * 0.22046
+        String.format("%.1f lbs", weightInPounds)
+    } else {
+        val weightInKg = weightInHectograms * 0.1
+        String.format("%.1f kg", weightInKg)
+    }
+}
+
+fun calculateGenderPercents(genderRate: Int?): Pair<Double?, Double?> {
+    return when (genderRate) {
+        null -> Pair(null, null)
+        -1 -> Pair(0.0, 0.0)
+        0 -> Pair(100.0, 0.0)
+        8 -> Pair(0.0, 100.0)
+        in 1..7 -> {
+            val female = genderRate / 8.0 * 100.0
+            val male = 100.0 - female
+            Pair(male, female)
+        }
+        else -> Pair(null, null)
     }
 }

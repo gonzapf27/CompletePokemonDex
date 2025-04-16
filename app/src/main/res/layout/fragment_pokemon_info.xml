@@ -427,8 +427,6 @@
                             android:id="@+id/pokemon_capture_rate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:text="45 - Dificil"
                             android:textColor="@color/text_secondary"
                             android:textSize="18sp"
@@ -462,21 +460,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/pokemon_abilities"
-                        android:background="@android:color/transparent"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/label_text"
                         android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textColor="@color/type_grass"
+                        android:textSize="18sp"
+                        android:background="@drawable/rounded_corner_bg"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="16dp"/>
 
                     <TextView
                         android:id="@+id/pokemon_abilities_explanation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Habilidades que puede tener este Pokémon. Algunas pueden ser ocultas."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
-                        android:layout_marginTop="2dp"
-                        android:background="@android:color/transparent" />
+                        android:text="@string/pokemon_abilities_explanation"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp" />
 
                     <LinearLayout
                         android:id="@+id/pokemon_abilities_cards_container"

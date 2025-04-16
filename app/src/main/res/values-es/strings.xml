@@ -7,6 +7,7 @@
     <string name="pokemon_base_stats">Estadísticas Base</string>
     <string name="pokemon_abilities">Habilidades</string>
     <string name="hidden_ability">Habilidad oculta</string>
+    <string name="pokemon_abilities_explanation">Habilidades que puede tener este Pokémon. Algunas pueden ser ocultas.</string>
     <!-- Pokemon Types -->
     <string name="type_normal">Normal</string>
     <string name="type_fire">Fuego</string>

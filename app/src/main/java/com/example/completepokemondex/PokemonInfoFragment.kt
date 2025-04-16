@@ -117,6 +117,20 @@ class PokemonInfoFragment : Fragment() {
             // Descripción
             binding.pokemonDetailsDescription.text = state.descripcion
 
+            // Mostrar % de sexo
+            val malePercent = state.genderMalePercent
+            val femalePercent = state.genderFemalePercent
+            if (malePercent == 0.0 && femalePercent == 0.0) {
+                binding.pokemonGenderMale.text = "—"
+                binding.pokemonGenderFemale.text = "—"
+                binding.genderRatioIndicator.progress = 0
+            } else {
+                binding.pokemonGenderMale.text = if (malePercent != null) String.format("%.1f%%", malePercent) else "?"
+                binding.pokemonGenderFemale.text = if (femalePercent != null) String.format("%.1f%%", femalePercent) else "?"
+                // El progreso es el % macho (0-100)
+                binding.genderRatioIndicator.progress = malePercent?.toInt() ?: 0
+            }
+
             // Mostrar tasa de captura + dificultad
             val captureRateText = state.captureRate?.toString() ?: "?"
             val difficultyText = state.captureRate?.let {
