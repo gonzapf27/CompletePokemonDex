@@ -63,15 +63,18 @@ class PokemonInfoFragment : Fragment() {
             currentIsFavorite = state.isFavorite
             // Fondo gradiente
             val gradientBg = binding.pokemonFragmentGradientBg
-            val mainTypeColor = state.types.firstOrNull()?.let { 
+            // Obtener los colores de los tipos (máximo 2, como en item_pokemon.xml)
+            val typeColors = state.types.take(2).map { 
                 androidx.core.content.ContextCompat.getColor(requireContext(), it.color)
-            } ?: android.graphics.Color.LTGRAY
-            val isDark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
-            // Usar gris claro u oscuro en vez de blanco/negro puro
-            val endColor = if (isDark) 0xFF222222.toInt() else 0xFFF0F0F0.toInt()
+            }
+            val gradientColors = when {
+                typeColors.isEmpty() -> intArrayOf(android.graphics.Color.LTGRAY, android.graphics.Color.LTGRAY)
+                typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+                else -> typeColors.toIntArray()
+            }
             val gradientDrawable = android.graphics.drawable.GradientDrawable(
-                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-                intArrayOf(mainTypeColor, endColor)
+                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, // vertical
+                gradientColors
             )
             gradientDrawable.cornerRadius = 0f
             gradientBg.background = gradientDrawable

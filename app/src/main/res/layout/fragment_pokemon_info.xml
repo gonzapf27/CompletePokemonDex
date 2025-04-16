@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,7 +21,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:elevation="0dp" />
 
-        <!-- Estrella de favoritos arriba a la derecha -->
         <ImageButton
             android:id="@+id/btn_favorite"
             android:layout_width="48dp"
@@ -34,182 +35,342 @@
             android:clickable="true"
             app:tint="@null" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_pokemon_image"
-            android:layout_width="0dp"
-            android:layout_height="260dp"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:layout_constraintEnd_toEndOf="parent"
+        <ImageView
+            android:id="@+id/pokemon_image"
+            android:layout_width="220dp"
+            android:layout_height="240dp"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/pokemon_image"
-                android:layout_width="220dp"
-                android:layout_height="240dp"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                tools:src="@tools:sample/avatars" />
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:src="@tools:sample/avatars" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/card_pokemon_image"
+            android:padding="0dp"
+            app:layout_constraintTop_toBottomOf="@id/pokemon_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Nombre e ID centrados -->
-            <TextView
-                android:id="@+id/pokemon_details_nombre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textStyle="bold"
-                android:background="@android:color/transparent"
-                android:textColor="@color/title_text"
-                android:textAlignment="center"
-                tools:text="Bulbasaur" />
-
-             <LinearLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:gravity="center"
-                 android:orientation="horizontal"
-                 android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/pokemon_details_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="20sp"
-                    android:layout_gravity="center"
-                    android:background="@android:color/transparent"
-                    tools:text="#001" />
-            </LinearLayout>
-
-            <!-- Chips de tipos -->
-            <LinearLayout
-                android:id="@+id/pokemon_type_chips_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/pokemon_type_chip1"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:text="" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/pokemon_type_chip2"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:text=""
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/darker_gray" />
-
-            <!-- Altura y peso -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pokemon_height"
-                        android:textStyle="bold"
-                        android:textColor="@color/label_text" />
-
-                    <TextView
-                        android:id="@+id/pokemon_details_height"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        tools:text="0.7 m" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pokemon_weight"
-                        android:textStyle="bold"
-                        android:textColor="@color/label_text" />
-
-                    <TextView
-                        android:id="@+id/pokemon_details_weight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        tools:text="6.9 kg" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Descripción -->
-            <TextView
-                android:id="@+id/pokemon_details_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/text_primary"
-                android:text=""
-                android:background="@android:color/transparent"
-                android:gravity="start"
-                tools:text="Este Pokémon tiene una semilla en su lomo desde que nace. La semilla crece poco a poco." />
-
-            <!-- Card para ratio de captura (ahora igual que habilidades) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:strokeColor="@color/stroke_card_abilities"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/section_bg"
+                app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="18dp"
+                    android:gravity="center_horizontal">
 
-                    <!-- Etiqueta de ratio de captura -->
+                    <TextView
+                        android:id="@+id/pokemon_details_nombre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textStyle="bold"
+                        android:textColor="@color/title_text"
+                        android:textAlignment="center"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.05"
+                        tools:text="Bulbasaur" />
+
+                    <TextView
+                        android:id="@+id/pokemon_details_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="18sp"
+                        android:layout_marginTop="2dp"
+                        android:textStyle="italic"
+                        android:background="@android:color/transparent"
+                        tools:text="#001" />
+
+                    <LinearLayout
+                        android:id="@+id/species_type_chips_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/species_type_chip1"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:visibility="gone"
+                            android:text=""
+                            android:textColor="@color/chip_text"
+                            app:chipBackgroundColor="@color/chip_bg"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:elevation="2dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/species_type_chip2"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:visibility="gone"
+                            android:text=""
+                            android:textColor="@color/chip_text"
+                            app:chipBackgroundColor="@color/chip_bg"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:elevation="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/section_bg"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/pokemon_species_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Species"
+                        android:textStyle="bold"
+                        android:textColor="@color/type_grass"
+                        android:textSize="18sp"
+                        android:background="@drawable/rounded_corner_bg"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:id="@+id/pokemon_species_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Seed Pokémon"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="22sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/pokemon_details_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/text_primary"
+                        android:text=""
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="16dp"
+                        tools:text="A strange seed was planted on its back at birth.\nThe plant sprouts and grows with this POKéMON." />
+
+                    <LinearLayout
+                        android:id="@+id/pokemon_type_chips_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/pokemon_type_chip1"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:visibility="visible"
+                            android:text="Grass"
+                            android:textColor="@color/white"
+                            app:chipBackgroundColor="@color/type_grass"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:elevation="2dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/pokemon_type_chip2"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:visibility="visible"
+                            android:text="Poison"
+                            android:textColor="@color/white"
+                            app:chipBackgroundColor="@color/type_poison"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:elevation="2dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_height"
+                                android:layout_marginBottom="4dp"
+                                app:tint="@color/text_secondary"/>
+
+                            <TextView
+                                android:id="@+id/pokemon_details_height"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="0.70 m" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="4dp">
+                                
+                                <ImageView
+                                    android:layout_width="16dp" 
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_male"
+                                    android:tint="#6890F0"/>
+                                    
+                                <TextView
+                                    android:id="@+id/pokemon_gender_male"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="#6890F0"
+                                    android:textSize="14sp"
+                                    android:layout_marginStart="2dp"
+                                    android:text="87.5%"/>
+                                    
+                                <ImageView
+                                    android:layout_width="16dp" 
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_female"
+                                    android:tint="#F85888"
+                                    android:layout_marginStart="8dp"/>
+                                    
+                                <TextView
+                                    android:id="@+id/pokemon_gender_female"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="#F85888"
+                                    android:textSize="14sp"
+                                    android:layout_marginStart="2dp"
+                                    android:text="12.5%"/>
+                            </LinearLayout>
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/gender_ratio_indicator"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:progress="87"
+                                app:indicatorColor="#6890F0"
+                                app:trackColor="#F85888"
+                                app:trackThickness="8dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_weight"
+                                android:layout_marginBottom="4dp"
+                                app:tint="@color/text_secondary"/>
+
+                            <TextView
+                                android:id="@+id/pokemon_details_weight"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="6.9 kg" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/section_bg"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
                     <TextView
                         android:id="@+id/pokemon_capture_rate_label"
                         android:layout_width="wrap_content"
@@ -221,7 +382,6 @@
                         android:background="@android:color/transparent"
                         />
 
-                    <!-- Explicación de ratio de captura -->
                     <TextView
                         android:id="@+id/pokemon_capture_rate_explanation"
                         android:layout_width="match_parent"
@@ -233,7 +393,6 @@
                         android:background="@android:color/transparent"
                         />
 
-                    <!-- Tasa de captura -->
                     <LinearLayout
                         android:id="@+id/pokemon_capture_rate_container"
                         android:layout_width="wrap_content"
@@ -263,146 +422,174 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Habilidades -->
-            <TextView
-                android:id="@+id/pokemon_abilities_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pokemon_abilities"
-                android:layout_marginTop="24dp"
-                android:background="@android:color/transparent"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/label_text" />
-
-            <LinearLayout
-                android:id="@+id/pokemon_abilities_cards_container"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/section_bg"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
 
-                <!-- Repite esto para cada habilidad -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/habilidadCard1"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:strokeColor="@color/stroke_card_abilities"
-                    app:strokeWidth="1dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/pokemon_abilities_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pokemon_abilities"
+                        android:background="@android:color/transparent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/label_text"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/pokemon_abilities_explanation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Habilidades que puede tener este Pokémon. Algunas pueden ser ocultas."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp"
+                        android:background="@android:color/transparent" />
 
                     <LinearLayout
+                        android:id="@+id/pokemon_abilities_cards_container"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_marginTop="12dp">
 
-                        <TextView
-                            android:id="@+id/habilidadNombre1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textStyle="bold"
-                            android:textColor="@color/label_text"
-                            android:text="" />
-
-                        <TextView
-                            android:id="@+id/habilidadDesc1"
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/habilidadCard1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                            android:textColor="@color/text_primary"
-                            android:text=""
-                            android:background="@android:color/transparent"
-                            android:gravity="start"
-                            android:visibility="gone" />
-                    </LinearLayout>
+                            android:layout_marginBottom="10dp"
+                            android:visibility="gone"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="1dp"
+                            app:cardBackgroundColor="@color/card_bg"
+                            app:strokeColor="@color/stroke_card_abilities"
+                            app:strokeWidth="1dp">
 
-                </com.google.android.material.card.MaterialCardView>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/habilidadCard2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:strokeColor="@color/stroke_card_abilities"
-                    app:strokeWidth="1dp">
+                                <TextView
+                                    android:id="@+id/habilidadNombre1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/label_text"
+                                    android:text="" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                                <TextView
+                                    android:id="@+id/habilidadDesc1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textColor="@color/text_primary"
+                                    android:text=""
+                                    android:background="@android:color/transparent"
+                                    android:gravity="start"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
-                        <TextView
-                            android:id="@+id/habilidadNombre2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textStyle="bold"
-                            android:textColor="@color/label_text"
-                            android:text="" />
-
-                        <TextView
-                            android:id="@+id/habilidadDesc2"
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/habilidadCard2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                            android:textColor="@color/text_primary"
-                            android:text=""
-                            android:background="@android:color/transparent"
-                            android:gravity="start"
-                            android:visibility="gone" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:layout_marginBottom="10dp"
+                            android:visibility="gone"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="1dp"
+                            app:cardBackgroundColor="@color/card_bg"
+                            app:strokeColor="@color/stroke_card_abilities"
+                            app:strokeWidth="1dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/habilidadCard3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:strokeColor="@color/stroke_card_abilities"
-                    app:strokeWidth="1dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-                        <TextView
-                            android:id="@+id/habilidadNombre3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textStyle="bold"
-                            android:textColor="@color/label_text"
-                            android:text="" />
-                        <TextView
-                            android:id="@+id/habilidadDesc3"
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:id="@+id/habilidadNombre2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/label_text"
+                                    android:text="" />
+
+                                <TextView
+                                    android:id="@+id/habilidadDesc2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textColor="@color/text_primary"
+                                    android:text=""
+                                    android:background="@android:color/transparent"
+                                    android:gravity="start"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/habilidadCard3"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                            android:textColor="@color/text_primary"
-                            android:text=""
-                            android:background="@android:color/transparent"
-                            android:gravity="start"
-                            android:visibility="gone" />
+                            android:layout_marginBottom="10dp"
+                            android:visibility="gone"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="1dp"
+                            app:cardBackgroundColor="@color/card_bg"
+                            app:strokeColor="@color/stroke_card_abilities"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:id="@+id/habilidadNombre3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/label_text"
+                                    android:text="" />
+
+                                <TextView
+                                    android:id="@+id/habilidadDesc3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textColor="@color/text_primary"
+                                    android:text=""
+                                    android:background="@android:color/transparent"
+                                    android:gravity="start"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Puedes copiar el bloque anterior para más habilidades -->
-
-            </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <ProgressBar

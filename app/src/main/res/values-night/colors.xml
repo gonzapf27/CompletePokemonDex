@@ -31,4 +31,14 @@
     <color name="title_text">#FFFFFFFF</color> <!-- Blanco puro para títulos -->
     <color name="pokemon_list_name">#FF212529</color> <!-- Negro profundo para nombres en la lista -->
     <color name="stroke_card_abilities">#666666</color> <!-- Gris medio para mayor contraste en el tema oscuro -->
+    <color name="card_bg">#CC23272A</color> <!-- Fondo tarjetas oscuro, semitransparente -->
+
+    <!-- Nuevos colores -->
+    <color name="background">#FF181A1B</color> <!-- Fondo general oscuro -->
+    <color name="section_bg">#FF23272A</color> <!-- Fondo de secciones/tarjetas -->
+    <color name="chip_bg">#333A4046</color> <!-- Fondo chips tipo -->
+    <color name="chip_text">#FFEDEDED</color> <!-- Texto chips tipo -->
+    <color name="divider">#FF33373B</color> <!-- Líneas divisoras suaves -->
+    <color name="card_shadow">#66000000</color> <!-- Sombra tarjetas -->
+    <color name="highlight">#FF4FC3F7</color> <!-- Color de acento -->
 </resources>
