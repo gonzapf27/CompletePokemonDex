@@ -20,13 +20,16 @@ import com.example.completepokemondex.data.local.database.PokedexDatabase
 class PokemonStatsFragment : Fragment() {
     private var _binding: FragmentPokemonStatsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PokemonDetallesViewModel by viewModels {
-        PokemonDetallesViewModel.Factory(PokedexDatabase.getDatabase(requireContext()))
+
+    private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
+
+    private val viewModel: PokemonStatsViewModel by viewModels {
+        PokemonStatsViewModel.Factory(PokedexDatabase.getDatabase(requireContext()))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getInt("pokemon_id")?.let { viewModel.setPokemonId(it) }
+        viewModel.setPokemonId(pokemonId)
     }
 
     override fun onCreateView(
@@ -40,27 +43,30 @@ class PokemonStatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            if (!state.isLoading && state.id.isNotBlank()) {
-                val pokemon = viewModel.getCurrentPokemonDetailsDomain()
-                if (pokemon != null) showStats(pokemon)
+            if (!state.isLoading && state.pokemon != null) {
+                showStats(state.pokemon)
+                // Gradiente igual que en fragment_pokemon_info.xml
+                val gradientBg = binding.root.findViewById<View>(R.id.pokemon_stats_gradient_bg)
+                val typeColors = state.pokemon.types?.take(2)?.mapNotNull { typeInfo ->
+                    typeInfo?.type?.name?.let { typeName ->
+                        // Usa el utilitario para obtener el color del tipo
+                        val type = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(typeName)
+                        ContextCompat.getColor(requireContext(), type.colorRes)
+                    }
+                } ?: listOf(ContextCompat.getColor(requireContext(), R.color.type_normal))
+                val gradientColors = when {
+                    typeColors.isEmpty() -> intArrayOf(android.graphics.Color.LTGRAY, android.graphics.Color.LTGRAY)
+                    typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+                    else -> typeColors.toIntArray()
+                }
+                val gradientDrawable = GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    gradientColors
+                )
+                gradientDrawable.cornerRadius = 0f
+                gradientBg?.background = gradientDrawable
             }
         }
-        // Gradiente igual que en fragment_pokemon_info.xml
-        val gradientBg = binding.root.findViewById<View>(R.id.pokemon_stats_gradient_bg)
-        val typeColors = viewModel.uiState.value?.types?.take(2)?.map {
-            ContextCompat.getColor(requireContext(), it.color)
-        } ?: listOf(ContextCompat.getColor(requireContext(), R.color.type_normal))
-        val gradientColors = when {
-            typeColors.isEmpty() -> intArrayOf(android.graphics.Color.LTGRAY, android.graphics.Color.LTGRAY)
-            typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
-            else -> typeColors.toIntArray()
-        }
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            gradientColors
-        )
-        gradientDrawable.cornerRadius = 0f
-        gradientBg?.background = gradientDrawable
     }
 
     override fun onDestroyView() {

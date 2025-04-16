@@ -8,19 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonInfoBinding
-import com.google.android.material.chip.Chip
 
 class PokemonInfoFragment : Fragment() {
     private var _binding: FragmentPokemonInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: PokemonDetallesViewModel by viewModels {
-        PokemonDetallesViewModel.Factory(PokedexDatabase.getDatabase(requireContext()))
+    private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
+
+    private val viewModel: PokemonInfoViewModel by viewModels {
+        PokemonInfoViewModel.Factory(PokedexDatabase.getDatabase(requireContext()))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getInt("pokemon_id")?.let { viewModel.setPokemonId(it) }
+        viewModel.setPokemonId(pokemonId)
     }
 
     override fun onCreateView(
@@ -52,10 +53,6 @@ class PokemonInfoFragment : Fragment() {
             } else {
                 binding.btnFavorite.setImageResource(R.drawable.ic_star_outline)
             }
-            // Animación al cambiar favorito
-            val context = binding.btnFavorite.context
-            val anim = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.favorite_pop)
-            binding.btnFavorite.startAnimation(anim)
             // Fondo gradiente
             val gradientBg = binding.pokemonFragmentGradientBg
             val typeColors = state.types.take(2).map { 
