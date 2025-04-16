@@ -27,7 +27,8 @@ data class PokemonDetallesUiState(
     val captureRate: Int? = null, // Tasa de captura
     val genderRate: Int? = null, // Nuevo: gender_rate crudo
     val genderMalePercent: Double? = null, // Nuevo: % macho
-    val genderFemalePercent: Double? = null // Nuevo: % hembra
+    val genderFemalePercent: Double? = null, // Nuevo: % hembra
+    val speciesGenus: String = "" // Nuevo: especie (genera)
 )
 
 data class PokemonTypeUi(
@@ -144,6 +145,12 @@ class PokemonDetallesViewModel(
                                     // Calcular porcentajes de género
                                     val genderRate = speciesResult.data.gender_rate
                                     val (malePercent, femalePercent) = calculateGenderPercents(genderRate)
+                                    // Obtener genus/especie en el idioma adecuado
+                                    val genus = speciesResult.data.genera
+                                        ?.firstOrNull { it?.language?.name == (if (Locale.getDefault().language == "es") "es" else "en") }
+                                        ?.genus
+                                        ?: speciesResult.data.genera?.firstOrNull { it?.language?.name == "en" }?.genus
+                                        ?: ""
                                     _uiState.value = PokemonDetallesUiState(
                                         isLoading = false,
                                         id = pokemon.id?.toString() ?: "",
@@ -168,7 +175,8 @@ class PokemonDetallesViewModel(
                                         captureRate = speciesResult.data.capture_rate,
                                         genderRate = genderRate,
                                         genderMalePercent = malePercent,
-                                        genderFemalePercent = femalePercent
+                                        genderFemalePercent = femalePercent,
+                                        speciesGenus = genus // Nuevo campo
                                     )
                                 }
                                 is Resource.Error -> {

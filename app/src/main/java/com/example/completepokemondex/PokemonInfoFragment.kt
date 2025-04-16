@@ -33,8 +33,6 @@ class PokemonInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var currentPokemonId: Int? = null
-        var currentIsFavorite: Boolean = false
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             binding.loadingIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
             binding.pokemonDetailsId.text = "#" + state.id
@@ -58,12 +56,8 @@ class PokemonInfoFragment : Fragment() {
             val context = binding.btnFavorite.context
             val anim = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.favorite_pop)
             binding.btnFavorite.startAnimation(anim)
-            // Guardar id y estado actual para el click
-            currentPokemonId = state.id.toIntOrNull()
-            currentIsFavorite = state.isFavorite
             // Fondo gradiente
             val gradientBg = binding.pokemonFragmentGradientBg
-            // Obtener los colores de los tipos (máximo 2, como en item_pokemon.xml)
             val typeColors = state.types.take(2).map { 
                 androidx.core.content.ContextCompat.getColor(requireContext(), it.color)
             }
@@ -104,7 +98,6 @@ class PokemonInfoFragment : Fragment() {
             state.habilidades.take(3).forEachIndexed { idx, habilidad ->
                 val triple = habilidadCards[idx]
                 triple.first.visibility = View.VISIBLE
-                // Si la habilidad es oculta, mostrar el texto correspondiente
                 if (habilidad.isOculta == true) {
                     triple.second.text = "${habilidad.nombre} (${getString(R.string.hidden_ability)})"
                 } else {
@@ -116,25 +109,24 @@ class PokemonInfoFragment : Fragment() {
 
             // Descripción
             binding.pokemonDetailsDescription.text = state.descripcion
+            // Mostrar especie
+            binding.pokemonSpeciesType.text = state.speciesGenus
 
             // Mostrar % de sexo
-            val malePercent = state.genderMalePercent
-            val femalePercent = state.genderFemalePercent
-            if (malePercent == 0.0 && femalePercent == 0.0) {
+            if (state.genderMalePercent == 0.0 && state.genderFemalePercent == 0.0) {
                 binding.pokemonGenderMale.text = "—"
                 binding.pokemonGenderFemale.text = "—"
                 binding.genderRatioIndicator.progress = 0
             } else {
-                binding.pokemonGenderMale.text = if (malePercent != null) String.format("%.1f%%", malePercent) else "?"
-                binding.pokemonGenderFemale.text = if (femalePercent != null) String.format("%.1f%%", femalePercent) else "?"
-                // El progreso es el % macho (0-100)
-                binding.genderRatioIndicator.progress = malePercent?.toInt() ?: 0
+                binding.pokemonGenderMale.text = if (state.genderMalePercent != null) String.format("%.1f%%", state.genderMalePercent) else "?"
+                binding.pokemonGenderFemale.text = if (state.genderFemalePercent != null) String.format("%.1f%%", state.genderFemalePercent) else "?"
+                binding.genderRatioIndicator.progress = state.genderMalePercent?.toInt() ?: 0
             }
 
             // Mostrar tasa de captura + dificultad
             val captureRateText = state.captureRate?.toString() ?: "?"
             val difficultyText = state.captureRate?.let {
-                com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain(
+                val resId = com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain(
                     capture_rate = it,
                     base_happiness = null, color = null, egg_groups = null, evolution_chain = null,
                     evolves_from_species = null, flavor_text_entries = null, form_descriptions = null,
@@ -143,7 +135,8 @@ class PokemonInfoFragment : Fragment() {
                     id = null, is_baby = null, is_legendary = null, is_mythical = null, name = null,
                     names = null, order = null, pal_park_encounters = null, pokedex_numbers = null,
                     shape = null, varieties = null
-                ).getCaptureDifficulty()
+                ).getCaptureDifficultyStringRes()
+                requireContext().getString(resId)
             } ?: ""
             binding.pokemonCaptureRate.text =
                 if (difficultyText.isNotBlank())
@@ -151,12 +144,12 @@ class PokemonInfoFragment : Fragment() {
                 else
                     captureRateText
 
-        }
-        // Listener para marcar/desmarcar favorito
-        binding.btnFavorite.setOnClickListener {
-            val id = currentPokemonId
-            if (id != null) {
-                viewModel.toggleFavorite(id, !currentIsFavorite)
+            // Listener para marcar/desmarcar favorito
+            binding.btnFavorite.setOnClickListener {
+                val id = state.id.toIntOrNull()
+                if (id != null) {
+                    viewModel.toggleFavorite(id, !state.isFavorite)
+                }
             }
         }
     }
