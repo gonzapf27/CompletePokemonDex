@@ -35,4 +35,7 @@
     <string name="capture_difficulty_hard">Difícil</string>
     <string name="capture_difficulty_extremely_hard">Extremadamente difícil</string>
     <string name="capture_difficulty_unknown">Desconocida</string>
+    <string name="pokemon_capture_rate_explanation">Indica la facilidad o dificultad para atrapar este Pokémon. Cuanto mayor es el número, más fácil es capturarlo.</string>
+    <string name="pokemon_capture_rate_label">Ratio de captura</string>
+    <string name="pokemon_species_label">Especie</string>
 </resources>
