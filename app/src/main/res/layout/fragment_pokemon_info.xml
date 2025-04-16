@@ -244,8 +244,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
-
+                        android:layout_marginBottom="12dp"
+                        android:baselineAligned="false">
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -265,55 +265,65 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/text_primary"
-                                android:textSize="18sp"
+                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 tools:text="0.70 m" />
                         </LinearLayout>
 
-                        <LinearLayout
+                       <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
-                            <LinearLayout
+                           <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
                                 android:layout_marginBottom="4dp">
-                                
-                                <ImageView
-                                    android:layout_width="16dp" 
-                                    android:layout_height="16dp"
-                                    android:src="@drawable/ic_male"
-                                    android:tint="#6890F0"/>
-                                    
-                                <TextView
-                                    android:id="@+id/pokemon_gender_male"
+
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textColor="#6890F0"
-                                    android:textSize="14sp"
-                                    android:layout_marginStart="2dp"
-                                    android:text="87.5%"/>
-                                    
-                                <ImageView
-                                    android:layout_width="16dp" 
-                                    android:layout_height="16dp"
-                                    android:src="@drawable/ic_female"
-                                    android:tint="#F85888"
-                                    android:layout_marginStart="8dp"/>
-                                    
-                                <TextView
-                                    android:id="@+id/pokemon_gender_female"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical">
+
+                                    <ImageView
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_male"
+                                        app:tint="#6890F0" />
+
+                                    <TextView
+                                        android:id="@+id/pokemon_gender_male"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="#6890F0"
+                                        android:textSize="14sp"
+                                        android:layout_marginStart="2dp"
+                                        android:text="87.5%" />
+                                </LinearLayout>
+
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textColor="#F85888"
-                                    android:textSize="14sp"
-                                    android:layout_marginStart="2dp"
-                                    android:text="12.5%"/>
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical">
+                                     <ImageView
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_female"
+                                        app:tint="#F85888" />
+                                     <TextView
+                                        android:id="@+id/pokemon_gender_female"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="#F85888"
+                                        android:textSize="14sp"
+                                        android:layout_marginStart="2dp"
+                                        android:text="12.5%" />
+                                </LinearLayout>
                             </LinearLayout>
 
                             <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -323,10 +333,11 @@
                                 android:progress="87"
                                 app:indicatorColor="#6890F0"
                                 app:trackColor="#F85888"
-                                app:trackThickness="8dp" />
+                                app:trackThickness="8dp"
+                                android:layout_marginEnd="8dp" />
                         </LinearLayout>
 
-                        <LinearLayout
+                       <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -345,7 +356,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/text_primary"
-                                android:textSize="18sp"
+                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 tools:text="6.9 kg" />
                         </LinearLayout>
