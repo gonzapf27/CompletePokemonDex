@@ -52,6 +52,9 @@ class PokemonDetallesViewModel(
     private val _uiState = MutableLiveData(PokemonDetallesUiState())
     val uiState: LiveData<PokemonDetallesUiState> = _uiState
 
+    private var currentPokemonDetails: PokemonDetailsDomain? = null
+    fun getCurrentPokemonDetailsDomain() = currentPokemonDetails
+
     /**
      * Establece el ID del Pokémon para buscar sus detalles.
      *
@@ -80,6 +83,7 @@ class PokemonDetallesViewModel(
                 when (result) {
                     is Resource.Success -> {
                         pokemon = result.data
+                        currentPokemonDetails = pokemon // Guardar referencia
                         pokemonRepository.getPokemonSpeciesById(id).collect { speciesResult ->
                             when (speciesResult) {
                                 is Resource.Success -> {
