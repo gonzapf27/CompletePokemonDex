@@ -9,12 +9,14 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 /**
  * MainActivity es la actividad principal de la aplicación que muestra la interfaz de usuario y
  * maneja la interacción del usuario.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var pokemonRepository: PokemonRepository

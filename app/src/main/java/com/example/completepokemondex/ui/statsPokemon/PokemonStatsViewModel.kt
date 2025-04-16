@@ -6,6 +6,8 @@ import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 data class PokemonStatsUiState(
@@ -14,7 +16,8 @@ data class PokemonStatsUiState(
     val pokemon: PokemonDetailsDomain? = null
 )
 
-class PokemonStatsViewModel(
+@HiltViewModel
+class PokemonStatsViewModel @Inject constructor(
     private val repository: PokemonRepository
 ) : ViewModel() {
 
@@ -50,22 +53,6 @@ class PokemonStatsViewModel(
                     }
                 }
             }
-        }
-    }
-
-    class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(PokemonStatsViewModel::class.java)) {
-                val pokemonDao = database.pokemonDao()
-                val remoteDataSource = PokemonRemoteDataSource()
-                val pokemonDetailsDao = database.pokemonDetailsDao()
-                val pokemonSpeciesDao = database.pokemonSpeciesDao()
-                val abilityDao = database.abilityDao()
-                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, abilityDao, remoteDataSource)
-                return PokemonStatsViewModel(repository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

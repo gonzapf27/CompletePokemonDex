@@ -16,19 +16,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
-import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonStatsBinding
 import com.example.completepokemondex.util.PokemonTypeUtil
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PokemonStatsFragment : Fragment() {
     private var _binding: FragmentPokemonStatsBinding? = null
     private val binding get() = _binding!!
 
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
 
-    private val viewModel: PokemonStatsViewModel by viewModels {
-        PokemonStatsViewModel.Factory(PokedexDatabase.Companion.getDatabase(requireContext()))
-    }
+    private val viewModel: PokemonStatsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
