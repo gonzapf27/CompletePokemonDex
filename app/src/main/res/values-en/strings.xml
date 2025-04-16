@@ -27,5 +27,14 @@
     <string name="type_fairy">Fairy</string>
     
     <!-- Search hint -->
+    <string name="type_all">All</string>
     <string name="search_pokemon_hint">Search Pokémon</string>
+
+    <!-- Capture Difficulty -->
+    <string name="capture_difficulty_very_easy">Very easy</string>
+    <string name="capture_difficulty_easy">Easy</string>
+    <string name="capture_difficulty_moderate">Moderate</string>
+    <string name="capture_difficulty_hard">Hard</string>
+    <string name="capture_difficulty_extremely_hard">Extremely hard</string>
+    <string name="capture_difficulty_unknown">Unknown</string>
 </resources>

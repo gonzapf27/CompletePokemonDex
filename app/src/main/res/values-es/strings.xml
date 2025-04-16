@@ -25,4 +25,13 @@
     <string name="type_dark">Siniestro</string>
     <string name="type_steel">Acero</string>
     <string name="type_fairy">Hada</string>
+    <string name="type_all">Todos</string>
+    <string name="search_pokemon_hint">Buscar Pokémon</string>
+    <!-- Capture Difficulty -->
+    <string name="capture_difficulty_very_easy">Muy fácil</string>
+    <string name="capture_difficulty_easy">Fácil</string>
+    <string name="capture_difficulty_moderate">Moderado</string>
+    <string name="capture_difficulty_hard">Difícil</string>
+    <string name="capture_difficulty_extremely_hard">Extremadamente difícil</string>
+    <string name="capture_difficulty_unknown">Desconocida</string>
 </resources>

@@ -31,6 +31,7 @@ data class PokemonSpeciesDomain(
 ) {
     fun getCaptureDifficulty(): String {
         return when {
+            //TODO: internacionalizar
             capture_rate == 255 || capture_rate != null && capture_rate > 200 -> "Muy fácil"
             capture_rate in 120..200 -> "Moderado"
             capture_rate in 100..119 -> "Fácil"
@@ -38,6 +39,22 @@ data class PokemonSpeciesDomain(
             capture_rate == 45 || capture_rate in 4..44 -> "Difícil"
             capture_rate == 3 || capture_rate != null && capture_rate <= 3 -> "Extremadamente difícil"
             else -> "Desconocida"
+        }
+    }
+
+    /**
+     * Devuelve el ID del string de dificultad de captura según el valor de capture_rate.
+     * El string debe obtenerse en la UI usando context.getString(result).
+     */
+    fun getCaptureDifficultyStringRes(): Int {
+        return when {
+            capture_rate == 255 || (capture_rate != null && capture_rate > 200) -> R.string.capture_difficulty_very_easy
+            capture_rate in 120..200 -> R.string.capture_difficulty_moderate
+            capture_rate in 100..119 -> R.string.capture_difficulty_easy
+            capture_rate in 46..99 -> R.string.capture_difficulty_moderate
+            capture_rate == 45 || (capture_rate in 4..44) -> R.string.capture_difficulty_hard
+            capture_rate == 3 || (capture_rate != null && capture_rate <= 3) -> R.string.capture_difficulty_extremely_hard
+            else -> R.string.capture_difficulty_unknown
         }
     }
 
