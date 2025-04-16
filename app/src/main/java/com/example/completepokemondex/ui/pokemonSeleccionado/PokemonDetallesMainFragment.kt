@@ -10,7 +10,9 @@ import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PokemonDetallesMainFragment : Fragment() {
     private var _binding: FragmentPokemonDetallesMainBinding? = null
     private val binding get() = _binding!!
