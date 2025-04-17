@@ -6,6 +6,7 @@ import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.domain.model.AbilityDomain
+import com.example.completepokemondex.data.domain.model.EvolutionChainDomain
 import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToEntity
@@ -17,10 +18,14 @@ import com.example.completepokemondex.data.mapping.pokemonSpeciesEntityToDomain
 import com.example.completepokemondex.data.mapping.toDomain as abilityDTOToDomain
 import com.example.completepokemondex.data.mapping.toEntity as abilityDTOToEntity
 import com.example.completepokemondex.data.mapping.toDomain as abilityEntityToDomain
+import com.example.completepokemondex.data.mapping.toDomain as evolutionChainDTOToDomain
+import com.example.completepokemondex.data.mapping.toEntity as evolutionChainDTOToEntity
+import com.example.completepokemondex.data.mapping.toDomain as evolutionChainEntityToDomain
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.dao.AbilityDao
+import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +48,7 @@ class PokemonRepository(
     private val pokemonSpeciesDao: PokemonSpeciesDao,
     private val abilityDao: AbilityDao,
     private val remoteDataSource: PokemonRemoteDataSource,
+    private val evolutionChainDao: EvolutionChainDao
 ) {
     private val tag = "PokemonRepository"
 
@@ -261,6 +267,53 @@ class PokemonRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+    /**
+     * Obtiene la cadena de evolución por su ID, usando caché local y API remota.
+     *
+     * @param id Identificador único de la evolution chain
+     * @return Flow que emite la evolution chain y el estado de carga
+     */
+    fun getEvolutionChainById(id: Int): Flow<Resource<EvolutionChainDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de evolution chain [id=$id]")
+
+            try {
+                // Consultar caché local
+                logDebug("Consultando base de datos local para evolution chain $id...")
+                val localChain = evolutionChainDao.getEvolutionChainById(id)
+
+                if (localChain != null) {
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo evolution chain $id de la base de datos local")
+                    emit(Resource.Success(localChain.evolutionChainEntityToDomain()))
+                } else {
+                    logDebug("No se encontró evolution chain $id en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getEvolutionChainById(id) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibida evolution chain $id de la API")
+                            saveToDatabase {
+                                logDebug("Insertando evolution chain $id en la base de datos")
+                                evolutionChainDao.insertEvolutionChain(apiResponse.evolutionChainDTOToEntity())
+                            }
+                            logDebug("Devolviendo evolution chain $id obtenida de la API")
+                            emit(Resource.Success(apiResponse.evolutionChainDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener evolution chain $id de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener evolution chain: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
     // Funciones auxiliares para evitar código repetido
 
     private suspend inline fun <T> handleApiResponse(
@@ -333,6 +386,4 @@ class PokemonRepository(
         val entity = pokemonDao.getPokemonById(pokemonId)
         return entity?.favorite ?: false
     }
-
-
 }

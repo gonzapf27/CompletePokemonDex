@@ -4,6 +4,7 @@ import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
+import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -39,6 +40,11 @@ interface ApiService {
     suspend fun getAbilityById(
         @Path("id") id: Int
     ): Response<AbilityDTO>
+
+    @GET("evolution-chain/{id}")
+    suspend fun getEvolutionChainById(
+        @Path("id") id: Int
+    ): Response<EvolutionChainDTO>
 }
 
 /**

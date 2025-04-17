@@ -7,6 +7,7 @@ import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
+import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -101,6 +102,32 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             }
         } catch (e: Exception) {
             Log.e("PokemonRemoteDataSource", "Error obteniendo especie del pokemon: ${e.message}")
+            Resource.Error("Error de red: ${e.message}")
+        }
+    }
+
+    /**
+     * Obtiene la cadena de evolución de un Pokémon por su ID desde la API.
+     *
+     * @param id Identificador único de la evolution chain
+     * @return Un objeto Resource que contiene la evolution chain o un mensaje de error
+     */
+    suspend fun getEvolutionChainById(id: Int): Resource<EvolutionChainDTO> {
+        return try {
+            val response = apiService.getEvolutionChainById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Evolution chain obtenida: $body")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo evolution chain: ${e.message}")
             Resource.Error("Error de red: ${e.message}")
         }
     }

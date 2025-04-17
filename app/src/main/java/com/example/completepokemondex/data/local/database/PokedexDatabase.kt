@@ -8,10 +8,12 @@ import com.example.completepokemondex.data.local.dao.AbilityDao
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
+import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.entities.AbilityEntity
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
+import com.example.completepokemondex.data.local.entities.EvolutionChainEntity
 
 /**
  * Base de datos principal de la aplicación Pokedex que contiene
@@ -20,7 +22,13 @@ import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
  * @property pokemonDao DAO para acceder a la información de Pokémon.
  */
 @Database(
-    entities = [PokemonEntity::class, PokemonDetailsEntity::class, PokemonSpeciesEntity::class, AbilityEntity::class],
+    entities = [
+        PokemonEntity::class,
+        PokemonDetailsEntity::class,
+        PokemonSpeciesEntity::class,
+        AbilityEntity::class,
+        EvolutionChainEntity::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -45,6 +53,11 @@ abstract class PokedexDatabase : RoomDatabase() {
      * Proporciona acceso al DAO de habilidades de Pokémon.
      */
     abstract fun abilityDao(): AbilityDao
+
+    /**
+     * Proporciona acceso al DAO de cadenas de evolución.
+     */
+    abstract fun evolutionChainDao(): EvolutionChainDao
 
     companion object {
         // Singleton para prevenir múltiples instancias de la base de datos
