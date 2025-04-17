@@ -92,4 +92,37 @@ data class EvolutionChainDomain(
             val url: String?
         )
     }
+
+    /**
+     * Obtiene todos los detalles de Pokémon de la cadena evolutiva de manera iterativa.
+     *
+     * @param getPokemonDetailsByName función suspendida que recibe el nombre de la especie y devuelve el PokemonDetailsDomain correspondiente.
+     * @return Lista de PokemonDetailsDomain en orden evolutivo.
+     */
+    suspend fun EvolutionChainDomain.getAllPokemonDetails(
+        getPokemonDetailsByName: suspend (String) -> PokemonDetailsDomain?
+    ): List<PokemonDetailsDomain> {
+        val result = mutableListOf<PokemonDetailsDomain>()
+        val queue = ArrayDeque<Any?>()
+        if (this.chain != null) queue.add(this.chain)
+
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            when (current) {
+                is Chain -> {
+                    current.species?.name?.let { name ->
+                        getPokemonDetailsByName(name)?.let { result.add(it) }
+                    }
+                    current.evolves_to?.forEach { queue.add(it) }
+                }
+                is Chain.EvolvesTo -> {
+                    current.species?.name?.let { name ->
+                        getPokemonDetailsByName(name)?.let { result.add(it) }
+                    }
+                    current.evolves_to?.forEach { queue.add(it) }
+                }
+            }
+        }
+        return result
+    }
 }

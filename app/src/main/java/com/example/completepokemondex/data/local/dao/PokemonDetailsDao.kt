@@ -31,4 +31,12 @@ interface PokemonDetailsDao {
      */
     @Query("SELECT * FROM pokemon_details_table")
     suspend fun getAllPokemonDetails(): List<PokemonDetailsEntity>
+
+    /**
+     * Obtiene el PokemonDetails de la base de datos por nombre.
+     * @param name Nombre del Pokémon a obtener.
+     * @return PokemonDetailsEntity con el nombre especificado.
+     */
+    @Query("SELECT * FROM pokemon_details_table WHERE LOWER(pokemon_name) = LOWER(:name)")
+    suspend fun getPokemonByName(name: String): PokemonDetailsEntity?
 }

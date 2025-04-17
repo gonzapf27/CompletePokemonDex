@@ -146,6 +146,22 @@ class PokemonInfoViewModel(
                                         pokemonRepository.getEvolutionChainById(evolutionChainId).collect { evoResult ->
                                             if (evoResult is Resource.Success) {
                                                 evolutionChain = evoResult.data
+                                                // Obtener todos los IDs de Pokémon en la cadena evolutiva
+                                                evolutionChain = evoResult.data
+                                                // Obtener todos los nombres de Pokémon en la cadena evolutiva
+                                                val pokemonNames = evolutionChain?.getPokemonNames() ?: emptyList()
+                                                println("Nombres en cadena evolutiva: $pokemonNames")
+
+                                                // Obtener detalles de cada Pokémon en la cadena evolutiva
+                                                for (name in pokemonNames) {
+                                                    pokemonRepository.getPokemonDetailsByName(name).collect { detailsResult ->
+                                                        if (detailsResult is Resource.Success) {
+                                                            val pokemonId = detailsResult.data.id ?: 0
+                                                            val pokemonName = detailsResult.data.name?.replaceFirstChar { it.uppercase() } ?: "Desconocido"
+                                                            println("POKEMON EN CADENA EVOLUTIVA: $pokemonName (ID: $pokemonId)")
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -285,4 +301,33 @@ fun calculateGenderPercents(genderRate: Int?): Pair<Double?, Double?> {
         }
         else -> Pair(null, null)
     }
+}
+
+/**
+ * Obtiene todos los nombres de Pokémon en la cadena evolutiva, recorriendo todos los niveles de anidamiento.
+ */
+fun EvolutionChainDomain?.getPokemonNames(): List<String> {
+    if (this == null) return emptyList()
+    val result = mutableListOf<String>()
+
+    // Función recursiva única que acepta cualquier nodo de la cadena evolutiva
+    fun traverse(node: Any?) {
+        when (node) {
+            is EvolutionChainDomain.Chain -> {
+                node.species?.name?.let { result.add(it) }
+                node.evolves_to?.forEach { traverse(it) }
+            }
+            is EvolutionChainDomain.Chain.EvolvesTo -> {
+                node.species?.name?.let { result.add(it) }
+                node.evolves_to?.forEach { traverse(it) }
+            }
+            is EvolutionChainDomain.Chain.EvolvesTo.EvolvesTo -> {
+                node.species?.name?.let { result.add(it) }
+                node.evolves_to?.forEach { traverse(it) }
+            }
+        }
+    }
+
+    traverse(this.chain)
+    return result
 }

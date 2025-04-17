@@ -386,4 +386,59 @@ class PokemonRepository(
         val entity = pokemonDao.getPokemonById(pokemonId)
         return entity?.favorite ?: false
     }
+
+    /**
+     * Obtiene los detalles de un Pokémon específico por su nombre. Primero intenta obtener los datos de la
+     * base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
+     *
+     * @param name Nombre del Pokémon
+     * @return Flow que emite los detalles del Pokémon y el estado de carga
+     */
+    fun getPokemonDetailsByName(name: String): Flow<Resource<PokemonDetailsDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de detalles del Pokémon [nombre=$name]")
+
+            try {
+                // Intentar obtener datos de la base de datos local
+                logDebug("Consultando base de datos local para detalles del Pokémon '$name'...")
+                val localPokemonDetails = pokemonDetailsDao.getPokemonByName(name.lowercase())
+
+                if (localPokemonDetails != null) {
+                    // Si hay datos en la base de datos local, devolverlos
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo detalles del Pokémon '$name' de la base de datos local")
+
+                    emit(Resource.Success(localPokemonDetails.pokemonDetailsEntityToDomain()))
+                } else {
+                    // Si no hay datos en la base de datos local, obtenerlos de la API
+                    logDebug("No se encontraron detalles del Pokémon '$name' en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getPokemonDetailsByName(name.lowercase()) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibidos detalles del Pokémon '$name' de la API")
+                            logDebug("Datos del pokemon en la API: $apiResponse")
+
+                            // Guardar en la base de datos local
+                            saveToDatabase {
+                                logDebug("Insertando detalles del Pokémon '$name' en la base de datos")
+                                pokemonDetailsDao.insertPokemonDetails(apiResponse.pokemonDetailsDTOToEntity())
+                            }
+
+                            logDebug("Devolviendo detalles del Pokémon '$name' obtenidos de la API")
+                            emit(Resource.Success(apiResponse.pokemonDetailsDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener detalles del Pokémon '$name' de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener detalles del Pokémon por nombre: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
 }

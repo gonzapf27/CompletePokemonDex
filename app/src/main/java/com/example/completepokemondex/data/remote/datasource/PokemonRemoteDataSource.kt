@@ -157,6 +157,36 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             Resource.Error("Error de red: ${e.message}")
         }
     }
+
+    /**
+     * Obtiene los detalles de un Pokémon específico por su nombre desde la API.
+     *
+     * @param name Nombre del Pokémon
+     * @return Un objeto Resource que contiene los detalles del Pokémon o un mensaje de error
+     */
+    suspend fun getPokemonDetailsByName(name: String): Resource<PokemonDetailsDTO> {
+        return try {
+            val response = apiService.getPokemonDetailsByName(name)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d(
+                        "PokemonRemoteDataSource",
+                        "Detalles del pokemon obtenidos por nombre: $body"
+                    )
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e(
+                "PokemonRemoteDataSource",
+                "Error obteniendo detalles del pokemon por nombre: ${e.message}"
+            )
+            Resource.Error("Error de red: ${e.message}")
+        }
+    }
 }
-
-
