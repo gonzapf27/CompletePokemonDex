@@ -7,6 +7,7 @@ import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSo
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
+import com.example.completepokemondex.data.domain.model.EvolutionChainDomain
 import com.example.completepokemondex.util.PokemonTypeUtil
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -39,7 +40,8 @@ data class PokemonInfoUiState(
     val genderRate: Int? = null,
     val genderMalePercent: Double? = null,
     val genderFemalePercent: Double? = null,
-    val speciesGenus: String = ""
+    val speciesGenus: String = "",
+    val evolutionChain: EvolutionChainDomain? = null
 )
 
 class PokemonInfoViewModel(
@@ -136,6 +138,17 @@ class PokemonInfoViewModel(
                                         ?.genus
                                         ?: speciesResult.data.genera?.firstOrNull { it?.language?.name == "en" }?.genus
                                         ?: ""
+                                    // Obtener evolution chain si existe
+                                    val evolutionChainId = speciesResult.data.evolution_chain?.url
+                                        ?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
+                                    var evolutionChain: EvolutionChainDomain? = null
+                                    if (evolutionChainId != null) {
+                                        pokemonRepository.getEvolutionChainById(evolutionChainId).collect { evoResult ->
+                                            if (evoResult is Resource.Success) {
+                                                evolutionChain = evoResult.data
+                                            }
+                                        }
+                                    }
                                     _uiState.value = PokemonInfoUiState(
                                         isLoading = false,
                                         id = pokemon.id?.toString() ?: "",
@@ -161,7 +174,8 @@ class PokemonInfoViewModel(
                                         genderRate = genderRate,
                                         genderMalePercent = malePercent,
                                         genderFemalePercent = femalePercent,
-                                        speciesGenus = genus
+                                        speciesGenus = genus,
+                                        evolutionChain = evolutionChain
                                     )
                                 }
                                 is Resource.Error -> {
@@ -206,7 +220,15 @@ class PokemonInfoViewModel(
                 val pokemonDetailsDao = database.pokemonDetailsDao()
                 val pokemonSpeciesDao = database.pokemonSpeciesDao()
                 val abilityDao = database.abilityDao()
-                val repository = PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, abilityDao, remoteDataSource)
+                val evolutionChainDao = database.evolutionChainDao()
+                val repository = PokemonRepository(
+                    pokemonDao,
+                    pokemonDetailsDao,
+                    pokemonSpeciesDao,
+                    abilityDao,
+                    remoteDataSource,
+                    evolutionChainDao
+                )
                 return PokemonInfoViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

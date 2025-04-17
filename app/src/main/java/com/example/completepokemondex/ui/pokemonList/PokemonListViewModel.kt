@@ -288,12 +288,14 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
                 val remoteDataSource = PokemonRemoteDataSource()
                 val pokemonSpeciesDao = database.pokemonSpeciesDao()
                 val abilityDao = database.abilityDao()
+                val evolutionChainDao = database.evolutionChainDao() // NUEVO: obtener evolutionChainDao
                 val repository = PokemonRepository(
                     pokemonDao,
                     pokemonDetailsDao,
                     pokemonSpeciesDao,
                     abilityDao,
-                    remoteDataSource
+                    remoteDataSource,
+                    evolutionChainDao
                 )
                 return PokemonListViewModel(repository) as T
             }

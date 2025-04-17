@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
@@ -36,16 +37,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Inicializar repository manualmente
-        val pokemonDao = PokedexDatabase.Companion.getDatabase(applicationContext).pokemonDao()
-        val pokemonDetailsDao =
-            PokedexDatabase.Companion.getDatabase(applicationContext).pokemonDetailsDao()
+        val database = PokedexDatabase.Companion.getDatabase(applicationContext)
+        val pokemonDao = database.pokemonDao()
+        val pokemonDetailsDao = database.pokemonDetailsDao()
         val remoteDataSource = PokemonRemoteDataSource()
-        val pokemonSpeciesDao =
-            PokedexDatabase.Companion.getDatabase(applicationContext).pokemonSpeciesDao()
-        val abilityDao =
-            PokedexDatabase.Companion.getDatabase(applicationContext).abilityDao()
-        pokemonRepository =
-            PokemonRepository(pokemonDao, pokemonDetailsDao, pokemonSpeciesDao, abilityDao, remoteDataSource)
+        val pokemonSpeciesDao = database.pokemonSpeciesDao()
+        val abilityDao = database.abilityDao()
+        val evolutionChainDao = database.evolutionChainDao()
+        pokemonRepository = PokemonRepository(
+            pokemonDao,
+            pokemonDetailsDao,
+            pokemonSpeciesDao,
+            abilityDao,
+            remoteDataSource,
+            evolutionChainDao
+        )
+
+        // Ejemplo de uso de evolution chain
+        loadEvolutionChain(1) // Puedes cambiar el ID por el que desees probar
     }
 
     /**
@@ -81,6 +90,28 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("Pokemon", "Nombre: ${pokemon.name}, ID: ${pokemon.id}")
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Carga la evolution chain y muestra los resultados por consola
+     */
+    private fun loadEvolutionChain(chainId: Int) {
+        lifecycleScope.launch {
+            pokemonRepository.getEvolutionChainById(chainId).collect { response ->
+                when (response) {
+                    is com.example.completepokemondex.data.remote.api.Resource.Loading -> {
+                        Log.d("EvolutionChain", "Cargando evolution chain...")
+                    }
+                    is com.example.completepokemondex.data.remote.api.Resource.Success -> {
+                        val chain = response.data
+                        Log.d("EvolutionChain", "Evolution chain cargada exitosamente: $chain")
+                    }
+                    is com.example.completepokemondex.data.remote.api.Resource.Error -> {
+                        Log.e("EvolutionChain", "Error al cargar evolution chain: ${response.message}")
                     }
                 }
             }
