@@ -13,7 +13,7 @@ package com.example.completepokemondex.data.domain.model
  * @property sprites Sprites (imágenes) del Pokémon.
  */
 
- data class PokemonDetailsDomain(
+data class PokemonDetailsDomain(
     val abilities: List<Ability?>?,
     val base_experience: Int?,
     val cries: Cries?,

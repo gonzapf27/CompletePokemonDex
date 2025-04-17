@@ -42,4 +42,5 @@
     <string name="pokemon_capture_rate_explanation">Indicates how easy or difficult it is to catch this Pokémon. The higher the number, the easier it is to catch.</string>
     <string name="pokemon_capture_rate_label">Capture Rate</string>
     <string name="pokemon_species_label">Species</string>
+    <string name="evolution_chain_label">Evolution Chain</string>
 </resources>
