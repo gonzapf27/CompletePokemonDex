@@ -41,7 +41,8 @@ data class PokemonInfoUiState(
     val genderMalePercent: Double? = null,
     val genderFemalePercent: Double? = null,
     val speciesGenus: String = "",
-    val evolutionChain: EvolutionChainDomain? = null
+    val evolutionChain: EvolutionChainDomain? = null,
+    val evolutionChainDetails: List<PokemonDetailsDomain> = emptyList()
 )
 
 class PokemonInfoViewModel(
@@ -142,26 +143,21 @@ class PokemonInfoViewModel(
                                     val evolutionChainId = speciesResult.data.evolution_chain?.url
                                         ?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
                                     var evolutionChain: EvolutionChainDomain? = null
+                                    var evolutionChainDetails: List<PokemonDetailsDomain> = emptyList()
                                     if (evolutionChainId != null) {
                                         pokemonRepository.getEvolutionChainById(evolutionChainId).collect { evoResult ->
                                             if (evoResult is Resource.Success) {
                                                 evolutionChain = evoResult.data
-                                                // Obtener todos los IDs de Pokémon en la cadena evolutiva
-                                                evolutionChain = evoResult.data
-                                                // Obtener todos los nombres de Pokémon en la cadena evolutiva
                                                 val pokemonNames = evolutionChain?.getPokemonNames() ?: emptyList()
-                                                println("Nombres en cadena evolutiva: $pokemonNames")
-
-                                                // Obtener detalles de cada Pokémon en la cadena evolutiva
+                                                val detailsList = mutableListOf<PokemonDetailsDomain>()
                                                 for (name in pokemonNames) {
                                                     pokemonRepository.getPokemonDetailsByName(name).collect { detailsResult ->
                                                         if (detailsResult is Resource.Success) {
-                                                            val pokemonId = detailsResult.data.id ?: 0
-                                                            val pokemonName = detailsResult.data.name?.replaceFirstChar { it.uppercase() } ?: "Desconocido"
-                                                            println("POKEMON EN CADENA EVOLUTIVA: $pokemonName (ID: $pokemonId)")
+                                                            detailsList.add(detailsResult.data)
                                                         }
                                                     }
                                                 }
+                                                evolutionChainDetails = detailsList
                                             }
                                         }
                                     }
@@ -191,7 +187,8 @@ class PokemonInfoViewModel(
                                         genderMalePercent = malePercent,
                                         genderFemalePercent = femalePercent,
                                         speciesGenus = genus,
-                                        evolutionChain = evolutionChain
+                                        evolutionChain = evolutionChain,
+                                        evolutionChainDetails = evolutionChainDetails
                                     )
                                 }
                                 is Resource.Error -> {

@@ -7,14 +7,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.completepokemondex.R
+import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonInfoBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PokemonInfoFragment : Fragment() {
     private var _binding: FragmentPokemonInfoBinding? = null
@@ -153,6 +162,51 @@ class PokemonInfoFragment : Fragment() {
                 val id = state.id.toIntOrNull()
                 if (id != null) {
                     viewModel.toggleFavorite(id, !state.isFavorite)
+                }
+            }
+
+            // Mostrar la cadena de evolución (imágenes y nombres)
+            val evolutionContainer = binding.evolutionChainContainer
+            evolutionContainer.removeAllViews()
+            val context = requireContext()
+            val evolutionDetails = state.evolutionChainDetails
+            for ((idx, poke) in evolutionDetails.withIndex()) {
+                val pokeLayout = LinearLayout(context).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(12)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                }
+                val imageView = ImageView(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(140, 140)
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                }
+                val nameView = TextView(context).apply {
+                    text = poke.name?.replaceFirstChar { it.uppercase() } ?: ""
+                    textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                    setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+                    textSize = 14f
+                }
+                val imageUrl = poke.sprites?.other?.`official-artwork`?.front_default
+                    ?: poke.sprites?.front_default
+                Glide.with(context)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_pokeball)
+                    .into(imageView)
+                pokeLayout.addView(imageView)
+                pokeLayout.addView(nameView)
+                evolutionContainer.addView(pokeLayout)
+
+                // Flecha entre pokémon (excepto el último)
+                if (idx < evolutionDetails.size - 1) {
+                    val arrow = ImageView(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(60, 60)
+                        setImageResource(R.drawable.ic_arrow_right) // Usa tu propio drawable de flecha
+                        setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
+                    }
+                    evolutionContainer.addView(arrow)
                 }
             }
         }
