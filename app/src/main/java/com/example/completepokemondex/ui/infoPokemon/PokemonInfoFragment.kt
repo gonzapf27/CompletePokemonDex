@@ -19,22 +19,21 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
-import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonInfoBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class PokemonInfoFragment : Fragment() {
     private var _binding: FragmentPokemonInfoBinding? = null
     private val binding get() = _binding!!
 
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
 
-    private val viewModel: PokemonInfoViewModel by viewModels {
-        PokemonInfoViewModel.Factory(PokedexDatabase.Companion.getDatabase(requireContext()))
-    }
+    private val viewModel: PokemonInfoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
