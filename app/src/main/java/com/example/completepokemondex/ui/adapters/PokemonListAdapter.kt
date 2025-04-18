@@ -16,16 +16,26 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDomain
 import com.example.completepokemondex.util.PokemonTypeUtil
+import javax.inject.Inject
 
 /**
  * Adaptador para mostrar la lista de Pokémon en un RecyclerView
+ * Ahora utiliza inyección de dependencias
  */
-class PokemonListAdapter(
-    private val onItemClicked: (PokemonDomain) -> Unit,
-    private val onFavoriteClicked: (PokemonDomain) -> Unit, // Nuevo callback
-    private var pokemonTypes: Map<Int, List<String>> = emptyMap()
-) : 
+class PokemonListAdapter @Inject constructor() : 
     ListAdapter<PokemonDomain, PokemonListAdapter.PokemonViewHolder>(PokemonDiffCallback) {
+
+    private var onItemClicked: ((PokemonDomain) -> Unit)? = null
+    private var onFavoriteClicked: ((PokemonDomain) -> Unit)? = null
+    private var pokemonTypes: Map<Int, List<String>> = emptyMap()
+    
+    fun setOnItemClickListener(listener: (PokemonDomain) -> Unit) {
+        onItemClicked = listener
+    }
+    
+    fun setOnFavoriteClickListener(listener: (PokemonDomain) -> Unit) {
+        onFavoriteClicked = listener
+    }
 
     fun updatePokemonTypes(newTypes: Map<Int, List<String>>) {
         pokemonTypes = newTypes
@@ -35,19 +45,17 @@ class PokemonListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_pokemon, parent, false)
-        return PokemonViewHolder(view, onItemClicked, onFavoriteClicked)
+        return PokemonViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
         val pokemon = getItem(position)
         val types = pokemonTypes[pokemon.id] ?: emptyList()
-        holder.bind(pokemon, types)
+        holder.bind(pokemon, types, onItemClicked, onFavoriteClicked)
     }
 
     class PokemonViewHolder(
-        itemView: View,
-        private val onItemClicked: (PokemonDomain) -> Unit,
-        private val onFavoriteClicked: (PokemonDomain) -> Unit
+        itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         private val nameTextView: TextView = itemView.findViewById(R.id.pokemon_name)
         private val idTextView: TextView = itemView.findViewById(R.id.pokemon_id)
@@ -55,7 +63,12 @@ class PokemonListAdapter(
         private val cardView: CardView = itemView as CardView
         private val favoriteButton: ImageView = itemView.findViewById(R.id.favorite_button)
 
-        fun bind(pokemon: PokemonDomain, types: List<String>?) {
+        fun bind(
+            pokemon: PokemonDomain, 
+            types: List<String>?,
+            onItemClicked: ((PokemonDomain) -> Unit)?,
+            onFavoriteClicked: ((PokemonDomain) -> Unit)?
+        ) {
             nameTextView.text = pokemon.name
             idTextView.text = "#${pokemon.id.toString().padStart(3, '0')}"
             
@@ -93,11 +106,11 @@ class PokemonListAdapter(
                 favoriteButton.setImageResource(R.drawable.ic_star_outline)
             }
             favoriteButton.setOnClickListener {
-                onFavoriteClicked(pokemon)
+                onFavoriteClicked?.invoke(pokemon)
             }
 
             itemView.setOnClickListener {
-                onItemClicked(pokemon)
+                onItemClicked?.invoke(pokemon)
             }
         }
     }

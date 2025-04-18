@@ -8,17 +8,29 @@ import com.example.completepokemondex.databinding.ItemPokemonTypeBinding
 import com.example.completepokemondex.util.PokemonTypeUtil.PokemonType
 import com.google.android.material.chip.Chip
 import androidx.core.content.ContextCompat
+import javax.inject.Inject
 
 /**
  * Adaptador para mostrar y manejar chips selectores de tipo de Pokémon
+ * Ahora utiliza inyección de dependencias
  */
-class PokemonTypeAdapter(
-    private val types: List<PokemonType>,
-    private val onTypeSelected: (String) -> Unit
-) : RecyclerView.Adapter<PokemonTypeAdapter.TypeViewHolder>() {
+class PokemonTypeAdapter @Inject constructor() : 
+    RecyclerView.Adapter<PokemonTypeAdapter.TypeViewHolder>() {
+    
+    private var types: List<PokemonType> = emptyList()
+    private var onTypeSelected: ((String) -> Unit)? = null
     
     // Posición del tipo seleccionado, por defecto "all" (posición 0)
     private var selectedPosition = 0
+    
+    fun setTypesList(typesList: List<PokemonType>) {
+        types = typesList
+        notifyDataSetChanged()
+    }
+    
+    fun setOnTypeSelectedListener(listener: (String) -> Unit) {
+        onTypeSelected = listener
+    }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TypeViewHolder {
         val binding = ItemPokemonTypeBinding.inflate(
@@ -28,7 +40,9 @@ class PokemonTypeAdapter(
     }
     
     override fun onBindViewHolder(holder: TypeViewHolder, position: Int) {
-        holder.bind(types[position], position == selectedPosition)
+        if (types.isNotEmpty()) {
+            holder.bind(types[position], position == selectedPosition)
+        }
     }
     
     override fun getItemCount() = types.size
@@ -42,7 +56,7 @@ class PokemonTypeAdapter(
             selectedPosition = position
             notifyItemChanged(oldPosition)
             notifyItemChanged(selectedPosition)
-            onTypeSelected(types[position].name)
+            onTypeSelected?.invoke(types[position].name)
         }
     }
     
@@ -51,7 +65,10 @@ class PokemonTypeAdapter(
         
         init {
             binding.typeChip.setOnClickListener {
-                selectType(adapterPosition)
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    selectType(position)
+                }
             }
         }
         

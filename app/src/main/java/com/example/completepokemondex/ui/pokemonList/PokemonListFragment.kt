@@ -22,6 +22,7 @@ import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Fragmento que muestra una lista de Pokémon.
@@ -52,14 +53,13 @@ class PokemonListFragment : Fragment() {
     private val binding get() = _binding!!
 
     /**
-     * Adaptador para el RecyclerView que muestra la lista de Pokémon.
+     * Adaptadores inyectados por Hilt
      */
-    private lateinit var pokemonAdapter: PokemonListAdapter
-
-    /**
-     * Adaptador para el RecyclerView que muestra los tipos de Pokémon.
-     */
-    private lateinit var typeAdapter: PokemonTypeAdapter
+    @Inject
+    lateinit var pokemonAdapter: PokemonListAdapter
+    
+    @Inject
+    lateinit var typeAdapter: PokemonTypeAdapter
 
     /**
      * Infla el layout del fragmento y configura el binding.
@@ -96,19 +96,17 @@ class PokemonListFragment : Fragment() {
      * Define el comportamiento cuando se selecciona un Pokémon.
      */
     private fun setupPokemonRecyclerView() {
-        pokemonAdapter = PokemonListAdapter(
-            onItemClicked = { pokemon ->
-                val fragmentoDetalles =
-                    PokemonDetallesMainFragment.Companion.newInstance(pokemon.id)
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerView, fragmentoDetalles)
-                    .addToBackStack(null)
-                    .commit()
-            },
-            onFavoriteClicked = { pokemon ->
-                viewModel.toggleFavorite(pokemon)
-            }
-        )
+        pokemonAdapter.setOnItemClickListener { pokemon ->
+            val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView, fragmentoDetalles)
+                .addToBackStack(null)
+                .commit()
+        }
+        
+        pokemonAdapter.setOnFavoriteClickListener { pokemon ->
+            viewModel.toggleFavorite(pokemon)
+        }
 
         binding.pokemonListRecyclerView.adapter = pokemonAdapter
         val layoutManager = LinearLayoutManager(context)
@@ -143,12 +141,10 @@ class PokemonListFragment : Fragment() {
      * Configura el RecyclerView de tipos de Pokémon.
      */
     private fun setupTypeRecyclerView() {
-        typeAdapter = PokemonTypeAdapter(
-            types = PokemonTypeUtil.allTypes,
-            onTypeSelected = { typeName ->
-                viewModel.updateSelectedType(typeName)
-            }
-        )
+        typeAdapter.setTypesList(PokemonTypeUtil.allTypes)
+        typeAdapter.setOnTypeSelectedListener { typeName ->
+            viewModel.updateSelectedType(typeName)
+        }
         binding.typeFilterRecyclerView.adapter = typeAdapter
     }
 

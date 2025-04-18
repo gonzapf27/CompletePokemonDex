@@ -10,7 +10,7 @@ import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
-import com.example.completepokemondex.ui.pokemonSeleccionado.PokemonDetallesMainViewModel
+import com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,7 +20,7 @@ class PokemonDetallesMainFragment : Fragment() {
 
     private var pokemonId: Int = 0
 
-    private val viewModel: PokemonDetallesMainViewModel by viewModels()
+    private val viewModel: PokemonDetallesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,15 +43,15 @@ class PokemonDetallesMainFragment : Fragment() {
         binding.pokemonDetallesBottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_info -> {
-                    viewModel.navigateTo(PokemonDetallesMainViewModel.NavDestination.INFO)
+                    viewModel.navigateTo(PokemonDetallesViewModel.NavDestination.INFO)
                     true
                 }
                 R.id.nav_stats -> {
-                    viewModel.navigateTo(PokemonDetallesMainViewModel.NavDestination.STATS)
+                    viewModel.navigateTo(PokemonDetallesViewModel.NavDestination.STATS)
                     true
                 }
                 R.id.nav_sprites -> {
-                    viewModel.navigateTo(PokemonDetallesMainViewModel.NavDestination.SPRITES)
+                    viewModel.navigateTo(PokemonDetallesViewModel.NavDestination.SPRITES)
                     true
                 }
                 else -> false
@@ -60,27 +60,27 @@ class PokemonDetallesMainFragment : Fragment() {
 
         viewModel.navState.observe(viewLifecycleOwner) { nav ->
             when (nav) {
-                PokemonDetallesMainViewModel.NavDestination.INFO -> {
+                PokemonDetallesViewModel.NavDestination.INFO -> {
                     childFragmentManager.beginTransaction()
                         .replace(
                             binding.pokemonDetallesFragmentContainer.id,
-                            PokemonInfoFragment.Companion.newInstance(pokemonId)
+                            PokemonInfoFragment.newInstance(pokemonId)
                         )
                         .commit()
                 }
-                PokemonDetallesMainViewModel.NavDestination.STATS -> {
+                PokemonDetallesViewModel.NavDestination.STATS -> {
                     childFragmentManager.beginTransaction()
                         .replace(
                             binding.pokemonDetallesFragmentContainer.id,
-                            PokemonStatsFragment.Companion.newInstance(pokemonId)
+                            PokemonStatsFragment.newInstance(pokemonId)
                         )
                         .commit()
                 }
-                PokemonDetallesMainViewModel.NavDestination.SPRITES -> {
+                PokemonDetallesViewModel.NavDestination.SPRITES -> {
                     childFragmentManager.beginTransaction()
                         .replace(
                             binding.pokemonDetallesFragmentContainer.id,
-                            com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment.newInstance(pokemonId)
+                            PokemonSpritesFragment.newInstance(pokemonId)
                         )
                         .commit()
                 }
