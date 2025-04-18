@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.view.Gravity
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,12 +45,14 @@ class PokemonSpritesFragment : Fragment() {
 
     private fun loadSprites() {
         val context = requireContext()
-        val spritesContainer = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16)
-        }
         binding.root.removeAllViews()
-        binding.root.addView(spritesContainer)
+
+        val grid = GridLayout(context).apply {
+            columnCount = 2
+            rowCount = GridLayout.UNDEFINED
+            setPadding(24, 24, 24, 24)
+        }
+        binding.root.addView(grid)
 
         val database = PokedexDatabase.getDatabase(context)
         val repo = PokemonRepository(
@@ -56,7 +60,7 @@ class PokemonSpritesFragment : Fragment() {
             database.pokemonDetailsDao(),
             database.pokemonSpeciesDao(),
             database.abilityDao(),
-            PokemonRemoteDataSource(), // Instancia directa aquí
+            PokemonRemoteDataSource(),
             database.evolutionChainDao()
         )
 
@@ -66,26 +70,40 @@ class PokemonSpritesFragment : Fragment() {
                 if (pokemon?.sprites != null) {
                     val spriteList = getAllSprites(pokemon.sprites)
                     if (spriteList.isEmpty()) {
-                        val tv = TextView(context).apply { text = "No hay sprites disponibles." }
-                        spritesContainer.addView(tv)
+                        val tv = TextView(context).apply {
+                            text = "No hay sprites disponibles."
+                            gravity = Gravity.CENTER
+                            textSize = 18f
+                        }
+                        binding.root.removeAllViews()
+                        binding.root.addView(tv)
                     } else {
-                        spriteList.forEach { (label, url) ->
-                            val row = LinearLayout(context).apply {
-                                orientation = LinearLayout.HORIZONTAL
-                                setPadding(8)
+                        spriteList.forEachIndexed { idx, (label, url) ->
+                            val itemLayout = LinearLayout(context).apply {
+                                orientation = LinearLayout.VERTICAL
+                                gravity = Gravity.CENTER_HORIZONTAL
+                                setPadding(12, 18, 12, 18)
                             }
                             val image = ImageView(context).apply {
-                                layoutParams = LinearLayout.LayoutParams(120, 120)
+                                layoutParams = LinearLayout.LayoutParams(180, 180)
                                 scaleType = ImageView.ScaleType.FIT_CENTER
                             }
                             Glide.with(context).load(url).into(image)
                             val text = TextView(context).apply {
-                                text = label
-                                setPadding(16, 0, 0, 0)
+                                text = label.replace('_', ' ').replace('-', ' ').replace('/', '\n')
+                                gravity = Gravity.CENTER
+                                textSize = 13f
+                                setPadding(0, 8, 0, 0)
                             }
-                            row.addView(image)
-                            row.addView(text)
-                            spritesContainer.addView(row)
+                            itemLayout.addView(image)
+                            itemLayout.addView(text)
+                            val params = GridLayout.LayoutParams().apply {
+                                width = 0
+                                height = GridLayout.LayoutParams.WRAP_CONTENT
+                                columnSpec = GridLayout.spec(idx % 2, 1f)
+                                setMargins(8, 8, 8, 8)
+                            }
+                            grid.addView(itemLayout, params)
                         }
                     }
                 }
