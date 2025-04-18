@@ -19,6 +19,7 @@ class PokemonDetallesMainFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var pokemonId: Int = 0
+    private var currentDestination: PokemonDetallesViewModel.NavDestination? = null
 
     private val viewModel: PokemonDetallesViewModel by viewModels()
 
@@ -58,34 +59,74 @@ class PokemonDetallesMainFragment : Fragment() {
             }
         }
 
-        viewModel.navState.observe(viewLifecycleOwner) { nav ->
-            when (nav) {
-                PokemonDetallesViewModel.NavDestination.INFO -> {
-                    childFragmentManager.beginTransaction()
-                        .replace(
-                            binding.pokemonDetallesFragmentContainer.id,
-                            PokemonInfoFragment.newInstance(pokemonId)
-                        )
-                        .commit()
-                }
-                PokemonDetallesViewModel.NavDestination.STATS -> {
-                    childFragmentManager.beginTransaction()
-                        .replace(
-                            binding.pokemonDetallesFragmentContainer.id,
-                            PokemonStatsFragment.newInstance(pokemonId)
-                        )
-                        .commit()
-                }
-                PokemonDetallesViewModel.NavDestination.SPRITES -> {
-                    childFragmentManager.beginTransaction()
-                        .replace(
-                            binding.pokemonDetallesFragmentContainer.id,
-                            PokemonSpritesFragment.newInstance(pokemonId)
-                        )
-                        .commit()
-                }
-                null -> {}
+        viewModel.navState.observe(viewLifecycleOwner) { newDestination ->
+            if (newDestination == null) return@observe
+            
+            // Determina la dirección de la animación
+            val (enterAnim, exitAnim) = getAnimations(currentDestination, newDestination)
+            
+            val fragment = when (newDestination) {
+                PokemonDetallesViewModel.NavDestination.INFO -> 
+                    PokemonInfoFragment.newInstance(pokemonId)
+                PokemonDetallesViewModel.NavDestination.STATS ->
+                    PokemonStatsFragment.newInstance(pokemonId)
+                PokemonDetallesViewModel.NavDestination.SPRITES ->
+                    PokemonSpritesFragment.newInstance(pokemonId)
             }
+
+            childFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    enterAnim,
+                    exitAnim,
+                    R.anim.slide_in_left,  // Para cuando se pulse "back"
+                    R.anim.slide_out_right  // Para cuando se pulse "back"
+                )
+                .replace(
+                    binding.pokemonDetallesFragmentContainer.id,
+                    fragment
+                )
+                .commit()
+            
+            // Actualizar el destino actual después de la transición
+            currentDestination = newDestination
+        }
+    }
+    
+    /**
+     * Determina las animaciones adecuadas basadas en la dirección de navegación.
+     * @return Par de (animación de entrada, animación de salida)
+     */
+    private fun getAnimations(
+        from: PokemonDetallesViewModel.NavDestination?, 
+        to: PokemonDetallesViewModel.NavDestination
+    ): Pair<Int, Int> {
+        if (from == null) {
+            // Primera carga, usar animación predeterminada
+            return Pair(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
+
+        // Orden de pestañas: INFO(0) -> STATS(1) -> SPRITES(2)
+        val fromIndex = getDestinationIndex(from)
+        val toIndex = getDestinationIndex(to)
+
+        return if (fromIndex < toIndex) {
+            // Movimiento hacia la derecha (siguiente)
+            Pair(R.anim.slide_in_right, R.anim.slide_out_left)
+        } else {
+            // Movimiento hacia la izquierda (anterior)
+            Pair(R.anim.slide_in_left, R.anim.slide_out_right)
+        }
+    }
+
+    /**
+     * Obtiene el índice numérico para un destino de navegación.
+     * Esto nos permite determinar la dirección de navegación.
+     */
+    private fun getDestinationIndex(destination: PokemonDetallesViewModel.NavDestination): Int {
+        return when (destination) {
+            PokemonDetallesViewModel.NavDestination.INFO -> 0
+            PokemonDetallesViewModel.NavDestination.STATS -> 1
+            PokemonDetallesViewModel.NavDestination.SPRITES -> 2
         }
     }
 

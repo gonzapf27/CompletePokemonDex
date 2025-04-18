@@ -102,6 +102,12 @@ class PokemonListFragment : Fragment() {
         pokemonAdapter.setOnItemClickListener { pokemon ->
             val fragmentoDetalles = PokemonDetallesMainFragment.newInstance(pokemon.id)
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentContainerView, fragmentoDetalles)
                 .addToBackStack(null)
                 .commit()
