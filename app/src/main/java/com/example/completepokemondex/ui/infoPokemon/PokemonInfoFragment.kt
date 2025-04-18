@@ -15,6 +15,7 @@ import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
@@ -51,7 +52,19 @@ class PokemonInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            binding.loadingIndicator.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+            // Mostrar el gif de carga y ocultar el contenido mientras isLoading es true
+            if (state.isLoading) {
+                binding.loadingIndicator.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.GONE
+                Glide.with(this)
+                    .asGif()
+                    .load(R.drawable.loading_pokeball)
+                    .into(binding.loadingIndicator)
+                return@observe // No mostrar nada más mientras carga
+            } else {
+                binding.loadingIndicator.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
+            }
             binding.pokemonDetailsId.text = "#" + state.id
             binding.pokemonDetailsNombre.text = state.nombre
             binding.pokemonDetailsHeight.text = state.height
