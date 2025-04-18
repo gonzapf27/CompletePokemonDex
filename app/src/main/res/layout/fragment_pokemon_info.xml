@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:paddingBottom="56dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -387,7 +388,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/pokemon_capture_rate_label"
                             android:textStyle="bold"
-                            android:textColor="@color/type_bug"
+                            android:textColor="@color/type_grass"
                             android:textSize="18sp"
                             android:background="@drawable/rounded_corner_bg"
                             android:paddingStart="24dp"
@@ -655,12 +656,10 @@
 
                         <LinearLayout
                             android:id="@+id/evolution_chain_container"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:gravity="center_vertical">
-                            <!-- Aquí se añadirán dinámicamente las imágenes de las evoluciones -->
-                        </LinearLayout>
+                            android:gravity="center_vertical"/>
                     </HorizontalScrollView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

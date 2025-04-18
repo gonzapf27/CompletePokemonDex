@@ -170,24 +170,43 @@ class PokemonInfoFragment : Fragment() {
             evolutionContainer.removeAllViews()
             val context = requireContext()
             val evolutionDetails = state.evolutionChainDetails
+            val total = evolutionDetails.size.coerceAtLeast(1)
             for ((idx, poke) in evolutionDetails.withIndex()) {
                 val pokeLayout = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
-                    setPadding(12)
+                    setPadding(8)
                     layoutParams = LinearLayout.LayoutParams(
+                        0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                        1f // Ocupa el mismo espacio proporcionalmente
                     )
                 }
                 val imageView = ImageView(context).apply {
-                    layoutParams = LinearLayout.LayoutParams(140, 140)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f // Imagen ocupa la mayor parte verticalmente
+                    ).apply {
+                        height = 0
+                        width = LinearLayout.LayoutParams.MATCH_PARENT
+                    }
+                    adjustViewBounds = true
                     scaleType = ImageView.ScaleType.FIT_CENTER
+                    minimumHeight = 80
                 }
                 val nameView = TextView(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
                     text = poke.name?.replaceFirstChar { it.uppercase() } ?: ""
                     textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                     setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                    textSize = 14f
+                    textSize = 12f // Fuente más pequeña
+                    maxLines = 2
+                    isSingleLine = false
+                    setLineSpacing(0f, 1.1f)
+                    ellipsize = null
                 }
                 val imageUrl = poke.sprites?.other?.`official-artwork`?.front_default
                     ?: poke.sprites?.front_default
@@ -195,15 +214,19 @@ class PokemonInfoFragment : Fragment() {
                     .load(imageUrl)
                     .placeholder(R.drawable.ic_pokeball)
                     .into(imageView)
-                pokeLayout.addView(imageView)
-                pokeLayout.addView(nameView)
+                pokeLayout.addView(imageView, 0)
+                pokeLayout.addView(nameView, 1)
                 evolutionContainer.addView(pokeLayout)
 
                 // Flecha entre pokémon (excepto el último)
                 if (idx < evolutionDetails.size - 1) {
                     val arrow = ImageView(context).apply {
-                        layoutParams = LinearLayout.LayoutParams(60, 60)
-                        setImageResource(R.drawable.ic_arrow_right) // Usa tu propio drawable de flecha
+                        layoutParams = LinearLayout.LayoutParams(
+                            40, 40
+                        ).apply {
+                            setMargins(0, 0, 0, 0)
+                        }
+                        setImageResource(R.drawable.ic_arrow_right)
                         setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
                     }
                     evolutionContainer.addView(arrow)
