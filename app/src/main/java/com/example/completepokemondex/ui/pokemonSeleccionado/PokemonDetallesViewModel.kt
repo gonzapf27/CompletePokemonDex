@@ -9,7 +9,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PokemonDetallesMainViewModel @Inject constructor() : ViewModel() {
 
-    enum class NavDestination { INFO, STATS }
+    enum class NavDestination { INFO, STATS, SPRITES }
 
     private val _navState = MutableLiveData<NavDestination?>()
     val navState: LiveData<NavDestination?> = _navState

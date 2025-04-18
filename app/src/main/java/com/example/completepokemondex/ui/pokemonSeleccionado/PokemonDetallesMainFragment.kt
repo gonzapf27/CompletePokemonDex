@@ -49,6 +49,10 @@ class PokemonDetallesMainFragment : Fragment() {
                     viewModel.navigateTo(PokemonDetallesMainViewModel.NavDestination.STATS)
                     true
                 }
+                R.id.nav_sprites -> {
+                    viewModel.navigateTo(PokemonDetallesMainViewModel.NavDestination.SPRITES)
+                    true
+                }
                 else -> false
             }
         }
@@ -68,6 +72,14 @@ class PokemonDetallesMainFragment : Fragment() {
                         .replace(
                             binding.pokemonDetallesFragmentContainer.id,
                             PokemonStatsFragment.Companion.newInstance(pokemonId)
+                        )
+                        .commit()
+                }
+                PokemonDetallesMainViewModel.NavDestination.SPRITES -> {
+                    childFragmentManager.beginTransaction()
+                        .replace(
+                            binding.pokemonDetallesFragmentContainer.id,
+                            com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment.newInstance(pokemonId)
                         )
                         .commit()
                 }
