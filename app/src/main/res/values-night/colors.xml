@@ -41,4 +41,11 @@
     <color name="divider">#FF33373B</color> <!-- Líneas divisoras suaves -->
     <color name="card_shadow">#66000000</color> <!-- Sombra tarjetas -->
     <color name="highlight">#FF4FC3F7</color> <!-- Color de acento -->
+    
+    <!-- Barra de búsqueda -->
+    <color name="search_bar_bg">#FF23272A</color> <!-- Fondo de la barra de búsqueda -->
+    <color name="search_bar_text">#FFEDEDED</color> <!-- Color del texto de búsqueda -->
+    <color name="search_bar_hint">#FFB0B3B8</color> <!-- Color del texto de sugerencia -->
+    <color name="search_bar_icon">#FFB0B3B8</color> <!-- Color del icono de búsqueda -->
+    <color name="search_bar_stroke">#FF33373B</color> <!-- Color del borde de la barra de búsqueda -->
 </resources>
