@@ -10,6 +10,7 @@ import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
+import com.example.completepokemondex.ui.pokemonSeleccionado.PokemonDetallesMainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
