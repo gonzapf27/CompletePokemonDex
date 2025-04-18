@@ -1,6 +1,7 @@
 package com.example.completepokemondex.data.remote.models
 
 
+import com.example.completepokemondex.data.remote.models.EncountersDTO.EncountersDTOItem
 import com.google.gson.annotations.SerializedName
 
 class EncountersDTO : ArrayList<EncountersDTOItem>(){

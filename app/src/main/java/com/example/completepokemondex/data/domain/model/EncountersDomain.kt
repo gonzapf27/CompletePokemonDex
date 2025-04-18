@@ -1,5 +1,7 @@
 package com.example.completepokemondex.data.domain.model
 
+import com.example.completepokemondex.data.domain.model.EncountersDomain.EncountersDomainItem
+
 class EncountersDomain : ArrayList<EncountersDomainItem>(){
     data class EncountersDomainItem(
         val location_area: LocationArea?,
