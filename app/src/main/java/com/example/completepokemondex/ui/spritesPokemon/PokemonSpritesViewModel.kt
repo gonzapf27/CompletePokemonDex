@@ -9,7 +9,9 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.ui.infoPokemon.PokemonTypeUi
 import com.example.completepokemondex.util.PokemonTypeUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class SpritesUiState(
     val isLoading: Boolean = true,
@@ -19,11 +21,14 @@ data class SpritesUiState(
     val types: List<PokemonTypeUi> = emptyList()
 )
 
-class PokemonSpritesViewModel : ViewModel() {
+@HiltViewModel
+class PokemonSpritesViewModel @Inject constructor(
+    private val repository: PokemonRepository
+) : ViewModel() {
     private val _uiState = MutableLiveData(SpritesUiState())
     val uiState: LiveData<SpritesUiState> = _uiState
     
-    fun loadPokemonSprites(pokemonId: Int, repository: PokemonRepository) {
+    fun loadPokemonSprites(pokemonId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
             

@@ -15,16 +15,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.completepokemondex.R
-import com.example.completepokemondex.data.local.database.PokedexDatabase
-import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.FragmentPokemonSpritesBinding
-import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PokemonSpritesFragment : Fragment() {
     private var _binding: FragmentPokemonSpritesBinding? = null
     private val binding get() = _binding!!
@@ -43,19 +40,8 @@ class PokemonSpritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Obtener el repositorio
-        val database = PokedexDatabase.getDatabase(requireContext())
-        val repo = PokemonRepository(
-            database.pokemonDao(),
-            database.pokemonDetailsDao(),
-            database.pokemonSpeciesDao(),
-            database.abilityDao(),
-            PokemonRemoteDataSource(),
-            database.evolutionChainDao()
-        )
-
-        // Cargar datos en el ViewModel
-        viewModel.loadPokemonSprites(pokemonId, repo)
+        // Cargar datos en el ViewModel usando el pokemonId
+        viewModel.loadPokemonSprites(pokemonId)
 
         // Observar cambios en el estado de la UI
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
