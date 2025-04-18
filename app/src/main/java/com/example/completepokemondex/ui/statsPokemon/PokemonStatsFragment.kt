@@ -26,7 +26,6 @@ class PokemonStatsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
-
     private val viewModel: PokemonStatsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
