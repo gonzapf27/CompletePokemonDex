@@ -2,19 +2,19 @@ package com.example.completepokemondex.ui.pokemonList
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.completepokemondex.data.domain.model.PokemonDomain
-import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.api.Resource
-import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PokemonListViewModel(private val repository: PokemonRepository) : ViewModel() {
+@HiltViewModel
+class PokemonListViewModel @Inject constructor(private val repository: PokemonRepository) : ViewModel() {
     // Definir el estado de UI como sealed class
     sealed class UiState {
         data object Loading : UiState()
@@ -277,29 +277,4 @@ class PokemonListViewModel(private val repository: PokemonRepository) : ViewMode
 
     /** Exponer el mapa de tipos de Pokémon */
     fun getPokemonTypesMap(): Map<Int, List<String>> = pokemonTypes.toMap()
-
-    /** Factory para crear instancias del ViewModel con el repositorio necesario */
-    class Factory(private val database: PokedexDatabase) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(PokemonListViewModel::class.java)) {
-                val pokemonDao = database.pokemonDao()
-                val pokemonDetailsDao = database.pokemonDetailsDao()
-                val remoteDataSource = PokemonRemoteDataSource()
-                val pokemonSpeciesDao = database.pokemonSpeciesDao()
-                val abilityDao = database.abilityDao()
-                val evolutionChainDao = database.evolutionChainDao() // NUEVO: obtener evolutionChainDao
-                val repository = PokemonRepository(
-                    pokemonDao,
-                    pokemonDetailsDao,
-                    pokemonSpeciesDao,
-                    abilityDao,
-                    remoteDataSource,
-                    evolutionChainDao
-                )
-                return PokemonListViewModel(repository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
 }

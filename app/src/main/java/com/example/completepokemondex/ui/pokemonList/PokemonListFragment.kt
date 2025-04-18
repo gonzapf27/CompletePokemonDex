@@ -14,13 +14,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.completepokemondex.R
-import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.databinding.FragmentPokemonListBinding
-import com.example.completepokemondex.ui.pokemonList.PokemonListViewModel
 import com.example.completepokemondex.ui.adapters.PokemonListAdapter
 import com.example.completepokemondex.ui.adapters.PokemonTypeAdapter
 import com.example.completepokemondex.ui.pokemonSeleccionado.PokemonDetallesMainFragment
 import com.example.completepokemondex.util.PokemonTypeUtil
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -29,6 +28,7 @@ import kotlinx.coroutines.launch
  * Este fragmento recupera y presenta los datos de los Pokémon en un RecyclerView,
  * permitiendo la selección de un Pokémon específico para ver sus detalles.
  */
+@AndroidEntryPoint
 class PokemonListFragment : Fragment() {
 
     companion object {
@@ -41,11 +41,8 @@ class PokemonListFragment : Fragment() {
 
     /**
      * ViewModel que gestiona los datos y la lógica de negocio para este fragmento.
-     * Se inicializa con la base de datos de Pokédex.
      */
-    private val viewModel: PokemonListViewModel by viewModels {
-        PokemonListViewModel.Factory(PokedexDatabase.Companion.getDatabase(requireContext()))
-    }
+    private val viewModel: PokemonListViewModel by viewModels()
 
     /**
      * Binding para acceder a las vistas del layout.
