@@ -192,7 +192,21 @@ class PokemonInfoFragment : Fragment() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         1f // Ocupa el mismo espacio proporcionalmente
                     )
+                    
+                    // Añadir listener de clic a cada Pokémon de la cadena evolutiva
+                    setOnClickListener {
+                        poke.id?.let { pokemonId ->
+                            // Navegar al fragmento de información del Pokémon seleccionado
+                            navigateToPokemon(pokemonId)
+                        }
+                    }
+                    
+                    // Cambiar el fondo al presionar para dar feedback visual
+                    isClickable = true
+                    isFocusable = true
+                    background = ContextCompat.getDrawable(context, R.drawable.ripple_effect)
                 }
+                
                 val imageView = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -244,6 +258,40 @@ class PokemonInfoFragment : Fragment() {
                     evolutionContainer.addView(arrow)
                 }
             }
+        }
+    }
+    
+    // Método para navegar a la información de otro Pokémon
+    private fun navigateToPokemon(pokemonId: Int) {
+        // Crear una nueva instancia del fragmento con el ID del Pokémon seleccionado
+        val fragment = newInstance(pokemonId)
+        
+        // Obtener el ID del contenedor de fragmentos actual
+        val currentView = view
+        if (currentView != null) {
+            val parent = currentView.parent as? ViewGroup
+            val containerId = parent?.id
+            
+            if (containerId != null && containerId != View.NO_ID) {
+                // Si encontramos un ID válido, usarlo para reemplazar el fragmento
+                parentFragmentManager.beginTransaction()
+                    .replace(containerId, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            } else {
+                // Si no podemos encontrar un ID válido, usar una estrategia alternativa:
+                // Reemplazar este fragmento por el nuevo
+                parentFragmentManager.beginTransaction()
+                    .replace(this.id, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        } else {
+            // Fallback más seguro: simplemente agregar un nuevo fragmento encima
+            parentFragmentManager.beginTransaction()
+                .add(fragment, "pokemon_detail_$pokemonId")
+                .addToBackStack(null)
+                .commit()
         }
     }
 
