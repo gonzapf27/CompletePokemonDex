@@ -275,6 +275,34 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
         }
     }
 
+    /** Actualiza los estados de favoritos para todos los pokémon en la lista */
+    fun refreshFavoriteStates() {
+        viewModelScope.launch {
+            // Si la lista está vacía, no hay nada que actualizar
+            if (allPokemonList.isEmpty()) return@launch
+            
+            Log.d("PokemonListViewModel", "Actualizando estados de favoritos")
+            
+            // Crear una nueva lista con estados de favoritos actualizados
+            val updatedList = allPokemonList.map { pokemon ->
+                val isFavorite = repository.isPokemonFavorite(pokemon.id)
+                if (pokemon.favorite != isFavorite) {
+                    // Solo crear nuevo objeto si el estado cambió
+                    pokemon.copy(favorite = isFavorite)
+                } else {
+                    pokemon
+                }
+            }
+            
+            // Actualizar la lista si hubo algún cambio
+            if (updatedList != allPokemonList) {
+                allPokemonList = updatedList
+                applyFilters() // Esto actualizará la UI con los nuevos estados
+                Log.d("PokemonListViewModel", "Estados de favoritos actualizados")
+            }
+        }
+    }
+
     /** Exponer el mapa de tipos de Pokémon */
     fun getPokemonTypesMap(): Map<Int, List<String>> = pokemonTypes.toMap()
 }

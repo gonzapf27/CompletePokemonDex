@@ -246,6 +246,15 @@ class PokemonListFragment : Fragment() {
     }
 
     /**
+     * Se llama cuando el fragmento se reanuda.
+     * Recarga los estados de favoritos.
+     */
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshFavoriteStates()
+    }
+
+    /**
      * Se llama cuando la vista del fragmento está siendo destruida.
      * Limpia la referencia al binding para evitar fugas de memoria.
      */
