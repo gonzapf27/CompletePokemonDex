@@ -6,6 +6,7 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonEncountersDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
 import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import kotlinx.coroutines.CoroutineDispatcher
@@ -187,6 +188,58 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
                 "Error obteniendo detalles del pokemon por nombre: ${e.message}"
             )
             Resource.Error("Error de red: ${e.message}")
+        }
+    }
+
+    /**
+     * Obtiene las ubicaciones donde se puede encontrar un Pokémon específico por su ID desde la API.
+     *
+     * @param id Identificador único del Pokémon
+     * @return Un objeto Resource que contiene la lista de ubicaciones donde se puede encontrar el Pokémon o un mensaje de error
+     */
+    suspend fun getPokemonEncountersById(id: Int): Resource<List<PokemonEncountersDTO>> {
+        return try {
+            val response = apiService.getPokemonEncountersById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Encuentros del pokemon obtenidos: ${body.size}")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío", emptyList())
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}", emptyList())
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo encuentros del pokemon: ${e.message}")
+            Resource.Error("Error de red: ${e.message}", emptyList())
+        }
+    }
+
+    /**
+     * Obtiene las ubicaciones donde se puede encontrar un Pokémon específico por su nombre desde la API.
+     *
+     * @param name Nombre del Pokémon
+     * @return Un objeto Resource que contiene la lista de ubicaciones donde se puede encontrar el Pokémon o un mensaje de error
+     */
+    suspend fun getPokemonEncountersByName(name: String): Resource<List<PokemonEncountersDTO>> {
+        return try {
+            val response = apiService.getPokemonEncountersByName(name)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Encuentros del pokemon obtenidos por nombre: ${body.size}")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío", emptyList())
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}", emptyList())
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo encuentros del pokemon por nombre: ${e.message}")
+            Resource.Error("Error de red: ${e.message}", emptyList())
         }
     }
 }
