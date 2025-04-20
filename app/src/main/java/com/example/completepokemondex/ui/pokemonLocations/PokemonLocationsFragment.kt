@@ -17,6 +17,7 @@ import android.graphics.Typeface
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.request.RequestOptions
@@ -27,7 +28,6 @@ import com.example.completepokemondex.util.PokemonLocationsUtil
 import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
 import android.widget.ImageView
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +35,8 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class PokemonLocationsFragment : Fragment() {
     private var _binding: FragmentPokemonEncountersBinding? = null
-    private val binding get() = _binding!!
+    // Modificar el getter del binding para evitar NullPointerException
+    private val binding get() = _binding ?: throw IllegalStateException("Binding no puede ser nulo")
 
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
 
@@ -74,7 +75,7 @@ class PokemonLocationsFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             // Gestionar estado de carga
             if (state.isLoading) {
-                binding.loadingIndicator.visibility = View.VISIBLE
+                _binding?.loadingIndicator?.visibility = View.VISIBLE
                 
                 // Usar Glide para cargar el GIF de carga en un ImageView temporal y luego configurar el ProgressBar
                 Glide.with(this)
@@ -84,11 +85,11 @@ class PokemonLocationsFragment : Fragment() {
                 
                 return@observe
             } else {
-                binding.loadingIndicator.visibility = View.GONE
+                _binding?.loadingIndicator?.visibility = View.GONE
             }
 
             // Actualizar título
-            binding.encountersTitle.text = "Lugares en Rojo/Azul: ${state.nombre}"
+            _binding?.encountersTitle?.text = "Lugares en Rojo/Azul: ${state.nombre}"
 
             // Establecer fondo con el tipo de Pokémon (usando agua como predeterminado para las ubicaciones)
             val waterType = PokemonTypeUtil.getTypeByName("water")
@@ -97,7 +98,7 @@ class PokemonLocationsFragment : Fragment() {
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 intArrayOf(color, Color.LTGRAY)
             )
-            binding.pokemonEncountersGradientBg.background = gradientDrawable
+            _binding?.pokemonEncountersGradientBg?.background = gradientDrawable
             
             // Si tenemos ubicaciones, actualizar el mapa para resaltarlas
             if (state.locationNames.isNotEmpty() && baseMapBitmap != null) {
@@ -106,8 +107,8 @@ class PokemonLocationsFragment : Fragment() {
 
             // Mostrar texto de encuentros o mensaje de vacío
             if (state.hasEncounters) {
-                binding.encountersEmpty.visibility = View.GONE
-                binding.encountersText.visibility = View.VISIBLE
+                _binding?.encountersEmpty?.visibility = View.GONE
+                _binding?.encountersText?.visibility = View.VISIBLE
                 
                 // Formatear y mostrar los datos de encuentro
                 val textBuilder = SpannableStringBuilder()
@@ -136,11 +137,11 @@ class PokemonLocationsFragment : Fragment() {
                     }
                 }
                 
-                binding.encountersText.text = textBuilder
+                _binding?.encountersText?.text = textBuilder
             } else {
-                binding.encountersText.visibility = View.GONE
-                binding.encountersEmpty.visibility = View.VISIBLE
-                binding.encountersEmpty.text = if (state.error != null) 
+                _binding?.encountersText?.visibility = View.GONE
+                _binding?.encountersEmpty?.visibility = View.VISIBLE
+                _binding?.encountersEmpty?.text = if (state.error != null) 
                     "Error al cargar las ubicaciones: ${state.error}" 
                 else 
                     "No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul."
@@ -152,7 +153,7 @@ class PokemonLocationsFragment : Fragment() {
      * Carga la imagen base del mapa de Kanto
      */
     private fun loadBaseMap() {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Cargar el mapa base desde los recursos
                 val inputStream = resources.openRawResource(R.drawable.map)
@@ -160,24 +161,28 @@ class PokemonLocationsFragment : Fragment() {
                 
                 // Mostrar el mapa base inicialmente
                 withContext(Dispatchers.Main) {
-                    Glide.with(requireContext())
-                        .asBitmap()
-                        .load(baseMapBitmap)
-                        .apply(RequestOptions()
-                            .fitCenter()
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true))
-                        .transition(BitmapTransitionOptions.withCrossFade())
-                        .into(binding.mapImage)
+                    _binding?.let { binding ->
+                        Glide.with(requireContext())
+                            .asBitmap()
+                            .load(baseMapBitmap)
+                            .apply(RequestOptions()
+                                .fitCenter()
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true))
+                            .transition(BitmapTransitionOptions.withCrossFade())
+                            .into(binding.mapImage)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("PokemonLocationsFragment", "Error al cargar el mapa base: ${e.message}")
                 // Cargar el mapa normalmente si falla
                 withContext(Dispatchers.Main) {
-                    Glide.with(requireContext())
-                        .load(R.drawable.map)
-                        .apply(RequestOptions().fitCenter())
-                        .into(binding.mapImage)
+                    _binding?.let { binding ->
+                        Glide.with(requireContext())
+                            .load(R.drawable.map)
+                            .apply(RequestOptions().fitCenter())
+                            .into(binding.mapImage)
+                    }
                 }
             }
         }
@@ -187,27 +192,33 @@ class PokemonLocationsFragment : Fragment() {
      * Actualiza el mapa con las ubicaciones resaltadas
      */
     private fun updateMapWithLocations(locationNames: List<String>) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 if (baseMapBitmap != null) {
                     // Usar PokemonLocationsUtil para resaltar las ubicaciones en el mapa
-                    val highlightedMap = PokemonLocationsUtil.highlightLocations(
-                        requireContext(),
-                        baseMapBitmap!!,
-                        locationNames
-                    )
+                    val highlightedMap = baseMapBitmap?.let {
+                        PokemonLocationsUtil.highlightLocations(
+                            requireContext(),
+                            it,
+                            locationNames
+                        )
+                    }
                     
                     // Mostrar el mapa actualizado en la UI
                     withContext(Dispatchers.Main) {
-                        Glide.with(requireContext())
-                            .asBitmap()
-                            .load(highlightedMap)
-                            .apply(RequestOptions()
-                                .fitCenter()
-                                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                .skipMemoryCache(true))
-                            .transition(BitmapTransitionOptions.withCrossFade())
-                            .into(binding.mapImage)
+                        _binding?.let { binding ->
+                            if (highlightedMap != null) {
+                                Glide.with(requireContext())
+                                    .asBitmap()
+                                    .load(highlightedMap)
+                                    .apply(RequestOptions()
+                                        .fitCenter()
+                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .skipMemoryCache(true))
+                                    .transition(BitmapTransitionOptions.withCrossFade())
+                                    .into(binding.mapImage)
+                            }
+                        }
                     }
                 }
             } catch (e: Exception) {
