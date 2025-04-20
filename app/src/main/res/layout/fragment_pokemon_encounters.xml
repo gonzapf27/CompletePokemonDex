@@ -52,8 +52,8 @@
                     android:paddingTop="8dp"
                     android:paddingEnd="24dp"
                     android:paddingBottom="8dp"
-                    android:text="Lugares en Rojo/Azul: Pokémon"
-                    android:textColor="@color/type_dragon"
+                    android:text="Lugares en Rojo/Azul"
+                    android:textColor="@color/type_grass"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -75,6 +75,7 @@
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:adjustViewBounds="true"
+                            android:src="@drawable/map"
                             android:contentDescription="Mapa de la región de Kanto con ubicaciones marcadas"
                             android:scaleType="fitCenter"
                             app:layout_constraintBottom_toBottomOf="parent"
