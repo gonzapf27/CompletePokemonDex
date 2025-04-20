@@ -3,6 +3,7 @@ package com.example.completepokemondex.data.remote.api
 import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
+import com.example.completepokemondex.data.remote.models.PokemonEncountersDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
 import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import retrofit2.Response
@@ -50,6 +51,28 @@ interface ApiService {
     suspend fun getEvolutionChainById(
         @Path("id") id: Int
     ): Response<EvolutionChainDTO>
+    
+    /**
+     * Obtiene los lugares donde se puede encontrar un Pokémon por su ID.
+     *
+     * @param id El ID del Pokémon.
+     * @return Una respuesta que contiene una lista de ubicaciones donde se puede encontrar el Pokémon.
+     */
+    @GET("pokemon/{id}/encounters")
+    suspend fun getPokemonEncountersById(
+        @Path("id") id: Int
+    ): Response<List<PokemonEncountersDTO>>
+    
+    /**
+     * Obtiene los lugares donde se puede encontrar un Pokémon por su nombre.
+     *
+     * @param name El nombre del Pokémon.
+     * @return Una respuesta que contiene una lista de ubicaciones donde se puede encontrar el Pokémon.
+     */
+    @GET("pokemon/{name}/encounters")
+    suspend fun getPokemonEncountersByName(
+        @Path("name") name: String
+    ): Response<List<PokemonEncountersDTO>>
 }
 
 /**
