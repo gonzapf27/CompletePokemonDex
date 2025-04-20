@@ -15,7 +15,7 @@ class PokemonDetallesViewModel @Inject constructor(
 ) : ViewModel() {
 
     enum class NavDestination {
-        INFO, STATS, SPRITES
+        INFO, STATS, SPRITES, LOCATIONS
     }
 
     private val _navState = MutableLiveData<NavDestination>()

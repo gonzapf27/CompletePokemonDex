@@ -10,6 +10,8 @@ import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
+import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsFragment
+import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsVIewModel
 import com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -55,6 +57,10 @@ class PokemonDetallesMainFragment : Fragment() {
                     viewModel.navigateTo(PokemonDetallesViewModel.NavDestination.SPRITES)
                     true
                 }
+                R.id.nav_encounters -> {
+                    viewModel.navigateTo(PokemonDetallesViewModel.NavDestination.LOCATIONS)
+                    true
+                }
                 else -> false
             }
         }
@@ -72,6 +78,8 @@ class PokemonDetallesMainFragment : Fragment() {
                     PokemonStatsFragment.newInstance(pokemonId)
                 PokemonDetallesViewModel.NavDestination.SPRITES ->
                     PokemonSpritesFragment.newInstance(pokemonId)
+                PokemonDetallesViewModel.NavDestination.LOCATIONS ->
+                    PokemonLocationsFragment.newInstance(pokemonId)
             }
 
             childFragmentManager.beginTransaction()
@@ -127,6 +135,7 @@ class PokemonDetallesMainFragment : Fragment() {
             PokemonDetallesViewModel.NavDestination.INFO -> 0
             PokemonDetallesViewModel.NavDestination.STATS -> 1
             PokemonDetallesViewModel.NavDestination.SPRITES -> 2
+            PokemonDetallesViewModel.NavDestination.LOCATIONS -> 3
         }
     }
 
