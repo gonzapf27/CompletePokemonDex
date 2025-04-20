@@ -1,20 +1,16 @@
 package com.example.completepokemondex.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.lifecycle.lifecycleScope
 import com.example.completepokemondex.data.local.database.PokedexDatabase
-import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 /**
  * MainActivity es la actividad principal de la aplicación que muestra la interfaz de usuario y
@@ -44,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Aplicar insets para respetar el área segura
-        setupInsets()
+        //setupInsets()
 
         // Inicializar repository manualmente
         val database = PokedexDatabase.Companion.getDatabase(applicationContext)
@@ -83,64 +79,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Carga la lista de Pokémon y muestra los resultados por consola
-     */
-    private fun loadPokemonList() {
-        lifecycleScope.launch {
-            pokemonRepository.getPokemonList(10, 0).collect { response ->
-                when (response) {
-                    is Resource.Loading -> {
-                        Log.d("Pokemon", "Cargando lista de Pokémon...")
-                    }
-
-                    is Resource.Success -> {
-                        val pokemons = response.data
-                        Log.d(
-                            "Pokemon",
-                            "Lista de Pokémon cargada exitosamente. Total: ${pokemons.size}"
-                        )
-                        pokemons.forEach { pokemon ->
-                            Log.d("Pokemon", "Nombre: ${pokemon.name}, ID: ${pokemon.id}")
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        Log.e("Pokemon", "Error al cargar la lista: ${response.message}")
-                        if (response.data?.isNotEmpty() == true) {
-                            Log.d(
-                                "Pokemon",
-                                "Mostrando datos en caché. Total: ${response.data.size}"
-                            )
-                            response.data.forEach { pokemon ->
-                                Log.d("Pokemon", "Nombre: ${pokemon.name}, ID: ${pokemon.id}")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Carga la evolution chain y muestra los resultados por consola
-     */
-    private fun loadEvolutionChain(chainId: Int) {
-        lifecycleScope.launch {
-            pokemonRepository.getEvolutionChainById(chainId).collect { response ->
-                when (response) {
-                    is com.example.completepokemondex.data.remote.api.Resource.Loading -> {
-                        Log.d("EvolutionChain", "Cargando evolution chain...")
-                    }
-                    is com.example.completepokemondex.data.remote.api.Resource.Success -> {
-                        val chain = response.data
-                        Log.d("EvolutionChain", "Evolution chain cargada exitosamente: $chain")
-                    }
-                    is com.example.completepokemondex.data.remote.api.Resource.Error -> {
-                        Log.e("EvolutionChain", "Error al cargar evolution chain: ${response.message}")
-                    }
-                }
-            }
-        }
-    }
 }
