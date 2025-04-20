@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonEncountersBinding
 import com.example.completepokemondex.util.PokemonTypeUtil
@@ -54,6 +55,14 @@ class PokemonLocationsFragment : Fragment() {
             )
         }
         
+        // Cargar la imagen del mapa con opciones mejoradas para asegurar que no se corte
+        Glide.with(this)
+            .load(R.drawable.map)
+            .apply(RequestOptions()
+                .fitCenter()
+                .override(1024, 768)) // Usar una resolución más alta para mejor calidad
+            .into(binding.mapImage)
+        
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             // Gestionar estado de carga
             if (state.isLoading) {
@@ -71,7 +80,7 @@ class PokemonLocationsFragment : Fragment() {
             }
 
             // Actualizar título
-            binding.encountersTitle.text = "Lugares de encuentro: ${state.nombre}"
+            binding.encountersTitle.text = "Lugares en Rojo/Azul: ${state.nombre}"
 
             // Establecer fondo con el tipo de Pokémon (usando agua como predeterminado para las ubicaciones)
             val waterType = PokemonTypeUtil.getTypeByName("water")
@@ -121,7 +130,7 @@ class PokemonLocationsFragment : Fragment() {
                 binding.encountersEmpty.text = if (state.error != null) 
                     "Error al cargar las ubicaciones: ${state.error}" 
                 else 
-                    "No se encontraron lugares de encuentro para este Pokémon."
+                    "No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul."
             }
         }
     }

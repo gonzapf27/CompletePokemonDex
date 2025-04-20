@@ -42,6 +42,9 @@ class PokemonLocationsVIewModel @Inject constructor(
     private val _uiState = MutableLiveData(PokemonLocationsUiState())
     val uiState: LiveData<PokemonLocationsUiState> = _uiState
 
+    // Lista de versiones que queremos filtrar (solo Red y Blue)
+    private val targetVersions = listOf("red", "blue")
+
     fun setPokemonId(id: Int) {
         if (_pokemonId.value == id) return
         _pokemonId.value = id
@@ -105,7 +108,8 @@ class PokemonLocationsVIewModel @Inject constructor(
     }
 
     /**
-     * Procesa los datos de encuentros del dominio a un formato más amigable para la UI
+     * Procesa los datos de encuentros del dominio a un formato más amigable para la UI,
+     * filtrando solo para los juegos Rojo y Azul
      */
     private fun processEncounters(encounters: PokemonEncountersDomain): List<LocationEncounterUi> {
         val result = mutableListOf<LocationEncounterUi>()
@@ -114,19 +118,23 @@ class PokemonLocationsVIewModel @Inject constructor(
         encounters.items.forEach { encounter ->
             val locationName = formatLocationName(encounter.location_area?.name ?: "")
             
-            // Agrupar por versión/juego
+            // Agrupar por versión/juego, pero solo para Rojo y Azul
             val gameEncounters = mutableMapOf<String, MutableList<PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail>>()
             encounter.version_details?.filterNotNull()?.forEach { versionDetail ->
-                val gameName = formatGameName(versionDetail.version?.name ?: "")
-                versionDetail.encounter_details?.filterNotNull()?.forEach { detail ->
-                    if (!gameEncounters.containsKey(gameName)) {
-                        gameEncounters[gameName] = mutableListOf()
+                val versionName = versionDetail.version?.name ?: ""
+                // Solo procesamos Red y Blue
+                if (targetVersions.contains(versionName)) {
+                    val gameName = formatGameName(versionName)
+                    versionDetail.encounter_details?.filterNotNull()?.forEach { detail ->
+                        if (!gameEncounters.containsKey(gameName)) {
+                            gameEncounters[gameName] = mutableListOf()
+                        }
+                        gameEncounters[gameName]?.add(detail)
                     }
-                    gameEncounters[gameName]?.add(detail)
                 }
             }
             
-            // Si hay encuentros para esta ubicación
+            // Si hay encuentros para esta ubicación en Red o Azul
             if (gameEncounters.isNotEmpty()) {
                 // Extraer los juegos
                 val games = gameEncounters.keys.toList()
