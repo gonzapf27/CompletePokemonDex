@@ -74,6 +74,7 @@ class PokemonLocationsVIewModel @Inject constructor(
                                     _uiState.value = _uiState.value?.copy(
                                         isLoading = false,
                                         id = pokemon.id?.toString() ?: "",
+                                        nombre = pokemonName,
                                         imageUrl = imageUrl,
                                         encounters = encounters,
                                         hasEncounters = encounters.isNotEmpty()
@@ -85,6 +86,7 @@ class PokemonLocationsVIewModel @Inject constructor(
                                         isLoading = false,
                                         error = encountersResult.message
                                             ?: "Error al cargar localizaciones",
+                                        nombre = pokemonName,
                                         imageUrl = imageUrl,
                                         hasEncounters = false
                                     )
@@ -123,7 +125,7 @@ class PokemonLocationsVIewModel @Inject constructor(
         // Iterar sobre cada área de localización
         encounters.items.forEach { encounter ->
             val locationAreaName = encounter.location_area?.name ?: ""
-            val locationName = locationAreaName
+            val locationName = formatLocationName(locationAreaName)
 
             // Agrupar por versión/juego, pero solo para Rojo y Azul
             val gameEncounters =
@@ -132,7 +134,7 @@ class PokemonLocationsVIewModel @Inject constructor(
                 val versionName = versionDetail.version?.name ?: ""
                 // Solo procesamos Red y Blue
                 if (targetVersions.contains(versionName)) {
-                    val gameName = versionName
+                    val gameName = formatGameName(versionName)
                     versionDetail.encounter_details?.filterNotNull()?.forEach { detail ->
                         if (!gameEncounters.containsKey(gameName)) {
                             gameEncounters[gameName] = mutableListOf()
@@ -193,5 +195,40 @@ class PokemonLocationsVIewModel @Inject constructor(
         return result
     }
 
+    /**
+     * Formatea el nombre de la localización para ser más legible
+     */
+    private fun formatLocationName(name: String): String {
+        return name.replace("-", " ")
+            .split(" ")
+            .joinToString(" ") { word ->
+                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+            }
+    }
 
+    /**
+     * Formatea el nombre del juego para ser más legible
+     */
+    private fun formatGameName(name: String): String {
+        // Mapeo de nombres de versión a nombres más amigables
+        return when (name) {
+            "red" -> "Rojo"
+            "blue" -> "Azul"
+            "yellow" -> "Amarillo"
+            "gold" -> "Oro"
+            "silver" -> "Plata"
+            "crystal" -> "Cristal"
+            "ruby" -> "Rubí"
+            "sapphire" -> "Zafiro"
+            "emerald" -> "Esmeralda"
+            "firered" -> "Rojo Fuego"
+            "leafgreen" -> "Verde Hoja"
+            "diamond" -> "Diamante"
+            "pearl" -> "Perla"
+            "platinum" -> "Platino"
+            "heartgold" -> "Oro HeartGold"
+            "soulsilver" -> "Plata SoulSilver"
+            else -> name.replaceFirstChar { it.uppercase() }
+        }
+    }
 }

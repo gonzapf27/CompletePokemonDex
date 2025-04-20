@@ -52,7 +52,7 @@
                     android:paddingTop="8dp"
                     android:paddingEnd="24dp"
                     android:paddingBottom="8dp"
-                    android:text="Lugares en Rojo/Azul"
+                    android:text="@string/encounters_title_template"
                     android:textColor="@color/type_grass"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -76,7 +76,7 @@
                             android:layout_height="0dp"
                             android:adjustViewBounds="true"
                             android:src="@drawable/map"
-                            android:contentDescription="Mapa de la región de Kanto con ubicaciones marcadas"
+                            android:contentDescription="@string/map_content_description"
                             android:scaleType="fitCenter"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintDimensionRatio="16:9"
@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:gravity="center"
-                    android:text="Ubicaciones marcadas en el mapa donde se puede encontrar este Pokémon en los juegos Rojo y Azul."
+                    android:text="@string/encounters_description"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="start"
-                    android:text="Cargando lugares de encuentro..."
+                    android:text="@string/encounters_loading"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -113,7 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:gravity="center"
-                    android:text="No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul."
+                    android:text="@string/encounters_empty"
                     android:textColor="@color/text_secondary"
                     android:textSize="16sp"
                     android:visibility="gone" />

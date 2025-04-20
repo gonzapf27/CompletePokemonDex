@@ -40,4 +40,11 @@
     <string name="pokemon_capture_rate_label">Ratio de captura</string>
     <string name="pokemon_species_label">Especie</string>
     <string name="evolution_chain_label">Cadena de evolución</string>
+    <!-- Pokemon Encounters -->
+    <string name="encounters_title_template">Lugares en %s</string>
+    <string name="encounters_red_blue">Rojo/Azul</string>
+    <string name="encounters_description">Ubicaciones marcadas en el mapa donde se puede encontrar este Pokémon en los juegos Rojo y Azul.</string>
+    <string name="encounters_loading">Cargando lugares de encuentro...</string>
+    <string name="encounters_empty">No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul.</string>
+    <string name="map_content_description">Mapa de la región de Kanto con ubicaciones marcadas</string>
 </resources>
