@@ -1,12 +1,15 @@
 package com.example.completepokemondex.ui.pokemonLocations
 
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +18,19 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonEncountersBinding
+import com.example.completepokemondex.util.PokemonLocationsUtil
 import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
 import android.widget.ImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class PokemonLocationsFragment : Fragment() {
@@ -30,6 +40,9 @@ class PokemonLocationsFragment : Fragment() {
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
 
     private val viewModel: PokemonLocationsVIewModel by viewModels()
+    
+    // Para mantener una referencia al mapa base
+    private var baseMapBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +68,8 @@ class PokemonLocationsFragment : Fragment() {
             )
         }
         
-        // Cargar la imagen del mapa con opciones mejoradas para asegurar que no se corte
-        Glide.with(this)
-            .load(R.drawable.map)
-            .apply(RequestOptions()
-                .fitCenter()
-                .override(1024, 768)) // Usar una resolución más alta para mejor calidad
-            .into(binding.mapImage)
+        // Cargar la imagen del mapa base primero
+        loadBaseMap()
         
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             // Gestionar estado de carga
@@ -90,6 +98,11 @@ class PokemonLocationsFragment : Fragment() {
                 intArrayOf(color, Color.LTGRAY)
             )
             binding.pokemonEncountersGradientBg.background = gradientDrawable
+            
+            // Si tenemos ubicaciones, actualizar el mapa para resaltarlas
+            if (state.locationNames.isNotEmpty() && baseMapBitmap != null) {
+                updateMapWithLocations(state.locationNames)
+            }
 
             // Mostrar texto de encuentros o mensaje de vacío
             if (state.hasEncounters) {
@@ -134,9 +147,80 @@ class PokemonLocationsFragment : Fragment() {
             }
         }
     }
+    
+    /**
+     * Carga la imagen base del mapa de Kanto
+     */
+    private fun loadBaseMap() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Cargar el mapa base desde los recursos
+                val inputStream = resources.openRawResource(R.drawable.map)
+                baseMapBitmap = BitmapFactory.decodeStream(inputStream)
+                
+                // Mostrar el mapa base inicialmente
+                withContext(Dispatchers.Main) {
+                    Glide.with(requireContext())
+                        .asBitmap()
+                        .load(baseMapBitmap)
+                        .apply(RequestOptions()
+                            .fitCenter()
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true))
+                        .transition(BitmapTransitionOptions.withCrossFade())
+                        .into(binding.mapImage)
+                }
+            } catch (e: Exception) {
+                Log.e("PokemonLocationsFragment", "Error al cargar el mapa base: ${e.message}")
+                // Cargar el mapa normalmente si falla
+                withContext(Dispatchers.Main) {
+                    Glide.with(requireContext())
+                        .load(R.drawable.map)
+                        .apply(RequestOptions().fitCenter())
+                        .into(binding.mapImage)
+                }
+            }
+        }
+    }
+    
+    /**
+     * Actualiza el mapa con las ubicaciones resaltadas
+     */
+    private fun updateMapWithLocations(locationNames: List<String>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if (baseMapBitmap != null) {
+                    // Usar PokemonLocationsUtil para resaltar las ubicaciones en el mapa
+                    val highlightedMap = PokemonLocationsUtil.highlightLocations(
+                        requireContext(),
+                        baseMapBitmap!!,
+                        locationNames
+                    )
+                    
+                    // Mostrar el mapa actualizado en la UI
+                    withContext(Dispatchers.Main) {
+                        Glide.with(requireContext())
+                            .asBitmap()
+                            .load(highlightedMap)
+                            .apply(RequestOptions()
+                                .fitCenter()
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true))
+                            .transition(BitmapTransitionOptions.withCrossFade())
+                            .into(binding.mapImage)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("PokemonLocationsFragment", "Error al resaltar ubicaciones: ${e.message}")
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Liberar recursos
+        baseMapBitmap?.recycle()
+        baseMapBitmap = null
         _binding = null
     }
 

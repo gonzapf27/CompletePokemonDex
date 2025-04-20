@@ -14,6 +14,7 @@ import javax.inject.Inject
  */
 data class LocationEncounterUi(
     val locationName: String,
+    val locationAreaName: String, // Nombre original del área para usar con PokemonLocationsUtil
     val games: List<String>,
     val levels: String,
     val chance: String,
@@ -30,7 +31,8 @@ data class PokemonLocationsUiState(
     val nombre: String = "",
     val imageUrl: String? = null,
     val encounters: List<LocationEncounterUi> = emptyList(),
-    val hasEncounters: Boolean = false
+    val hasEncounters: Boolean = false,
+    val locationNames: List<String> = emptyList() // Lista de nombres de ubicación para marcar en el mapa
 )
 
 @HiltViewModel
@@ -78,27 +80,32 @@ class PokemonLocationsVIewModel @Inject constructor(
                                         hasEncounters = encounters.isNotEmpty()
                                     )
                                 }
+
                                 is Resource.Error -> {
                                     _uiState.value = _uiState.value?.copy(
                                         isLoading = false,
-                                        error = encountersResult.message ?: "Error al cargar localizaciones",
+                                        error = encountersResult.message
+                                            ?: "Error al cargar localizaciones",
                                         nombre = pokemonName,
                                         imageUrl = imageUrl,
                                         hasEncounters = false
                                     )
                                 }
+
                                 is Resource.Loading -> {
                                     // Mantenemos el estado de carga
                                 }
                             }
                         }
                     }
+
                     is Resource.Error -> {
                         _uiState.value = _uiState.value?.copy(
                             isLoading = false,
                             error = detailsResult.message ?: "Error al cargar datos del Pokémon"
                         )
                     }
+
                     is Resource.Loading -> {
                         // Mantenemos el estado de carga
                     }
@@ -113,13 +120,16 @@ class PokemonLocationsVIewModel @Inject constructor(
      */
     private fun processEncounters(encounters: PokemonEncountersDomain): List<LocationEncounterUi> {
         val result = mutableListOf<LocationEncounterUi>()
-        
+        val locationNames = mutableListOf<String>() // Para almacenar nombres de ubicación
+
         // Iterar sobre cada área de localización
         encounters.items.forEach { encounter ->
-            val locationName = formatLocationName(encounter.location_area?.name ?: "")
-            
+            val locationAreaName = encounter.location_area?.name ?: ""
+            val locationName = formatLocationName(locationAreaName)
+
             // Agrupar por versión/juego, pero solo para Rojo y Azul
-            val gameEncounters = mutableMapOf<String, MutableList<PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail>>()
+            val gameEncounters =
+                mutableMapOf<String, MutableList<PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail>>()
             encounter.version_details?.filterNotNull()?.forEach { versionDetail ->
                 val versionName = versionDetail.version?.name ?: ""
                 // Solo procesamos Red y Blue
@@ -133,12 +143,15 @@ class PokemonLocationsVIewModel @Inject constructor(
                     }
                 }
             }
-            
+
             // Si hay encuentros para esta ubicación en Red o Azul
             if (gameEncounters.isNotEmpty()) {
                 // Extraer los juegos
                 val games = gameEncounters.keys.toList()
-                
+
+                // Añadir nombre de ubicación a la lista para el mapa
+                locationNames.add(locationAreaName)
+
                 // Calcular rango de niveles combinando todos los detalles de encuentro
                 val allLevels = mutableSetOf<Int>()
                 gameEncounters.values.flatten().forEach { detail ->
@@ -147,22 +160,25 @@ class PokemonLocationsVIewModel @Inject constructor(
                 }
                 val minLevel = allLevels.minOrNull() ?: 0
                 val maxLevel = allLevels.maxOrNull() ?: 0
-                val levels = if (minLevel == maxLevel) "Nivel $minLevel" else "Niveles $minLevel-$maxLevel"
-                
+                val levels =
+                    if (minLevel == maxLevel) "Nivel $minLevel" else "Niveles $minLevel-$maxLevel"
+
                 // Calcular probabilidad promedio de encuentro
                 val chances = gameEncounters.values.flatten().mapNotNull { it.chance }
                 val avgChance = if (chances.isNotEmpty()) chances.average() else 0.0
                 val chanceText = "${avgChance.toInt()}%"
-                
+
+                // Extraer métodos de encuentro
                 // Extraer métodos de encuentro
                 val methods = gameEncounters.values.flatten()
                     .mapNotNull { it.method?.name }
-                    .map { formatMethodName(it) }
+                    .map { (it) }
                     .distinct()
-                
+
                 result.add(
                     LocationEncounterUi(
                         locationName = locationName,
+                        locationAreaName = locationAreaName, // Guardar el nombre original para usar con el mapa
                         games = games,
                         levels = levels,
                         chance = chanceText,
@@ -171,10 +187,14 @@ class PokemonLocationsVIewModel @Inject constructor(
                 )
             }
         }
-        
+
+        // Actualizar los nombres de ubicación en el estado UI
+        val currentState = _uiState.value
+        _uiState.value = currentState?.copy(locationNames = locationNames)
+
         return result
     }
-    
+
     /**
      * Formatea el nombre de la localización para ser más legible
      */
@@ -185,7 +205,7 @@ class PokemonLocationsVIewModel @Inject constructor(
                 word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
             }
     }
-    
+
     /**
      * Formatea el nombre del juego para ser más legible
      */
@@ -208,49 +228,7 @@ class PokemonLocationsVIewModel @Inject constructor(
             "platinum" -> "Platino"
             "heartgold" -> "Oro HeartGold"
             "soulsilver" -> "Plata SoulSilver"
-            "black" -> "Negro"
-            "white" -> "Blanco"
-            "black-2" -> "Negro 2"
-            "white-2" -> "Blanco 2"
-            "x" -> "X"
-            "y" -> "Y"
-            "omega-ruby" -> "Rubí Omega"
-            "alpha-sapphire" -> "Zafiro Alfa"
-            "sun" -> "Sol"
-            "moon" -> "Luna"
-            "ultra-sun" -> "Ultra Sol"
-            "ultra-moon" -> "Ultra Luna"
-            "lets-go-pikachu" -> "Let's Go Pikachu"
-            "lets-go-eevee" -> "Let's Go Eevee"
-            "sword" -> "Espada"
-            "shield" -> "Escudo"
-            "scarlet" -> "Escarlata"
-            "violet" -> "Púrpura"
-            else -> name.replace("-", " ").replaceFirstChar { it.uppercase() }
-        }
-    }
-    
-    /**
-     * Formatea el nombre del método de encuentro para ser más legible
-     */
-    private fun formatMethodName(method: String): String {
-        return when (method) {
-            "walk" -> "Caminando"
-            "surf" -> "Surfeando"
-            "old-rod" -> "Caña Vieja"
-            "good-rod" -> "Caña Buena"
-            "super-rod" -> "Super Caña"
-            "rock-smash" -> "Rompiendo Rocas"
-            "headbutt" -> "Cabezazo"
-            "grass-spots" -> "En la hierba"
-            "cave-spots" -> "En cuevas"
-            "bridge-spots" -> "En puentes"
-            "super-rod-spots" -> "Pescando"
-            "dark-grass" -> "Hierba alta"
-            "rough-terrain" -> "Terreno rocoso"
-            "gift" -> "Regalo"
-            "gift-egg" -> "Huevo"
-            else -> method.replace("-", " ").replaceFirstChar { it.uppercase() }
+            else -> name.replaceFirstChar { it.uppercase() }
         }
     }
 }

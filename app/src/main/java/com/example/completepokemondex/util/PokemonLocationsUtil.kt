@@ -89,26 +89,44 @@ class PokemonLocationsUtil {
         )
 
         /**
-         * Obtiene las coordenadas de una ubicación específica
-         * @param locationId El ID de la ubicación
+         * Obtiene las coordenadas de una ubicación específica por su nombre
+         * @param locationName El nombre de la ubicación
          * @return Par de coordenadas (x,y) o null si no se encuentra
          */
-        fun getCoordinates(locationId: String): Pair<Int, Int>? {
-            return LOCATION_MAP[locationId]
+        fun getCoordinates(locationName: String): Pair<Int, Int>? {
+            return LOCATION_MAP[locationName]
         }
 
         /**
-         * Resalta una o varias ubicaciones en un mapa base
+         * Resalta una o varias ubicaciones en un mapa base usando nombres de ubicación.
+         * El mapa se convierte a escala de grises y solo las ubicaciones resaltadas mantienen color.
          *
          * @param context Contexto de la aplicación
          * @param mapImage La imagen base del mapa
-         * @param locationIds Lista de IDs de ubicaciones a resaltar
-         * @return Bitmap con las ubicaciones resaltadas o la imagen original si falla
+         * @param locationNames Lista de nombres de ubicaciones a resaltar
+         * @return Bitmap con el mapa en escala de grises y las ubicaciones resaltadas en color
          */
-        fun highlightLocations(context: Context, mapImage: Bitmap, locationIds: List<String>): Bitmap {
+        fun highlightLocations(context: Context, mapImage: Bitmap, locationNames: List<String>): Bitmap {
             try {
                 // Crear una copia mutable del bitmap original
                 val resultBitmap = mapImage.copy(Bitmap.Config.ARGB_8888, true)
+
+                // Convertir la imagen a escala de grises
+                val width = resultBitmap.width
+                val height = resultBitmap.height
+                val pixels = IntArray(width * height)
+                resultBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+
+                for (i in pixels.indices) {
+                    val pixel = pixels[i]
+                    val r = Color.red(pixel)
+                    val g = Color.green(pixel)
+                    val b = Color.blue(pixel)
+                    val gray = (0.299 * r + 0.587 * g + 0.114 * b).toInt()
+                    pixels[i] = Color.rgb(gray, gray, gray)
+                }
+
+                resultBitmap.setPixels(pixels, 0, width, 0, 0, width, height)
                 val canvas = Canvas(resultBitmap)
 
                 // Configurar el círculo para resaltar la ubicación
@@ -128,17 +146,20 @@ class PokemonLocationsUtil {
                 }
 
                 // Procesar cada ubicación
-                locationIds.forEach { locationId ->
-                    val coordinates = getCoordinates(locationId)
+                var locationsMarcadas = 0
+                locationNames.forEach { locationName ->
+                    val coordinates = getCoordinates(locationName)
                     coordinates?.let { (x, y) ->
                         // Dibujar círculo exterior
                         canvas.drawCircle(x.toFloat(), y.toFloat(), 40f, paint)
 
                         // Dibujar círculo interior
                         canvas.drawCircle(x.toFloat(), y.toFloat(), 30f, fillPaint)
+                        locationsMarcadas++
                     }
                 }
 
+                Log.d("PokemonLocationsUtil", "Se marcaron $locationsMarcadas ubicaciones de ${locationNames.size} sobre mapa en escala de grises")
                 return resultBitmap
             } catch (e: Exception) {
                 Log.e("PokemonLocationsUtil", "Error al resaltar ubicaciones: ${e.message}")
