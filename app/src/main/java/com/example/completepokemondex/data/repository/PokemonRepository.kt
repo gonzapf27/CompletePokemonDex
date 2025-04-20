@@ -4,9 +4,11 @@ import android.util.Log
 import com.example.completepokemondex.data.mapping.PokemonDTOToEntityList
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
+import com.example.completepokemondex.data.domain.model.PokemonEncountersDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.domain.model.AbilityDomain
 import com.example.completepokemondex.data.domain.model.EvolutionChainDomain
+import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
 import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToEntity
@@ -15,6 +17,9 @@ import com.example.completepokemondex.data.mapping.pokemonEntityToDomainList
 import com.example.completepokemondex.data.mapping.pokemonSpeciesDTOToDomain
 import com.example.completepokemondex.data.mapping.pokemonSpeciesDTOToEntity
 import com.example.completepokemondex.data.mapping.pokemonSpeciesEntityToDomain
+import com.example.completepokemondex.data.mapping.toEntity as pokemonEncountersDTOToEntity
+import com.example.completepokemondex.data.mapping.toDomain as pokemonEncountersEntityToDomain
+import com.example.completepokemondex.data.mapping.toDomain as pokemonEncountersDTOToDomain
 import com.example.completepokemondex.data.mapping.toDomain as abilityDTOToDomain
 import com.example.completepokemondex.data.mapping.toEntity as abilityDTOToEntity
 import com.example.completepokemondex.data.mapping.toDomain as abilityEntityToDomain
@@ -48,7 +53,8 @@ class PokemonRepository(
     private val pokemonSpeciesDao: PokemonSpeciesDao,
     private val abilityDao: AbilityDao,
     private val remoteDataSource: PokemonRemoteDataSource,
-    private val evolutionChainDao: EvolutionChainDao
+    private val evolutionChainDao: EvolutionChainDao,
+    private val pokemonEncountersDao: PokemonEncountersDao
 ) {
     private val tag = "PokemonRepository"
 
@@ -438,6 +444,67 @@ class PokemonRepository(
                 }
             } catch (e: Exception) {
                 logError("Error inesperado al obtener detalles del Pokémon por nombre: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    /**
+     * Obtiene las ubicaciones donde se puede encontrar un Pokémon por su ID.
+     * Primero intenta obtener los datos de la base de datos local. Si no los encuentra,
+     * los obtiene de la API y los guarda en la base de datos.
+     *
+     * @param id Identificador único del Pokémon
+     * @return Flow que emite los lugares de encuentro del Pokémon y el estado de carga
+     */
+    fun getPokemonEncountersById(id: Int): Flow<Resource<PokemonEncountersDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de lugares de encuentro del Pokémon [id=$id]")
+
+            try {
+                // Intentar obtener datos de la base de datos local
+                logDebug("Consultando base de datos local para encuentros del Pokémon $id...")
+                val localEncounters = pokemonEncountersDao.getPokemonEncountersById(id)
+
+                if (localEncounters != null) {
+                    // Si hay datos en la base de datos local, devolverlos
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo encuentros del Pokémon $id de la base de datos local")
+                    
+                    emit(Resource.Success(localEncounters.pokemonEncountersEntityToDomain()))
+                } else {
+                    // Si no hay datos en la base de datos local, obtenerlos de la API
+                    logDebug("No se encontraron encuentros del Pokémon $id en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getPokemonEncountersById(id) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibidos encuentros del Pokémon $id de la API")
+
+                            // Guardar en la base de datos local
+                            if (apiResponse.isNotEmpty()) {
+                                saveToDatabase {
+                                    logDebug("Insertando encuentros del Pokémon $id en la base de datos")
+                                    pokemonEncountersDao.insertPokemonEncounters(
+                                        apiResponse.pokemonEncountersDTOToEntity(id)
+                                    )
+                                }
+                            } else {
+                                logDebug("No hay encuentros para el Pokémon $id")
+                            }
+
+                            logDebug("Devolviendo encuentros del Pokémon $id obtenidos de la API")
+                            emit(Resource.Success(apiResponse.pokemonEncountersDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener encuentros del Pokémon $id de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener encuentros del Pokémon: ${e.message}")
                 emit(Resource.Error(message = "Error: ${e.message}"))
             }
         }.flowOn(Dispatchers.IO)
