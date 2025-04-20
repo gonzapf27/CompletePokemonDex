@@ -9,11 +9,13 @@ import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.dao.EvolutionChainDao
+import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
 import com.example.completepokemondex.data.local.entities.AbilityEntity
 import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEntity
 import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
 import com.example.completepokemondex.data.local.entities.EvolutionChainEntity
+import com.example.completepokemondex.data.local.entities.PokemonEncountersEntity
 
 /**
  * Base de datos principal de la aplicación Pokedex que contiene
@@ -27,7 +29,8 @@ import com.example.completepokemondex.data.local.entities.EvolutionChainEntity
         PokemonDetailsEntity::class,
         PokemonSpeciesEntity::class,
         AbilityEntity::class,
-        EvolutionChainEntity::class
+        EvolutionChainEntity::class,
+        PokemonEncountersEntity::class,
     ],
     version = 1,
     exportSchema = false
@@ -58,6 +61,11 @@ abstract class PokedexDatabase : RoomDatabase() {
      * Proporciona acceso al DAO de cadenas de evolución.
      */
     abstract fun evolutionChainDao(): EvolutionChainDao
+
+    /**
+     * Proporciona acceso al DAO de encuentros de Pokémon.
+     */
+    abstract fun pokemonEncountersDao(): PokemonEncountersDao
 
     companion object {
         // Singleton para prevenir múltiples instancias de la base de datos
