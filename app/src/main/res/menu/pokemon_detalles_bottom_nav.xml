@@ -11,4 +11,9 @@
         android:id="@+id/nav_sprites"
         android:title="Sprites"
         android:icon="@drawable/ic_image"/>
+
+    <item
+        android:id="@+id/nav_encounters"
+        android:title="Locations"
+        android:icon="@drawable/ic_location"/>
 </menu>

@@ -64,10 +64,6 @@ class MainActivity : AppCompatActivity() {
             evolutionChainDao,
             pokemonEncountersDao
         )
-
-        // Ejemplo de uso de evolution chain
-        //TODO: eliminar
-        loadEvolutionChain(1) // Puedes cambiar el ID por el que desees probar
     }
 
     /**
