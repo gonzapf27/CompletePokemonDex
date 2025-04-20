@@ -54,16 +54,19 @@ class MainActivity : AppCompatActivity() {
         val pokemonSpeciesDao = database.pokemonSpeciesDao()
         val abilityDao = database.abilityDao()
         val evolutionChainDao = database.evolutionChainDao()
+        val pokemonEncountersDao = database.pokemonEncountersDao()
         pokemonRepository = PokemonRepository(
             pokemonDao,
             pokemonDetailsDao,
             pokemonSpeciesDao,
             abilityDao,
             remoteDataSource,
-            evolutionChainDao
+            evolutionChainDao,
+            pokemonEncountersDao
         )
 
         // Ejemplo de uso de evolution chain
+        //TODO: eliminar
         loadEvolutionChain(1) // Puedes cambiar el ID por el que desees probar
     }
 
