@@ -14,6 +14,7 @@ import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.card.MaterialCardView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 
 @AndroidEntryPoint
 class PokemonMovesFragment : Fragment() {
@@ -39,18 +40,24 @@ class PokemonMovesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // Configurar la imagen de carga
-        val loadingImage = binding.loadingIndicator
+        // Configurar la imagen de carga como GIF animado
+        Glide.with(this)
+            .asGif()
+            .load(R.drawable.loading_pokeball)
+            .into(binding.loadingIndicator)
         
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            // Mostrar/ocultar la imagen de carga
-            binding.loadingIndicator.isVisible = state.isLoading
+            // Mostrar/ocultar la imagen de carga mientras cualquier proceso de carga esté activo
+            binding.loadingIndicator.isVisible = state.isLoading || state.isLoadingMoveDetails
             
-            // Cuando está cargando, ocultamos el contenido
-            binding.movesSectionsContainer.isVisible = !state.isLoading
-            binding.movesEmpty.isVisible = state.sections.isEmpty() && !state.isLoading
+            // Cuando está cargando los datos iniciales, ocultamos el contenido
+            binding.movesCard.isVisible = !state.isLoading
+            
+            // Mostrar mensaje de vacío solo cuando no hay secciones y ha terminado de cargar
+            binding.movesEmpty.isVisible = state.sections.isEmpty() && !state.isLoading && !state.isLoadingMoveDetails
 
-            if (!state.isLoading) {
+            // Si ya tenemos secciones, actualizar la UI aunque estemos cargando detalles
+            if (!state.isLoading && state.sections.isNotEmpty()) {
                 val container = binding.movesSectionsContainer
                 container.removeAllViews()
 
