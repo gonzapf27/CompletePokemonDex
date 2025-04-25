@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         val abilityDao = database.abilityDao()
         val evolutionChainDao = database.evolutionChainDao()
         val pokemonEncountersDao = database.pokemonEncountersDao()
+        val pokemonMoveDao = database.pokemonMoveDao()
         pokemonRepository = PokemonRepository(
             pokemonDao,
             pokemonDetailsDao,
@@ -58,7 +59,8 @@ class MainActivity : AppCompatActivity() {
             abilityDao,
             remoteDataSource,
             evolutionChainDao,
-            pokemonEncountersDao
+            pokemonEncountersDao,
+            pokemonMoveDao
         )
     }
 

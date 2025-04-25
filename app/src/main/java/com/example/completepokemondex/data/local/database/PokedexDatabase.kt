@@ -9,6 +9,7 @@ import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
+import com.example.completepokemondex.data.local.dao.PokemonMoveDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.entities.AbilityEntity
 import com.example.completepokemondex.data.local.entities.EvolutionChainEntity
@@ -68,6 +69,11 @@ abstract class PokedexDatabase : RoomDatabase() {
      * Proporciona acceso al DAO de encuentros de Pokémon.
      */
     abstract fun pokemonEncountersDao(): PokemonEncountersDao
+
+    /**
+     * Proporciona acceso al DAO de movimientos de Pokémon.
+     */
+    abstract fun pokemonMoveDao(): PokemonMoveDao
 
     companion object {
         // Singleton para prevenir múltiples instancias de la base de datos

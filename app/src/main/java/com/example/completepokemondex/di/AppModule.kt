@@ -6,6 +6,7 @@ import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
+import com.example.completepokemondex.data.local.dao.PokemonMoveDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.database.PokedexDatabase
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
@@ -63,6 +64,11 @@ object AppModule {
     }
 
     @Provides
+    fun providePokemonMoveDao(database: PokedexDatabase): PokemonMoveDao {
+        return database.pokemonMoveDao()
+    }
+
+    @Provides
     @Singleton
     fun providePokemonRepository(
         pokemonDao: PokemonDao,
@@ -71,7 +77,9 @@ object AppModule {
         abilityDao: AbilityDao,
         remoteDataSource: PokemonRemoteDataSource,
         evolutionChainDao: EvolutionChainDao,
-        pokemonEncountersDao: PokemonEncountersDao
+        pokemonEncountersDao: PokemonEncountersDao,
+        pokemonMoveDao: PokemonMoveDao
+
     ): PokemonRepository {
         return PokemonRepository(
             pokemonDao,
@@ -80,7 +88,8 @@ object AppModule {
             abilityDao,
             remoteDataSource,
             evolutionChainDao,
-            pokemonEncountersDao
+            pokemonEncountersDao,
+            pokemonMoveDao
         )
     }
 }
