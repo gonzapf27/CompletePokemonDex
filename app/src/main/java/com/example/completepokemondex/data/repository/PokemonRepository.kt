@@ -8,6 +8,7 @@ import com.example.completepokemondex.data.domain.model.PokemonEncountersDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.domain.model.AbilityDomain
 import com.example.completepokemondex.data.domain.model.EvolutionChainDomain
+import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
 import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
@@ -26,11 +27,15 @@ import com.example.completepokemondex.data.mapping.toDomain as abilityEntityToDo
 import com.example.completepokemondex.data.mapping.toDomain as evolutionChainDTOToDomain
 import com.example.completepokemondex.data.mapping.toEntity as evolutionChainDTOToEntity
 import com.example.completepokemondex.data.mapping.toDomain as evolutionChainEntityToDomain
+import com.example.completepokemondex.data.mapping.toDomain as pokemonMoveDTOToDomain
+import com.example.completepokemondex.data.mapping.toEntity as pokemonMoveDTOToEntity
+import com.example.completepokemondex.data.mapping.toDomain as pokemonMoveEntityToDomain
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.dao.AbilityDao
 import com.example.completepokemondex.data.local.dao.EvolutionChainDao
+import com.example.completepokemondex.data.local.dao.PokemonMoveDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +59,8 @@ class PokemonRepository(
     private val abilityDao: AbilityDao,
     private val remoteDataSource: PokemonRemoteDataSource,
     private val evolutionChainDao: EvolutionChainDao,
-    private val pokemonEncountersDao: PokemonEncountersDao
+    private val pokemonEncountersDao: PokemonEncountersDao,
+    private val pokemonMoveDao: PokemonMoveDao
 ) {
     private val tag = "PokemonRepository"
 
@@ -316,6 +322,61 @@ class PokemonRepository(
                 }
             } catch (e: Exception) {
                 logError("Error inesperado al obtener evolution chain: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    /**
+     * Obtiene un movimiento específico por su ID.
+     * Primero intenta obtener los datos de la base de datos local. Si no los encuentra,
+     * los obtiene de la API y los guarda en la base de datos.
+     *
+     * @param id Identificador único del movimiento
+     * @return Flow que emite los detalles del movimiento y el estado de carga
+     */
+    fun getMoveById(id: Int): Flow<Resource<PokemonMoveDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de movimiento [id=$id]")
+
+            try {
+                // Intentar obtener datos de la base de datos local
+                logDebug("Consultando base de datos local para movimiento $id...")
+                val localMove = pokemonMoveDao.getMoveById(id)
+
+                if (localMove != null) {
+                    // Si hay datos en la base de datos local, devolverlos
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo movimiento $id de la base de datos local")
+
+                    emit(Resource.Success(localMove.pokemonMoveEntityToDomain()))
+                } else {
+                    // Si no hay datos en la base de datos local, obtenerlos de la API
+                    logDebug("No se encontró movimiento $id en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getMoveById(id) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibido movimiento $id de la API")
+                            
+                            // Guardar en la base de datos local
+                            saveToDatabase {
+                                logDebug("Insertando movimiento $id en la base de datos")
+                                pokemonMoveDao.insertMove(apiResponse.pokemonMoveDTOToEntity())
+                            }
+
+                            logDebug("Devolviendo movimiento $id obtenido de la API")
+                            emit(Resource.Success(apiResponse.pokemonMoveDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener movimiento $id de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener movimiento: ${e.message}")
                 emit(Resource.Error(message = "Error: ${e.message}"))
             }
         }.flowOn(Dispatchers.IO)
