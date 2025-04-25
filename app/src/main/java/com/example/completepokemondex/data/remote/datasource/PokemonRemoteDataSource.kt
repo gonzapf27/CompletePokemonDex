@@ -4,11 +4,12 @@ import android.util.Log
 import com.example.completepokemondex.data.remote.api.ApiClient
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.models.AbilityDTO
+import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonEncountersDTO
+import com.example.completepokemondex.data.remote.models.PokemonMoveDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
-import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -203,7 +204,10 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
-                    Log.d("PokemonRemoteDataSource", "Encuentros del pokemon obtenidos: ${body.size}")
+                    Log.d(
+                        "PokemonRemoteDataSource",
+                        "Encuentros del pokemon obtenidos: ${body.size}"
+                    )
                     Resource.Success(body)
                 } else {
                     Resource.Error("Cuerpo de respuesta vacío", emptyList())
@@ -212,7 +216,10 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
                 Resource.Error("Error ${response.code()}: ${response.message()}", emptyList())
             }
         } catch (e: Exception) {
-            Log.e("PokemonRemoteDataSource", "Error obteniendo encuentros del pokemon: ${e.message}")
+            Log.e(
+                "PokemonRemoteDataSource",
+                "Error obteniendo encuentros del pokemon: ${e.message}"
+            )
             Resource.Error("Error de red: ${e.message}", emptyList())
         }
     }
@@ -229,7 +236,10 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
-                    Log.d("PokemonRemoteDataSource", "Encuentros del pokemon obtenidos por nombre: ${body.size}")
+                    Log.d(
+                        "PokemonRemoteDataSource",
+                        "Encuentros del pokemon obtenidos por nombre: ${body.size}"
+                    )
                     Resource.Success(body)
                 } else {
                     Resource.Error("Cuerpo de respuesta vacío", emptyList())
@@ -238,8 +248,37 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
                 Resource.Error("Error ${response.code()}: ${response.message()}", emptyList())
             }
         } catch (e: Exception) {
-            Log.e("PokemonRemoteDataSource", "Error obteniendo encuentros del pokemon por nombre: ${e.message}")
+            Log.e(
+                "PokemonRemoteDataSource",
+                "Error obteniendo encuentros del pokemon por nombre: ${e.message}"
+            )
             Resource.Error("Error de red: ${e.message}", emptyList())
+        }
+    }
+
+    /**
+     * Obtiene un movimiento específico por su ID desde la API.
+     *
+     * @param id Identificador único del movimiento
+     * @return Un objeto Resource que contiene los detalles del movimiento o un mensaje de error
+     */
+    suspend fun getMoveById(id: Int): Resource<PokemonMoveDTO> {
+        return try {
+            val response = apiService.getMoveById(id)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Log.d("PokemonRemoteDataSource", "Movimiento obtenido: $body")
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Cuerpo de respuesta vacío")
+                }
+            } else {
+                Resource.Error("Error ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("PokemonRemoteDataSource", "Error obteniendo movimiento: ${e.message}")
+            Resource.Error("Error de red: ${e.message}")
         }
     }
 }

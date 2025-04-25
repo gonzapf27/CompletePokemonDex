@@ -1,11 +1,12 @@
 package com.example.completepokemondex.data.remote.api
 
 import com.example.completepokemondex.data.remote.models.AbilityDTO
+import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import com.example.completepokemondex.data.remote.models.PokemonDTO
 import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonEncountersDTO
+import com.example.completepokemondex.data.remote.models.PokemonMoveDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
-import com.example.completepokemondex.data.remote.models.EvolutionChainDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -51,7 +52,7 @@ interface ApiService {
     suspend fun getEvolutionChainById(
         @Path("id") id: Int
     ): Response<EvolutionChainDTO>
-    
+
     /**
      * Obtiene los lugares donde se puede encontrar un Pokémon por su ID.
      *
@@ -62,7 +63,7 @@ interface ApiService {
     suspend fun getPokemonEncountersById(
         @Path("id") id: Int
     ): Response<List<PokemonEncountersDTO>>
-    
+
     /**
      * Obtiene los lugares donde se puede encontrar un Pokémon por su nombre.
      *
@@ -73,6 +74,17 @@ interface ApiService {
     suspend fun getPokemonEncountersByName(
         @Path("name") name: String
     ): Response<List<PokemonEncountersDTO>>
+
+    /**
+     * Obtiene un movimiento dado su ID
+     *
+     * @param id El ID del movimiento
+     * @return Una respuesta que contiene el movimiento
+     */
+    @GET("move/{id}")
+    suspend fun getMoveById(
+        @Path("id") id: Int
+    ): Response<PokemonMoveDTO>
 }
 
 /**
