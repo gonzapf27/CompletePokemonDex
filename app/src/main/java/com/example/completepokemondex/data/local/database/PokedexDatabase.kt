@@ -5,22 +5,23 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.completepokemondex.data.local.dao.AbilityDao
+import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
-import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
-import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
+import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.entities.AbilityEntity
-import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
-import com.example.completepokemondex.data.local.entities.PokemonEntity
-import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
 import com.example.completepokemondex.data.local.entities.EvolutionChainEntity
+import com.example.completepokemondex.data.local.entities.PokemonDetailsEntity
 import com.example.completepokemondex.data.local.entities.PokemonEncountersEntity
+import com.example.completepokemondex.data.local.entities.PokemonEntity
+import com.example.completepokemondex.data.local.entities.PokemonMoveEntity
+import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
 
 /**
  * Base de datos principal de la aplicación Pokedex que contiene
  * todas las tablas relacionadas con los Pokémon.
- * 
+ *
  * @property pokemonDao DAO para acceder a la información de Pokémon.
  */
 @Database(
@@ -31,6 +32,7 @@ import com.example.completepokemondex.data.local.entities.PokemonEncountersEntit
         AbilityEntity::class,
         EvolutionChainEntity::class,
         PokemonEncountersEntity::class,
+        PokemonMoveEntity::class,
     ],
     version = 1,
     exportSchema = false
