@@ -2,6 +2,7 @@ package com.example.completepokemondex.ui.pokemonMoves
 
 import androidx.lifecycle.*
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
+import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,8 @@ class PokemonMovesViewModel @Inject constructor(
     private val _uiState = MutableLiveData(PokemonMovesUiState())
     val uiState: LiveData<PokemonMovesUiState> = _uiState
 
+    private val loadedMoveDetails = mutableMapOf<Int, PokemonMoveDomain>()
+
     fun setPokemonId(id: Int) {
         if (_pokemonId.value == id) return
         _pokemonId.value = id
@@ -45,6 +48,9 @@ class PokemonMovesViewModel @Inject constructor(
                             isLoading = false,
                             sections = sections
                         )
+                        
+                        // Cargar detalles de cada movimiento
+                        loadMovesDetails(moves)
                     }
                     is Resource.Error -> {
                         _uiState.value = PokemonMovesUiState(isLoading = false)
@@ -55,6 +61,34 @@ class PokemonMovesViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun loadMovesDetails(moves: List<PokemonDetailsDomain.Move?>) {
+        viewModelScope.launch {
+            moves.forEach { move ->
+                move?.move?.url?.let { url ->
+                    // Extraer el ID del movimiento de la URL
+                    val moveId = extractMoveIdFromUrl(url)
+                    if (moveId != null) {
+                        repository.getMoveById(moveId).collect { result ->
+                            when (result) {
+                                is Resource.Success -> {
+                                    loadedMoveDetails[moveId] = result.data
+                                    // No es necesario actualizar la UI ya que solo estamos cargando
+                                    // los detalles para tenerlos en caché
+                                }
+                                else -> { /* No hacer nada si hay errores al cargar los detalles */ }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private fun extractMoveIdFromUrl(url: String): Int? {
+        // URL ejemplo: https://pokeapi.co/api/v2/move/5/
+        return url.trim('/').split('/').lastOrNull()?.toIntOrNull()
     }
 
     private fun groupMovesByMethod(moves: List<PokemonDetailsDomain.Move?>): List<MovesSectionUi> {

@@ -48,4 +48,6 @@
     <color name="search_bar_hint">#FF757575</color> <!-- Color del texto de sugerencia -->
     <color name="search_bar_icon">#FF6C757D</color> <!-- Color del icono de búsqueda -->
     <color name="search_bar_stroke">#FFE0E0E0</color> <!-- Color del borde de la barra de búsqueda -->
+
+
 </resources>
