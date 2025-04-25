@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import java.util.Locale
 import javax.inject.Inject
 
 data class MovesSectionUi(
@@ -98,6 +99,9 @@ class PokemonMovesViewModel @Inject constructor(
             // Contador para seguir el progreso de carga
             var completedMoves = 0
             
+            // Obtener el locale actual de la aplicación
+            val currentLocale = Locale.getDefault().language
+            
             // Cargar todos los movimientos y esperar a que terminen
             moveIds.forEach { moveId ->
                 if (moveId != null) {
@@ -112,11 +116,11 @@ class PokemonMovesViewModel @Inject constructor(
                                 
                                 // Verificar si todos los movimientos se han cargado
                                 if (completedMoves >= moveIds.size) {
-                                    val currentSections = _uiState.value?.sections ?: emptyList()
+                                    val updatedSections = getLocalizedMoveSections(currentLocale)
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
-                                        sections = currentSections
+                                        sections = updatedSections
                                     )
                                 }
                             }
@@ -128,11 +132,11 @@ class PokemonMovesViewModel @Inject constructor(
                                 
                                 // Verificar si todos los movimientos se han cargado
                                 if (completedMoves >= moveIds.size) {
-                                    val currentSections = _uiState.value?.sections ?: emptyList()
+                                    val updatedSections = getLocalizedMoveSections(currentLocale)
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
-                                        sections = currentSections
+                                        sections = updatedSections
                                     )
                                 }
                             }
@@ -146,6 +150,50 @@ class PokemonMovesViewModel @Inject constructor(
         }
     }
     
+    private fun getLocalizedMoveSections(locale: String): List<MovesSectionUi> {
+        val currentState = _uiState.value ?: return emptyList()
+        val sections = currentState.sections
+        
+        // Para cada sección, actualizar los nombres de los movimientos con los localizados
+        return sections.map { section ->
+            val updatedMoves = section.moves.map { moveName ->
+                // Encontrar el ID del movimiento basado en el nombre por defecto
+                val moveId = findMoveIdByDefaultName(moveName)
+                
+                if (moveId != null) {
+                    // Obtener los detalles del movimiento si están disponibles
+                    val moveDetails = loadedMoveDetails[moveId]
+                    
+                    // Buscar el nombre localizado en base al idioma actual
+                    val localizedName = moveDetails?.names?.find { nameEntry -> 
+                        nameEntry?.language?.name == locale 
+                    }?.name
+                    
+                    // Si encontramos un nombre localizado, usarlo; de lo contrario, usar el nombre por defecto
+                    localizedName ?: moveName
+                } else {
+                    // Si no podemos encontrar el ID del movimiento, usar el nombre por defecto
+                    moveName
+                }
+            }
+            
+            MovesSectionUi(section.title, updatedMoves.sorted())
+        }
+    }
+    
+    private fun findMoveIdByDefaultName(defaultName: String): Int? {
+        // Convertir el defaultName a formato de API (por ejemplo, "Mega Punch" a "mega-punch")
+        val apiStyleName = defaultName.lowercase().replace(" ", "-")
+        
+        // Buscar el ID correspondiente
+        for ((id, moveDetails) in loadedMoveDetails) {
+            if (moveDetails.name == apiStyleName) {
+                return id
+            }
+        }
+        return null
+    }
+    
     private fun extractMoveIdFromUrl(url: String): Int? {
         // URL ejemplo: https://pokeapi.co/api/v2/move/5/
         return url.trim('/').split('/').lastOrNull()?.toIntOrNull()
@@ -155,7 +203,7 @@ class PokemonMovesViewModel @Inject constructor(
         // Agrupa los movimientos por método de aprendizaje (solo nombres, sin lógica avanzada)
         val sectionsMap = linkedMapOf<String, MutableList<String>>()
         for (move in moves) {
-            val moveName = move?.move?.name?.replaceFirstChar { it.uppercase() } ?: continue
+            val moveName = move?.move?.name?.replaceFirstChar { it.uppercase() }?.replace("-", " ") ?: continue
             val method = move.version_group_details?.firstOrNull()?.move_learn_method?.name ?: "unknown"
             val sectionTitle = when (method) {
                 "level-up" -> "Por nivel"
@@ -172,3 +220,4 @@ class PokemonMovesViewModel @Inject constructor(
         return sectionsMap.map { MovesSectionUi(it.key, it.value.sorted()) }
     }
 }
+
