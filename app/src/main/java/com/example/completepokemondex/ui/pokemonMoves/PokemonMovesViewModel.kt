@@ -7,14 +7,20 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import java.util.Locale
 import javax.inject.Inject
 
+data class MoveUi(
+    val name: String,
+    val power: Int? = null,
+    val type: String? = null,
+    val moveId: Int? = null,
+    val accuracy: Int? = null
+)
+
 data class MovesSectionUi(
     val title: String,
-    val moves: List<String>
+    val moves: List<MoveUi>
 )
 
 data class PokemonMovesUiState(
@@ -35,6 +41,9 @@ class PokemonMovesViewModel @Inject constructor(
     private val loadedMoveDetails = mutableMapOf<Int, PokemonMoveDomain>()
     private var totalMovesToLoad = 0
     private var loadedMovesCount = 0
+    
+    // Mapa para relacionar nombres de movimientos con sus IDs
+    private val moveNameToIdMap = mutableMapOf<String, Int>()
 
     fun setPokemonId(id: Int) {
         if (_pokemonId.value == id) return
@@ -49,6 +58,18 @@ class PokemonMovesViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         val moves = result.data.moves ?: emptyList()
+                        
+                        // Llenar el mapa de nombres a ids
+                        moves.forEach { move ->
+                            move?.move?.url?.let { url ->
+                                val moveId = extractMoveIdFromUrl(url)
+                                val moveName = move.move?.name?.replaceFirstChar { it.uppercase() }?.replace("-", " ")
+                                if (moveId != null && moveName != null) {
+                                    moveNameToIdMap[moveName] = moveId
+                                }
+                            }
+                        }
+                        
                         val sections = groupMovesByMethod(moves)
                         
                         // Mostrar las secciones pero mantener el estado de carga
@@ -116,7 +137,7 @@ class PokemonMovesViewModel @Inject constructor(
                                 
                                 // Verificar si todos los movimientos se han cargado
                                 if (completedMoves >= moveIds.size) {
-                                    val updatedSections = getLocalizedMoveSections(currentLocale)
+                                    val updatedSections = getEnhancedMoveSections(currentLocale)
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
@@ -132,7 +153,7 @@ class PokemonMovesViewModel @Inject constructor(
                                 
                                 // Verificar si todos los movimientos se han cargado
                                 if (completedMoves >= moveIds.size) {
-                                    val updatedSections = getLocalizedMoveSections(currentLocale)
+                                    val updatedSections = getEnhancedMoveSections(currentLocale)
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
@@ -150,48 +171,37 @@ class PokemonMovesViewModel @Inject constructor(
         }
     }
     
-    private fun getLocalizedMoveSections(locale: String): List<MovesSectionUi> {
+    private fun getEnhancedMoveSections(locale: String): List<MovesSectionUi> {
         val currentState = _uiState.value ?: return emptyList()
         val sections = currentState.sections
         
-        // Para cada sección, actualizar los nombres de los movimientos con los localizados
         return sections.map { section ->
-            val updatedMoves = section.moves.map { moveName ->
-                // Encontrar el ID del movimiento basado en el nombre por defecto
-                val moveId = findMoveIdByDefaultName(moveName)
+            val enhancedMoves = section.moves.map { moveUi ->
+                val moveId = moveUi.moveId ?: moveNameToIdMap[moveUi.name]
                 
                 if (moveId != null) {
-                    // Obtener los detalles del movimiento si están disponibles
                     val moveDetails = loadedMoveDetails[moveId]
                     
-                    // Buscar el nombre localizado en base al idioma actual
+                    // Intentamos obtener el nombre localizado
                     val localizedName = moveDetails?.names?.find { nameEntry -> 
                         nameEntry?.language?.name == locale 
-                    }?.name
+                    }?.name ?: moveUi.name
                     
-                    // Si encontramos un nombre localizado, usarlo; de lo contrario, usar el nombre por defecto
-                    localizedName ?: moveName
+                    MoveUi(
+                        name = localizedName,
+                        power = moveDetails?.power,
+                        type = moveDetails?.type?.name,
+                        moveId = moveId,
+                        accuracy = moveDetails?.accuracy
+                    )
                 } else {
-                    // Si no podemos encontrar el ID del movimiento, usar el nombre por defecto
-                    moveName
+                    // Si no encontramos detalles, usamos el movimiento original
+                    moveUi
                 }
             }
             
-            MovesSectionUi(section.title, updatedMoves.sorted())
+            MovesSectionUi(section.title, enhancedMoves.sortedBy { it.name })
         }
-    }
-    
-    private fun findMoveIdByDefaultName(defaultName: String): Int? {
-        // Convertir el defaultName a formato de API (por ejemplo, "Mega Punch" a "mega-punch")
-        val apiStyleName = defaultName.lowercase().replace(" ", "-")
-        
-        // Buscar el ID correspondiente
-        for ((id, moveDetails) in loadedMoveDetails) {
-            if (moveDetails.name == apiStyleName) {
-                return id
-            }
-        }
-        return null
     }
     
     private fun extractMoveIdFromUrl(url: String): Int? {
@@ -200,10 +210,11 @@ class PokemonMovesViewModel @Inject constructor(
     }
 
     private fun groupMovesByMethod(moves: List<PokemonDetailsDomain.Move?>): List<MovesSectionUi> {
-        // Agrupa los movimientos por método de aprendizaje (solo nombres, sin lógica avanzada)
-        val sectionsMap = linkedMapOf<String, MutableList<String>>()
+        // Agrupa los movimientos por método de aprendizaje
+        val sectionsMap = linkedMapOf<String, MutableList<MoveUi>>()
         for (move in moves) {
             val moveName = move?.move?.name?.replaceFirstChar { it.uppercase() }?.replace("-", " ") ?: continue
+            val moveId = move.move?.url?.let { extractMoveIdFromUrl(it) }
             val method = move.version_group_details?.firstOrNull()?.move_learn_method?.name ?: "unknown"
             val sectionTitle = when (method) {
                 "level-up" -> "Por nivel"
@@ -215,9 +226,8 @@ class PokemonMovesViewModel @Inject constructor(
             if (!sectionsMap.containsKey(sectionTitle)) {
                 sectionsMap[sectionTitle] = mutableListOf()
             }
-            sectionsMap[sectionTitle]?.add(moveName)
+            sectionsMap[sectionTitle]?.add(MoveUi(name = moveName, moveId = moveId))
         }
-        return sectionsMap.map { MovesSectionUi(it.key, it.value.sorted()) }
+        return sectionsMap.map { MovesSectionUi(it.key, it.value.sortedBy { move -> move.name }) }
     }
 }
-

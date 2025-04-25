@@ -4,17 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.completepokemondex.databinding.ItemMoveBinding
 import com.google.android.material.card.MaterialCardView
-import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
+import com.google.android.material.chip.Chip
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PokemonMovesFragment : Fragment() {
@@ -81,33 +85,68 @@ class PokemonMovesFragment : Fragment() {
                     
                     // Añadir cada movimiento a la lista
                     for (move in section.moves) {
-                        val moveCardView = MaterialCardView(requireContext()).apply {
-                            radius = resources.getDimension(R.dimen.card_corner_radius)
-                            strokeWidth = 1
-                            strokeColor = ContextCompat.getColor(context, R.color.divider)
-                            cardElevation = resources.getDimension(R.dimen.card_elevation_small)
-                            setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_bg))
-                            layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                setMargins(0, 8, 0, 8)
-                            }
+                        val moveItemView = LayoutInflater.from(requireContext())
+                            .inflate(R.layout.item_move, movesList, false)
+                        
+                        // Configurar la tarjeta del movimiento
+                        val moveCard = moveItemView.findViewById<MaterialCardView>(R.id.move_card)
+                        val moveTypeChip = moveItemView.findViewById<Chip>(R.id.move_type_chip)
+                        val moveName = moveItemView.findViewById<TextView>(R.id.move_name)
+                        val movePowerContainer = moveItemView.findViewById<LinearLayout>(R.id.move_power_container)
+                        val movePower = moveItemView.findViewById<TextView>(R.id.move_power)
+                        
+                        // Establecer el nombre del movimiento
+                        moveName.text = move.name
+                        
+                        // Configurar el tipo y colores
+                        val typeString = move.type ?: "normal"
+                        moveTypeChip.text = typeString.uppercase()
+                        
+                        // Configurar el color del tipo
+                        val typeColorResId = getTypeColorResId(typeString)
+                        val typeColor = ContextCompat.getColor(requireContext(), typeColorResId)
+                        moveTypeChip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(typeColor)
+                        
+                        // Aplicar un borde de color al movCard
+                        moveCard.strokeColor = typeColor
+                        
+                        // Mostrar el poder del movimiento si está disponible
+                        if (move.power != null && move.power > 0) {
+                            movePowerContainer.visibility = View.VISIBLE
+                            movePower.text = move.power.toString()
+                        } else {
+                            movePowerContainer.visibility = View.GONE
                         }
                         
-                        val moveTextView = TextView(requireContext()).apply {
-                            text = move
-                            textSize = 16f
-                            setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                            setPadding(24, 16, 24, 16)
-                        }
-                        
-                        moveCardView.addView(moveTextView)
-                        movesList.addView(moveCardView)
+                        movesList.addView(moveItemView)
                     }
                     container.addView(movesList)
                 }
             }
+        }
+    }
+    
+    private fun getTypeColorResId(type: String): Int {
+        return when (type.lowercase()) {
+            "normal" -> R.color.type_normal
+            "fire" -> R.color.type_fire
+            "water" -> R.color.type_water
+            "electric" -> R.color.type_electric
+            "grass" -> R.color.type_grass
+            "ice" -> R.color.type_ice
+            "fighting" -> R.color.type_fighting
+            "poison" -> R.color.type_poison
+            "ground" -> R.color.type_ground
+            "flying" -> R.color.type_flying
+            "psychic" -> R.color.type_psychic
+            "bug" -> R.color.type_bug
+            "rock" -> R.color.type_rock
+            "ghost" -> R.color.type_ghost
+            "dragon" -> R.color.type_dragon
+            "dark" -> R.color.type_dark
+            "steel" -> R.color.type_steel
+            "fairy" -> R.color.type_fairy
+            else -> R.color.type_normal
         }
     }
 
