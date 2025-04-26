@@ -12,6 +12,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import java.util.Locale
 import javax.inject.Inject
+import android.util.Log
 
 data class MoveUi(
     val name: String,
@@ -133,7 +134,8 @@ class PokemonMovesViewModel @Inject constructor(
                 }
             }
 
-            val currentLocale = Locale.getDefault().language
+            // Normaliza el locale a solo el código de idioma (ej: "es", "en")
+            val currentLocale = Locale.getDefault().language.lowercase()
 
             // Lanzar todas las peticiones en paralelo
             coroutineScope {
@@ -164,19 +166,39 @@ class PokemonMovesViewModel @Inject constructor(
     private fun getEnhancedMoveSections(locale: String): List<MovesSectionUi> {
         val currentState = _uiState.value ?: return emptyList()
         val sections = currentState.sections
-        
+
+        Log.d("PokemonMovesVM", "Locale actual para nombres de movimientos: $locale")
+
         return sections.map { section ->
             val enhancedMoves = section.moves.map { moveUi ->
                 val moveId = moveUi.moveId ?: moveNameToIdMap[moveUi.name]
-                
+
                 if (moveId != null) {
                     val moveDetails = loadedMoveDetails[moveId]
-                    
-                    // Intentamos obtener el nombre localizado
-                    val localizedName = moveDetails?.names?.find { nameEntry -> 
-                        nameEntry?.language?.name == locale 
-                    }?.name ?: moveUi.name
-                    
+
+                    moveDetails?.names?.forEach { nameEntry ->
+                        Log.d(
+                            "PokemonMovesVM",
+                            "MoveId: $moveId, name: ${nameEntry?.name}, language: ${nameEntry?.language?.name}"
+                        )
+                    }
+
+                    // Busca primero por el locale exacto, luego por inglés, luego el primer nombre no nulo, luego el campo name
+                    val localizedName = moveDetails?.names
+                        ?.firstOrNull { nameEntry ->
+                            nameEntry?.language?.name?.equals(locale, ignoreCase = true) == true && !nameEntry.name.isNullOrBlank()
+                        }?.name
+                        ?: moveDetails?.names
+                            ?.firstOrNull { nameEntry ->
+                                nameEntry?.language?.name?.equals("en", ignoreCase = true) == true && !nameEntry.name.isNullOrBlank()
+                            }?.name
+                        ?: moveDetails?.names
+                            ?.firstOrNull { nameEntry ->
+                                !nameEntry?.name.isNullOrBlank()
+                            }?.name
+                        ?: moveDetails?.name
+                        ?: moveUi.name
+
                     MoveUi(
                         name = localizedName,
                         power = moveDetails?.power,
@@ -185,11 +207,10 @@ class PokemonMovesViewModel @Inject constructor(
                         accuracy = moveDetails?.accuracy
                     )
                 } else {
-                    // Si no encontramos detalles, usamos el movimiento original
                     moveUi
                 }
             }
-            
+
             MovesSectionUi(section.title, enhancedMoves.sortedBy { it.name })
         }
     }

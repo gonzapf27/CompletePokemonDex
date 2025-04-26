@@ -87,8 +87,8 @@ class PokemonMoveListAdapter @Inject constructor() :
             val move = moveItem.move
             val context = itemView.context
 
-            // Configurar nombre del movimiento con primera letra en mayúscula
-            nameTextView.text = move.name?.replaceFirstChar { it.uppercase() } ?: "???"
+            // Usar el nombre localizado si está disponible
+            nameTextView.text = moveItem.localizedName ?: move.name?.replaceFirstChar { it.uppercase() } ?: "???"
 
             // Configurar chip con tipo del movimiento
             move.type?.name?.let { typeName ->
@@ -151,6 +151,10 @@ class PokemonMoveListAdapter @Inject constructor() :
 
     sealed class ListItem {
         data class SectionHeader(val title: String) : ListItem()
-        data class MoveItem(val move: PokemonMoveDomain, val learnMethod: String) : ListItem()
+        data class MoveItem(
+            val move: PokemonMoveDomain,
+            val learnMethod: String,
+            val localizedName: String? = null // Nuevo campo
+        ) : ListItem()
     }
 }

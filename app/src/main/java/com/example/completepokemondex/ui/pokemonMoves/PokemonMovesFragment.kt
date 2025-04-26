@@ -96,10 +96,12 @@ class PokemonMovesFragment : Fragment() {
                 section.moves.forEach { moveUi ->
                     val moveDomain = viewModel.getMoveDetails(moveUi.moveId)
                     if (moveDomain != null) {
+                        // Obtener el nombre localizado desde moveUi.name
                         items.add(
                             PokemonMoveListAdapter.ListItem.MoveItem(
                                 move = moveDomain,
-                                learnMethod = section.title
+                                learnMethod = section.title,
+                                localizedName = moveUi.name // Aquí se pasa el nombre localizado
                             )
                         )
                     }
