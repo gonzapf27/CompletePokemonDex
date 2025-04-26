@@ -115,6 +115,13 @@ class PokemonMovesViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Obtiene los detalles de un movimiento por su ID
+     */
+    fun getMoveDetails(moveId: Int?): PokemonMoveDomain? {
+        return moveId?.let { loadedMoveDetails[it] }
+    }
+
     private fun loadMovesDetails(moves: List<PokemonDetailsDomain.Move?>, pokemonTypes: List<String>) {
         viewModelScope.launch {
             val moveIds = moves.mapNotNull { move ->

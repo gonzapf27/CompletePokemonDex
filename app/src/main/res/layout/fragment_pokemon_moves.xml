@@ -68,14 +68,13 @@
                     android:gravity="center"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Contenedor de secciones de movimientos -->
-                <LinearLayout
-                    android:id="@+id/moves_sections_container"
+                <!-- Reemplazo del contenedor lineal por un RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/moves_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:divider="?android:attr/dividerHorizontal"
-                    android:showDividers="middle" />
+                    android:scrollbars="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                 <TextView
                     android:id="@+id/moves_empty"
