@@ -44,6 +44,14 @@
     <string name="pokemon_species_label">Species</string>
     <string name="evolution_chain_label">Evolution Chain</string>
 
+    <!-- Pokemon Moves -->
+    <string name="move_power">Power</string>
+    <string name="move_type">Type</string>
+    <string name="move_list_title">Moves</string>
+    <string name="move_list_explanation">List of moves this Pokémon can learn by level up, TM/HM, tutor, etc.</string>
+    <string name="move_accuracy">Accuracy:</string>
+    <string name="move_empty_list">No moves found for this Pokémon.</string>
+
     <!-- Pokemon Encounters -->
     <string name="encounters_title_template">Locations in %s</string>
     <string name="encounters_red_blue">Red/Blue</string>
