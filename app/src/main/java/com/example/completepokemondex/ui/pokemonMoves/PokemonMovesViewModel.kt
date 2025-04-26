@@ -26,7 +26,8 @@ data class MovesSectionUi(
 data class PokemonMovesUiState(
     val isLoading: Boolean = false,
     val isLoadingMoveDetails: Boolean = false,
-    val sections: List<MovesSectionUi> = emptyList()
+    val sections: List<MovesSectionUi> = emptyList(),
+    val pokemonTypes: List<String>? = null
 )
 
 @HiltViewModel
@@ -59,6 +60,9 @@ class PokemonMovesViewModel @Inject constructor(
                     is Resource.Success -> {
                         val moves = result.data.moves ?: emptyList()
                         
+                        // Extraer los tipos de Pokémon para el gradiente
+                        val pokemonTypes = result.data.types?.mapNotNull { it?.type?.name } ?: emptyList()
+                        
                         // Llenar el mapa de nombres a ids
                         moves.forEach { move ->
                             move?.move?.url?.let { url ->
@@ -76,7 +80,8 @@ class PokemonMovesViewModel @Inject constructor(
                         _uiState.value = PokemonMovesUiState(
                             isLoading = true,
                             isLoadingMoveDetails = true,
-                            sections = sections
+                            sections = sections,
+                            pokemonTypes = pokemonTypes
                         )
                         
                         // Cargar detalles de cada movimiento
@@ -88,12 +93,13 @@ class PokemonMovesViewModel @Inject constructor(
                             _uiState.value = PokemonMovesUiState(
                                 isLoading = false,
                                 isLoadingMoveDetails = false,
-                                sections = sections
+                                sections = sections,
+                                pokemonTypes = pokemonTypes
                             )
                             return@collect
                         }
                         
-                        loadMovesDetails(moves)
+                        loadMovesDetails(moves, pokemonTypes)
                     }
                     is Resource.Error -> {
                         _uiState.value = PokemonMovesUiState(
@@ -109,7 +115,7 @@ class PokemonMovesViewModel @Inject constructor(
         }
     }
 
-    private fun loadMovesDetails(moves: List<PokemonDetailsDomain.Move?>) {
+    private fun loadMovesDetails(moves: List<PokemonDetailsDomain.Move?>, pokemonTypes: List<String>) {
         viewModelScope.launch {
             val moveIds = moves.mapNotNull { move ->
                 move?.move?.url?.let { url ->
@@ -141,7 +147,8 @@ class PokemonMovesViewModel @Inject constructor(
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
-                                        sections = updatedSections
+                                        sections = updatedSections,
+                                        pokemonTypes = pokemonTypes
                                     )
                                 }
                             }
@@ -157,7 +164,8 @@ class PokemonMovesViewModel @Inject constructor(
                                     _uiState.value = PokemonMovesUiState(
                                         isLoading = false,
                                         isLoadingMoveDetails = false,
-                                        sections = updatedSections
+                                        sections = updatedSections,
+                                        pokemonTypes = pokemonTypes
                                     )
                                 }
                             }

@@ -1,5 +1,7 @@
 package com.example.completepokemondex.ui.pokemonMoves
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -59,6 +61,11 @@ class PokemonMovesFragment : Fragment() {
             
             // Mostrar mensaje de vacío solo cuando no hay secciones y ha terminado de cargar
             binding.movesEmpty.isVisible = state.sections.isEmpty() && !state.isLoading && !state.isLoadingMoveDetails
+
+            // Configurar el fondo gradiente basado en los tipos de Pokémon
+            state.pokemonTypes?.let { types ->
+                setupGradientBackground(types)
+            }
 
             // Si ya tenemos secciones, actualizar la UI aunque estemos cargando detalles
             if (!state.isLoading && state.sections.isNotEmpty()) {
@@ -124,6 +131,26 @@ class PokemonMovesFragment : Fragment() {
                 }
             }
         }
+    }
+    
+    private fun setupGradientBackground(types: List<String>) {
+        val typeColors = types.take(2).map { typeName ->
+            ContextCompat.getColor(requireContext(), getTypeColorResId(typeName))
+        }
+        
+        val gradientColors = when {
+            typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
+            typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+            else -> typeColors.toIntArray()
+        }
+        
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            gradientColors
+        )
+        gradientDrawable.cornerRadius = 0f
+        
+        binding.pokemonMovesGradientBg.background = gradientDrawable
     }
     
     private fun getTypeColorResId(type: String): Int {
