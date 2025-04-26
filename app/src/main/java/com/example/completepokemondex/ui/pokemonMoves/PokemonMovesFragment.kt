@@ -29,8 +29,6 @@ class PokemonMovesFragment : Fragment() {
     
     @Inject
     lateinit var moveListAdapter: PokemonMoveListAdapter
-    
-    private val moveItems = mutableListOf<PokemonMoveListAdapter.PokemonMoveItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,14 +83,14 @@ class PokemonMovesFragment : Fragment() {
     }
 
     private fun processMoveSections(sections: List<MovesSectionUi>) {
-        moveItems.clear()
-        
+        val items = mutableListOf<PokemonMoveListAdapter.ListItem>()
         sections.forEach { section ->
+            items.add(PokemonMoveListAdapter.ListItem.SectionHeader(section.title))
             section.moves.forEach { moveUi ->
                 val moveDomain = viewModel.getMoveDetails(moveUi.moveId)
                 if (moveDomain != null) {
-                    moveItems.add(
-                        PokemonMoveListAdapter.PokemonMoveItem(
+                    items.add(
+                        PokemonMoveListAdapter.ListItem.MoveItem(
                             move = moveDomain,
                             learnMethod = section.title
                         )
@@ -100,10 +98,8 @@ class PokemonMovesFragment : Fragment() {
                 }
             }
         }
-        
-        moveListAdapter.submitList(moveItems)
-        
-        binding.movesEmpty.isVisible = moveItems.isEmpty()
+        moveListAdapter.submitList(items)
+        binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
     }
 
     private fun setupGradientBackground(types: List<String>) {

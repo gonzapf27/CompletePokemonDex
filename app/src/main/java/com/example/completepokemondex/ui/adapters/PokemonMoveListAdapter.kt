@@ -14,13 +14,15 @@ import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.util.PokemonTypeUtil
 import com.google.android.material.chip.Chip
 import javax.inject.Inject
+import android.widget.LinearLayout
+import com.example.completepokemondex.ui.pokemonMoves.MovesSectionUi
 
 /**
  * Adaptador para mostrar la lista de movimientos de un Pokémon en un RecyclerView
  * Utiliza inyección de dependencias
  */
 class PokemonMoveListAdapter @Inject constructor() :
-    ListAdapter<PokemonMoveListAdapter.PokemonMoveItem, PokemonMoveListAdapter.MoveViewHolder>(MoveDiffCallback) {
+    ListAdapter<PokemonMoveListAdapter.ListItem, RecyclerView.ViewHolder>(MoveDiffCallback) {
 
     private var onMoveClicked: ((PokemonMoveDomain) -> Unit)? = null
 
@@ -28,15 +30,45 @@ class PokemonMoveListAdapter @Inject constructor() :
         onMoveClicked = listener
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoveViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_pokemon_move, parent, false)
-        return MoveViewHolder(view)
+    companion object {
+        private const val VIEW_TYPE_SECTION_HEADER = 0
+        private const val VIEW_TYPE_MOVE = 1
     }
 
-    override fun onBindViewHolder(holder: MoveViewHolder, position: Int) {
-        val moveItem = getItem(position)
-        holder.bind(moveItem, onMoveClicked)
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is ListItem.SectionHeader -> VIEW_TYPE_SECTION_HEADER
+            is ListItem.MoveItem -> VIEW_TYPE_MOVE
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_SECTION_HEADER -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_move_section_header, parent, false)
+                SectionHeaderViewHolder(view)
+            }
+            else -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_pokemon_move, parent, false)
+                MoveViewHolder(view)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is ListItem.SectionHeader -> (holder as SectionHeaderViewHolder).bind(item)
+            is ListItem.MoveItem -> (holder as MoveViewHolder).bind(item, onMoveClicked)
+        }
+    }
+
+    class SectionHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val sectionTitle: TextView = itemView.findViewById(R.id.section_title)
+        fun bind(item: ListItem.SectionHeader) {
+            sectionTitle.text = item.title
+        }
     }
 
     class MoveViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,7 +81,7 @@ class PokemonMoveListAdapter @Inject constructor() :
         private val learnMethodTextView: TextView = itemView.findViewById(R.id.move_learn_method)
 
         fun bind(
-            moveItem: PokemonMoveItem,
+            moveItem: ListItem.MoveItem,
             onMoveClicked: ((PokemonMoveDomain) -> Unit)?
         ) {
             val move = moveItem.move
@@ -101,22 +133,24 @@ class PokemonMoveListAdapter @Inject constructor() :
         }
     }
 
-    object MoveDiffCallback : DiffUtil.ItemCallback<PokemonMoveItem>() {
-        override fun areItemsTheSame(oldItem: PokemonMoveItem, newItem: PokemonMoveItem): Boolean {
-            return oldItem.move.id == newItem.move.id && 
-                   oldItem.learnMethod == newItem.learnMethod
+    object MoveDiffCallback : DiffUtil.ItemCallback<ListItem>() {
+        override fun areItemsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
+            return when {
+                oldItem is ListItem.SectionHeader && newItem is ListItem.SectionHeader ->
+                    oldItem.title == newItem.title
+                oldItem is ListItem.MoveItem && newItem is ListItem.MoveItem ->
+                    oldItem.move.id == newItem.move.id && oldItem.learnMethod == newItem.learnMethod
+                else -> false
+            }
         }
 
-        override fun areContentsTheSame(oldItem: PokemonMoveItem, newItem: PokemonMoveItem): Boolean {
+        override fun areContentsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
             return oldItem == newItem
         }
     }
 
-    /**
-     * Clase que encapsula un movimiento de Pokémon y su método de aprendizaje
-     */
-    data class PokemonMoveItem(
-        val move: PokemonMoveDomain,
-        val learnMethod: String
-    )
+    sealed class ListItem {
+        data class SectionHeader(val title: String) : ListItem()
+        data class MoveItem(val move: PokemonMoveDomain, val learnMethod: String) : ListItem()
+    }
 }
