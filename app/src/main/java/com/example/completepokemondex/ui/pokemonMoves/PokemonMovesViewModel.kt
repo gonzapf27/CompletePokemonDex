@@ -7,6 +7,9 @@ import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.util.Locale
 import javax.inject.Inject
 
@@ -129,60 +132,32 @@ class PokemonMovesViewModel @Inject constructor(
                     extractMoveIdFromUrl(url)
                 }
             }
-            
-            // Contador para seguir el progreso de carga
-            var completedMoves = 0
-            
-            // Obtener el locale actual de la aplicación
+
             val currentLocale = Locale.getDefault().language
-            
-            // Cargar todos los movimientos y esperar a que terminen
-            moveIds.forEach { moveId ->
-                if (moveId != null) {
-                    repository.getMoveById(moveId).collect { result ->
-                        when (result) {
-                            is Resource.Success -> {
-                                loadedMoveDetails[moveId] = result.data
-                                completedMoves++
-                                
-                                // Actualizar el contador de movimientos cargados
-                                loadedMovesCount = completedMoves
-                                
-                                // Verificar si todos los movimientos se han cargado
-                                if (completedMoves >= moveIds.size) {
-                                    val updatedSections = getEnhancedMoveSections(currentLocale)
-                                    _uiState.value = PokemonMovesUiState(
-                                        isLoading = false,
-                                        isLoadingMoveDetails = false,
-                                        sections = updatedSections,
-                                        pokemonTypes = pokemonTypes
-                                    )
+
+            // Lanzar todas las peticiones en paralelo
+            coroutineScope {
+                moveIds.map { moveId ->
+                    async {
+                        if (moveId != null) {
+                            repository.getMoveById(moveId).collect { result ->
+                                if (result is Resource.Success) {
+                                    loadedMoveDetails[moveId] = result.data
                                 }
-                            }
-                            is Resource.Error -> {
-                                completedMoves++
-                                
-                                // Actualizar el contador incluso si hay error
-                                loadedMovesCount = completedMoves
-                                
-                                // Verificar si todos los movimientos se han cargado
-                                if (completedMoves >= moveIds.size) {
-                                    val updatedSections = getEnhancedMoveSections(currentLocale)
-                                    _uiState.value = PokemonMovesUiState(
-                                        isLoading = false,
-                                        isLoadingMoveDetails = false,
-                                        sections = updatedSections,
-                                        pokemonTypes = pokemonTypes
-                                    )
-                                }
-                            }
-                            is Resource.Loading -> {
-                                // No hacer nada durante la carga individual
                             }
                         }
                     }
-                }
+                }.awaitAll()
             }
+
+            // Cuando todas terminan, actualiza el estado
+            val updatedSections = getEnhancedMoveSections(currentLocale)
+            _uiState.value = PokemonMovesUiState(
+                isLoading = false,
+                isLoadingMoveDetails = false,
+                sections = updatedSections,
+                pokemonTypes = pokemonTypes
+            )
         }
     }
     

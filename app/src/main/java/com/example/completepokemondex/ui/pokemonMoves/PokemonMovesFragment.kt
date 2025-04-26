@@ -17,6 +17,7 @@ import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
 import com.example.completepokemondex.ui.adapters.PokemonMoveListAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,9 +56,7 @@ class PokemonMovesFragment : Fragment() {
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             binding.loadingIndicator.isVisible = state.isLoading || state.isLoadingMoveDetails
-
             binding.movesCard.isVisible = !state.isLoading
-
             binding.movesEmpty.isVisible =
                 state.sections.isEmpty() && !state.isLoading && !state.isLoadingMoveDetails
 
@@ -65,6 +64,7 @@ class PokemonMovesFragment : Fragment() {
                 setupGradientBackground(types)
             }
 
+            // Solo actualiza la lista cuando ya no está cargando detalles
             if (!state.isLoading && !state.isLoadingMoveDetails) {
                 processMoveSections(state.sections)
             }
@@ -83,23 +83,33 @@ class PokemonMovesFragment : Fragment() {
     }
 
     private fun processMoveSections(sections: List<MovesSectionUi>) {
-        val items = mutableListOf<PokemonMoveListAdapter.ListItem>()
-        sections.forEach { section ->
-            items.add(PokemonMoveListAdapter.ListItem.SectionHeader(section.title))
-            section.moves.forEach { moveUi ->
-                val moveDomain = viewModel.getMoveDetails(moveUi.moveId)
-                if (moveDomain != null) {
-                    items.add(
-                        PokemonMoveListAdapter.ListItem.MoveItem(
-                            move = moveDomain,
-                            learnMethod = section.title
+        // Solo procesa si hay secciones y los detalles están completos
+        if (sections.isEmpty() || viewModel.uiState.value?.isLoadingMoveDetails == true) {
+            return
+        }
+
+        // Procesa la lista fuera del hilo principal
+        CoroutineScope(Dispatchers.Default).launch {
+            val items = mutableListOf<PokemonMoveListAdapter.ListItem>()
+            sections.forEach { section ->
+                items.add(PokemonMoveListAdapter.ListItem.SectionHeader(section.title))
+                section.moves.forEach { moveUi ->
+                    val moveDomain = viewModel.getMoveDetails(moveUi.moveId)
+                    if (moveDomain != null) {
+                        items.add(
+                            PokemonMoveListAdapter.ListItem.MoveItem(
+                                move = moveDomain,
+                                learnMethod = section.title
+                            )
                         )
-                    )
+                    }
                 }
             }
+            withContext(Dispatchers.Main) {
+                moveListAdapter.submitList(items)
+                binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
+            }
         }
-        moveListAdapter.submitList(items)
-        binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
     }
 
     private fun setupGradientBackground(types: List<String>) {
