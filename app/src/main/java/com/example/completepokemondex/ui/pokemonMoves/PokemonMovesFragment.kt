@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.completepokemondex.R
@@ -17,7 +18,7 @@ import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
 import com.example.completepokemondex.ui.adapters.PokemonMoveListAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -88,8 +89,8 @@ class PokemonMovesFragment : Fragment() {
             return
         }
 
-        // Procesa la lista fuera del hilo principal
-        CoroutineScope(Dispatchers.Default).launch {
+        // Usar el scope del lifecycle del view para evitar leaks y NPE
+        viewLifecycleOwner.lifecycleScope.launch {
             val items = mutableListOf<PokemonMoveListAdapter.ListItem>()
             sections.forEach { section ->
                 items.add(PokemonMoveListAdapter.ListItem.SectionHeader(section.title))
@@ -107,10 +108,8 @@ class PokemonMovesFragment : Fragment() {
                     }
                 }
             }
-            withContext(Dispatchers.Main) {
-                moveListAdapter.submitList(items)
-                binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
-            }
+            moveListAdapter.submitList(items)
+            binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
         }
     }
 
