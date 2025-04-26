@@ -32,7 +32,8 @@ data class PokemonLocationsUiState(
     val imageUrl: String? = null,
     val encounters: List<LocationEncounterUi> = emptyList(),
     val hasEncounters: Boolean = false,
-    val locationNames: List<String> = emptyList() // Lista de nombres de ubicación para marcar en el mapa
+    val locationNames: List<String> = emptyList(), // Lista de nombres de ubicación para marcar en el mapa
+    val pokemonTypes: List<String>? = null // <-- NUEVO
 )
 
 @HiltViewModel
@@ -65,6 +66,8 @@ class PokemonLocationsVIewModel @Inject constructor(
                         val pokemonName = pokemon.name?.replaceFirstChar { it.uppercase() } ?: ""
                         val imageUrl = pokemon.sprites?.other?.`official-artwork`?.front_default
                             ?: pokemon.sprites?.front_default
+                        // Obtener tipos del Pokémon
+                        val pokemonTypes = pokemon.types?.mapNotNull { it?.type?.name } ?: emptyList()
 
                         // Ahora obtenemos las localizaciones de encuentro
                         pokemonRepository.getPokemonEncountersById(id).collect { encountersResult ->
@@ -77,7 +80,8 @@ class PokemonLocationsVIewModel @Inject constructor(
                                         nombre = pokemonName,
                                         imageUrl = imageUrl,
                                         encounters = encounters,
-                                        hasEncounters = encounters.isNotEmpty()
+                                        hasEncounters = encounters.isNotEmpty(),
+                                        pokemonTypes = pokemonTypes // <-- NUEVO
                                     )
                                 }
 
@@ -88,7 +92,8 @@ class PokemonLocationsVIewModel @Inject constructor(
                                             ?: "Error al cargar localizaciones",
                                         nombre = pokemonName,
                                         imageUrl = imageUrl,
-                                        hasEncounters = false
+                                        hasEncounters = false,
+                                        pokemonTypes = pokemonTypes // <-- NUEVO
                                     )
                                 }
 
@@ -168,7 +173,6 @@ class PokemonLocationsVIewModel @Inject constructor(
                 val avgChance = if (chances.isNotEmpty()) chances.average() else 0.0
                 val chanceText = "${avgChance.toInt()}%"
 
-                // Extraer métodos de encuentro
                 // Extraer métodos de encuentro
                 val methods = gameEncounters.values.flatten()
                     .mapNotNull { it.method?.name }

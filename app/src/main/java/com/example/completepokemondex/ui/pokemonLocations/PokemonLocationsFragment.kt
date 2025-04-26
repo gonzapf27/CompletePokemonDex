@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.graphics.Typeface
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -74,32 +75,17 @@ class PokemonLocationsFragment : Fragment() {
         
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             // Gestionar estado de carga
-            if (state.isLoading) {
-                _binding?.loadingIndicator?.visibility = View.VISIBLE
-                
-                // Usar Glide para cargar el GIF de carga en un ImageView temporal y luego configurar el ProgressBar
-                Glide.with(this)
-                    .asGif()
-                    .load(R.drawable.loading_pokeball)
-                    .into(loadingImageView)
-                
-                return@observe
-            } else {
-                _binding?.loadingIndicator?.visibility = View.GONE
-            }
+            _binding?.loadingIndicator?.isVisible = state.isLoading
 
             // Actualizar título
             _binding?.encountersTitle?.text = "Lugares en Rojo/Azul: ${state.nombre}"
 
-            // Establecer fondo con el tipo de Pokémon (usando agua como predeterminado para las ubicaciones)
-            val waterType = PokemonTypeUtil.getTypeByName("water")
-            val color = ContextCompat.getColor(requireContext(), waterType.colorRes)
-            val gradientDrawable = GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                intArrayOf(color, Color.LTGRAY)
-            )
-            _binding?.pokemonEncountersGradientBg?.background = gradientDrawable
-            
+            // Solo aplica el gradiente si pokemonTypes no es nulo
+            if (state.pokemonTypes != null) {
+                setupGradientBackground(state.pokemonTypes)
+            }
+            // No hay else/fallback, así se evita el fondo azul inicial
+
             // Si tenemos ubicaciones, actualizar el mapa para resaltarlas
             if (state.locationNames.isNotEmpty() && baseMapBitmap != null) {
                 updateMapWithLocations(state.locationNames)
@@ -224,6 +210,51 @@ class PokemonLocationsFragment : Fragment() {
             } catch (e: Exception) {
                 Log.e("PokemonLocationsFragment", "Error al resaltar ubicaciones: ${e.message}")
             }
+        }
+    }
+
+    // Copiado y adaptado de fragmento de movimientos
+    private fun setupGradientBackground(types: List<String>) {
+        val typeColors = types.take(2).map { typeName ->
+            ContextCompat.getColor(requireContext(), getTypeColorResId(typeName))
+        }
+
+        val gradientColors = when {
+            typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
+            typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+            else -> typeColors.toIntArray()
+        }
+
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            gradientColors
+        )
+        gradientDrawable.cornerRadius = 0f
+
+        _binding?.pokemonEncountersGradientBg?.background = gradientDrawable
+    }
+
+    private fun getTypeColorResId(type: String): Int {
+        return when (type.lowercase()) {
+            "normal" -> R.color.type_normal
+            "fire" -> R.color.type_fire
+            "water" -> R.color.type_water
+            "electric" -> R.color.type_electric
+            "grass" -> R.color.type_grass
+            "ice" -> R.color.type_ice
+            "fighting" -> R.color.type_fighting
+            "poison" -> R.color.type_poison
+            "ground" -> R.color.type_ground
+            "flying" -> R.color.type_flying
+            "psychic" -> R.color.type_psychic
+            "bug" -> R.color.type_bug
+            "rock" -> R.color.type_rock
+            "ghost" -> R.color.type_ghost
+            "dragon" -> R.color.type_dragon
+            "dark" -> R.color.type_dark
+            "steel" -> R.color.type_steel
+            "fairy" -> R.color.type_fairy
+            else -> R.color.type_normal
         }
     }
 
