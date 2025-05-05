@@ -1,9 +1,9 @@
 package com.example.completepokemondex.data.local.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.example.completepokemondex.data.local.util.PokemonSpeciesConverters
 
+@TypeConverters(PokemonSpeciesConverters::class)
 @Entity(tableName = "pokemon_species_table")
 data class PokemonSpeciesEntity(
     @PrimaryKey
@@ -11,80 +11,122 @@ data class PokemonSpeciesEntity(
     val id: Int,
 
     @ColumnInfo(name = "base_happiness")
-    val baseHappiness: Int?,
+    val base_happiness: Int?,
 
     @ColumnInfo(name = "capture_rate")
-    val captureRate: Int?,
+    val capture_rate: Int?,
 
     @ColumnInfo(name = "color")
-    val color: String?, // JSON serializado
+    val color: Color?,
 
     @ColumnInfo(name = "egg_groups")
-    val eggGroups: String?, // JSON serializado
+    val egg_groups: List<EggGroup?>?,
 
     @ColumnInfo(name = "evolution_chain")
-    val evolutionChain: String?, // JSON serializado
+    val evolution_chain: EvolutionChain?,
 
     @ColumnInfo(name = "evolves_from_species")
-    val evolvesFromSpecies: String?, // JSON serializado
+    val evolves_from_species: EvolvesFromSpecies?,
 
     @ColumnInfo(name = "flavor_text_entries")
-    val flavorTextEntries: String?, // JSON serializado
+    val flavor_text_entries: List<FlavorTextEntry?>?,
 
     @ColumnInfo(name = "form_descriptions")
-    val formDescriptions: String?, // JSON serializado
+    val form_descriptions: List<Any?>?,
 
     @ColumnInfo(name = "forms_switchable")
-    val formsSwitchable: Boolean?,
+    val forms_switchable: Boolean?,
 
     @ColumnInfo(name = "gender_rate")
-    val genderRate: Int?,
+    val gender_rate: Int?,
 
     @ColumnInfo(name = "genera")
-    val genera: String?, // JSON serializado
+    val genera: List<Genera?>?,
 
     @ColumnInfo(name = "generation")
-    val generation: String?, // JSON serializado
+    val generation: Generation?,
 
     @ColumnInfo(name = "growth_rate")
-    val growthRate: String?, // JSON serializado
+    val growth_rate: GrowthRate?,
 
     @ColumnInfo(name = "habitat")
-    val habitat: String?, // JSON serializado
+    val habitat: Habitat?,
 
     @ColumnInfo(name = "has_gender_differences")
-    val hasGenderDifferences: Boolean?,
+    val has_gender_differences: Boolean?,
 
     @ColumnInfo(name = "hatch_counter")
-    val hatchCounter: Int?,
+    val hatch_counter: Int?,
 
     @ColumnInfo(name = "is_baby")
-    val isBaby: Boolean?,
+    val is_baby: Boolean?,
 
     @ColumnInfo(name = "is_legendary")
-    val isLegendary: Boolean?,
+    val is_legendary: Boolean?,
 
     @ColumnInfo(name = "is_mythical")
-    val isMythical: Boolean?,
+    val is_mythical: Boolean?,
 
     @ColumnInfo(name = "name")
     val name: String?,
 
     @ColumnInfo(name = "names")
-    val names: String?, // JSON serializado
+    val names: List<Name?>?,
 
     @ColumnInfo(name = "order")
     val order: Int?,
 
     @ColumnInfo(name = "pal_park_encounters")
-    val palParkEncounters: String?, // JSON serializado
+    val pal_park_encounters: List<PalParkEncounter?>?,
 
     @ColumnInfo(name = "pokedex_numbers")
-    val pokedexNumbers: String?, // JSON serializado
+    val pokedex_numbers: List<PokedexNumber?>?,
 
     @ColumnInfo(name = "shape")
-    val shape: String?, // JSON serializado
+    val shape: Shape?,
 
     @ColumnInfo(name = "varieties")
-    val varieties: String? // JSON serializado
-)
+    val varieties: List<Variety?>?
+) {
+    data class Color(val name: String?, val url: String?)
+    data class EggGroup(val name: String?, val url: String?)
+    data class EvolutionChain(val url: String?)
+    data class EvolvesFromSpecies(val name: String?, val url: String?)
+    data class FlavorTextEntry(
+        val flavor_text: String?,
+        val language: Language?,
+        val version: Version?
+    ) {
+        data class Language(val name: String?, val url: String?)
+        data class Version(val name: String?, val url: String?)
+    }
+    data class Genera(val genus: String?, val language: Language?) {
+        data class Language(val name: String?, val url: String?)
+    }
+    data class Generation(val name: String?, val url: String?)
+    data class GrowthRate(val name: String?, val url: String?)
+    data class Habitat(val name: String?, val url: String?)
+    data class Name(val name: String?, val language: Language?) {
+        data class Language(val name: String?, val url: String?)
+    }
+    data class PalParkEncounter(
+        val area: Area?,
+        val base_score: Int?,
+        val rate: Int?
+    ) {
+        data class Area(val name: String?, val url: String?)
+    }
+    data class PokedexNumber(
+        val entry_number: Int?,
+        val pokedex: Pokedex?
+    ) {
+        data class Pokedex(val name: String?, val url: String?)
+    }
+    data class Shape(val name: String?, val url: String?)
+    data class Variety(
+        val is_default: Boolean?,
+        val pokemon: Pokemon?
+    ) {
+        data class Pokemon(val name: String?, val url: String?)
+    }
+}

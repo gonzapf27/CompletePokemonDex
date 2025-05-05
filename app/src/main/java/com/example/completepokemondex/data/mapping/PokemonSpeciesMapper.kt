@@ -3,8 +3,6 @@ package com.example.completepokemondex.data.mapping
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.local.entities.PokemonSpeciesEntity
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /**
  * Convierte un PokemonSpeciesDTO de la API a un objeto de dominio PokemonSpeciesDomain.
@@ -169,36 +167,78 @@ fun PokemonSpeciesDTO.pokemonSpeciesDTOToDomain(): PokemonSpeciesDomain {
  * @return PokemonSpeciesEntity convertida desde PokemonSpeciesDTO.
  */
 fun PokemonSpeciesDTO.pokemonSpeciesDTOToEntity(): PokemonSpeciesEntity {
-    val gson = Gson()
-    
     return PokemonSpeciesEntity(
         id = id ?: 0,
-        baseHappiness = baseHappiness,
-        captureRate = captureRate,
-        color = gson.toJson(color),
-        eggGroups = gson.toJson(eggGroups),
-        evolutionChain = gson.toJson(evolutionChain),
-        evolvesFromSpecies = gson.toJson(evolvesFromSpecies),
-        flavorTextEntries = gson.toJson(flavorTextEntries),
-        formDescriptions = gson.toJson(formDescriptions),
-        formsSwitchable = formsSwitchable,
-        genderRate = genderRate,
-        genera = gson.toJson(genera),
-        generation = gson.toJson(generation),
-        growthRate = gson.toJson(growthRate),
-        habitat = gson.toJson(habitat),
-        hasGenderDifferences = hasGenderDifferences,
-        hatchCounter = hatchCounter,
-        isBaby = isBaby,
-        isLegendary = isLegendary,
-        isMythical = isMythical,
+        base_happiness = baseHappiness,
+        capture_rate = captureRate,
+        color = color?.let { PokemonSpeciesEntity.Color(it.name, it.url) },
+        egg_groups = eggGroups?.map { it?.let { eg -> PokemonSpeciesEntity.EggGroup(eg.name, eg.url) } },
+        evolution_chain = evolutionChain?.let { PokemonSpeciesEntity.EvolutionChain(it.url) },
+        evolves_from_species = evolvesFromSpecies?.let { PokemonSpeciesEntity.EvolvesFromSpecies(it.name, it.url) },
+        flavor_text_entries = flavorTextEntries?.map { entry ->
+            entry?.let {
+                PokemonSpeciesEntity.FlavorTextEntry(
+                    flavor_text = it.flavorText,
+                    language = it.language?.let { lang -> PokemonSpeciesEntity.FlavorTextEntry.Language(lang.name, lang.url) },
+                    version = it.version?.let { ver -> PokemonSpeciesEntity.FlavorTextEntry.Version(ver.name, ver.url) }
+                )
+            }
+        },
+        form_descriptions = formDescriptions,
+        forms_switchable = formsSwitchable,
+        gender_rate = genderRate,
+        genera = genera?.map { g ->
+            g?.let {
+                PokemonSpeciesEntity.Genera(
+                    genus = it.genus,
+                    language = it.language?.let { lang -> PokemonSpeciesEntity.Genera.Language(lang.name, lang.url) }
+                )
+            }
+        },
+        generation = generation?.let { PokemonSpeciesEntity.Generation(it.name, it.url) },
+        growth_rate = growthRate?.let { PokemonSpeciesEntity.GrowthRate(it.name, it.url) },
+        habitat = habitat?.let { PokemonSpeciesEntity.Habitat(it.name, it.url) },
+        has_gender_differences = hasGenderDifferences,
+        hatch_counter = hatchCounter,
+        is_baby = isBaby,
+        is_legendary = isLegendary,
+        is_mythical = isMythical,
         name = name,
-        names = gson.toJson(names),
+        names = names?.map { n ->
+            n?.let {
+                PokemonSpeciesEntity.Name(
+                    name = it.name,
+                    language = it.language?.let { lang -> PokemonSpeciesEntity.Name.Language(lang.name, lang.url) }
+                )
+            }
+        },
         order = order,
-        palParkEncounters = gson.toJson(palParkEncounters),
-        pokedexNumbers = gson.toJson(pokedexNumbers),
-        shape = gson.toJson(shape),
-        varieties = gson.toJson(varieties)
+        pal_park_encounters = palParkEncounters?.map { p ->
+            p?.let {
+                PokemonSpeciesEntity.PalParkEncounter(
+                    area = it.area?.let { a -> PokemonSpeciesEntity.PalParkEncounter.Area(a.name, a.url) },
+                    base_score = it.baseScore,
+                    rate = it.rate
+                )
+            }
+        },
+        pokedex_numbers = pokedexNumbers?.map { pn ->
+            pn?.let {
+                PokemonSpeciesEntity.PokedexNumber(
+                    entry_number = it.entryNumber,
+                    pokedex = it.pokedex?.let { pdx -> PokemonSpeciesEntity.PokedexNumber.Pokedex(pdx.name, pdx.url) }
+                )
+            }
+        },
+        shape = shape?.let { PokemonSpeciesEntity.Shape(it.name, it.url) },
+        varieties = varieties?.map { v ->
+            v?.let {
+                PokemonSpeciesEntity.Variety(
+                    is_default = it.isDefault,
+                    pokemon = it.pokemon?.let { pkm -> PokemonSpeciesEntity.Variety.Pokemon(pkm.name, pkm.url) }
+                )
+            }
+        }
     )
 }
 
@@ -208,187 +248,75 @@ fun PokemonSpeciesDTO.pokemonSpeciesDTOToEntity(): PokemonSpeciesEntity {
  * @return PokemonSpeciesDomain convertido desde PokemonSpeciesEntity.
  */
 fun PokemonSpeciesEntity.pokemonSpeciesEntityToDomain(): PokemonSpeciesDomain {
-    val gson = Gson()
-    
-    // Definir TypeTokens para cada campo JSON
-    val colorType = object : TypeToken<PokemonSpeciesDTO.Color?>() {}.type
-    val eggGroupsType = object : TypeToken<List<PokemonSpeciesDTO.EggGroup?>?>() {}.type
-    val evolutionChainType = object : TypeToken<PokemonSpeciesDTO.EvolutionChain?>() {}.type
-    val evolvesFromSpeciesType = object : TypeToken<PokemonSpeciesDTO.EvolvesFromSpecies?>() {}.type
-    val flavorTextEntriesType = object : TypeToken<List<PokemonSpeciesDTO.FlavorTextEntry?>?>() {}.type
-    val formDescriptionsType = object : TypeToken<List<Any?>?>() {}.type
-    val generaType = object : TypeToken<List<PokemonSpeciesDTO.Genera?>?>() {}.type
-    val generationType = object : TypeToken<PokemonSpeciesDTO.Generation?>() {}.type
-    val growthRateType = object : TypeToken<PokemonSpeciesDTO.GrowthRate?>() {}.type
-    val habitatType = object : TypeToken<PokemonSpeciesDTO.Habitat?>() {}.type
-    val namesType = object : TypeToken<List<PokemonSpeciesDTO.Name?>?>() {}.type
-    val palParkEncountersType = object : TypeToken<List<PokemonSpeciesDTO.PalParkEncounter?>?>() {}.type
-    val pokedexNumbersType = object : TypeToken<List<PokemonSpeciesDTO.PokedexNumber?>?>() {}.type
-    val shapeType = object : TypeToken<PokemonSpeciesDTO.Shape?>() {}.type
-    val varietiesType = object : TypeToken<List<PokemonSpeciesDTO.Variety?>?>() {}.type
-    
-    // Deserializar los campos JSON
-    val colorDTO: PokemonSpeciesDTO.Color? = gson.fromJson(color, colorType)
-    val eggGroupsDTO: List<PokemonSpeciesDTO.EggGroup?>? = gson.fromJson(eggGroups, eggGroupsType)
-    val evolutionChainDTO: PokemonSpeciesDTO.EvolutionChain? = gson.fromJson(evolutionChain, evolutionChainType)
-    val evolvesFromSpeciesDTO: PokemonSpeciesDTO.EvolvesFromSpecies? = gson.fromJson(evolvesFromSpecies, evolvesFromSpeciesType)
-    val flavorTextEntriesDTO: List<PokemonSpeciesDTO.FlavorTextEntry?>? = gson.fromJson(flavorTextEntries, flavorTextEntriesType)
-    val formDescriptionsDTO: List<Any?>? = gson.fromJson(formDescriptions, formDescriptionsType)
-    val generaDTO: List<PokemonSpeciesDTO.Genera?>? = gson.fromJson(genera, generaType)
-    val generationDTO: PokemonSpeciesDTO.Generation? = gson.fromJson(generation, generationType)
-    val growthRateDTO: PokemonSpeciesDTO.GrowthRate? = gson.fromJson(growthRate, growthRateType)
-    val habitatDTO: PokemonSpeciesDTO.Habitat? = gson.fromJson(habitat, habitatType)
-    val namesDTO: List<PokemonSpeciesDTO.Name?>? = gson.fromJson(names, namesType)
-    val palParkEncountersDTO: List<PokemonSpeciesDTO.PalParkEncounter?>? = gson.fromJson(palParkEncounters, palParkEncountersType)
-    val pokedexNumbersDTO: List<PokemonSpeciesDTO.PokedexNumber?>? = gson.fromJson(pokedexNumbers, pokedexNumbersType)
-    val shapeDTO: PokemonSpeciesDTO.Shape? = gson.fromJson(shape, shapeType)
-    val varietiesDTO: List<PokemonSpeciesDTO.Variety?>? = gson.fromJson(varieties, varietiesType)
-
     return PokemonSpeciesDomain(
-        base_happiness = baseHappiness,
-        capture_rate = captureRate,
-        color = colorDTO?.let {
-            PokemonSpeciesDomain.Color(
-                name = it.name,
-                url = it.url
-            )
-        },
-        egg_groups = eggGroupsDTO?.map { eggGroupDTO ->
-            eggGroupDTO?.let {
-                PokemonSpeciesDomain.EggGroup(
-                    name = it.name,
-                    url = it.url
-                )
-            }
-        },
-        evolution_chain = evolutionChainDTO?.let {
-            PokemonSpeciesDomain.EvolutionChain(
-                url = it.url
-            )
-        },
-        evolves_from_species = evolvesFromSpeciesDTO?.let {
-            PokemonSpeciesDomain.EvolvesFromSpecies(
-                name = it.name,
-                url = it.url
-            )
-        },
-        flavor_text_entries = flavorTextEntriesDTO?.map { entryDTO ->
-            entryDTO?.let {
+        base_happiness = base_happiness,
+        capture_rate = capture_rate,
+        color = color?.let { PokemonSpeciesDomain.Color(it.name, it.url) },
+        egg_groups = egg_groups?.map { it?.let { eg -> PokemonSpeciesDomain.EggGroup(eg.name, eg.url) } },
+        evolution_chain = evolution_chain?.let { PokemonSpeciesDomain.EvolutionChain(it.url) },
+        evolves_from_species = evolves_from_species?.let { PokemonSpeciesDomain.EvolvesFromSpecies(it.name, it.url) },
+        flavor_text_entries = flavor_text_entries?.map { entry ->
+            entry?.let {
                 PokemonSpeciesDomain.FlavorTextEntry(
-                    flavor_text = it.flavorText,
-                    language = it.language?.let { langDTO ->
-                        PokemonSpeciesDomain.FlavorTextEntry.Language(
-                            name = langDTO.name,
-                            url = langDTO.url
-                        )
-                    },
-                    version = it.version?.let { versionDTO ->
-                        PokemonSpeciesDomain.FlavorTextEntry.Version(
-                            name = versionDTO.name,
-                            url = versionDTO.url
-                        )
-                    }
+                    flavor_text = it.flavor_text,
+                    language = it.language?.let { lang -> PokemonSpeciesDomain.FlavorTextEntry.Language(lang.name, lang.url) },
+                    version = it.version?.let { ver -> PokemonSpeciesDomain.FlavorTextEntry.Version(ver.name, ver.url) }
                 )
             }
         },
-        form_descriptions = formDescriptionsDTO,
-        forms_switchable = formsSwitchable,
-        gender_rate = genderRate,
-        genera = generaDTO?.map { generaDTO ->
-            generaDTO?.let {
+        form_descriptions = form_descriptions,
+        forms_switchable = forms_switchable,
+        gender_rate = gender_rate,
+        genera = genera?.map { g ->
+            g?.let {
                 PokemonSpeciesDomain.Genera(
                     genus = it.genus,
-                    language = it.language?.let { langDTO ->
-                        PokemonSpeciesDomain.Genera.Language(
-                            name = langDTO.name,
-                            url = langDTO.url
-                        )
-                    }
+                    language = it.language?.let { lang -> PokemonSpeciesDomain.Genera.Language(lang.name, lang.url) }
                 )
             }
         },
-        generation = generationDTO?.let {
-            PokemonSpeciesDomain.Generation(
-                name = it.name,
-                url = it.url
-            )
-        },
-        growth_rate = growthRateDTO?.let {
-            PokemonSpeciesDomain.GrowthRate(
-                name = it.name,
-                url = it.url
-            )
-        },
-        habitat = habitatDTO?.let {
-            PokemonSpeciesDomain.Habitat(
-                name = it.name,
-                url = it.url
-            )
-        },
-        has_gender_differences = hasGenderDifferences,
-        hatch_counter = hatchCounter,
+        generation = generation?.let { PokemonSpeciesDomain.Generation(it.name, it.url) },
+        growth_rate = growth_rate?.let { PokemonSpeciesDomain.GrowthRate(it.name, it.url) },
+        habitat = habitat?.let { PokemonSpeciesDomain.Habitat(it.name, it.url) },
+        has_gender_differences = has_gender_differences,
+        hatch_counter = hatch_counter,
         id = id,
-        is_baby = isBaby,
-        is_legendary = isLegendary,
-        is_mythical = isMythical,
+        is_baby = is_baby,
+        is_legendary = is_legendary,
+        is_mythical = is_mythical,
         name = name,
-        names = namesDTO?.map { nameDTO ->
-            nameDTO?.let {
+        names = names?.map { n ->
+            n?.let {
                 PokemonSpeciesDomain.Name(
                     name = it.name,
-                    language = it.language?.let { langDTO ->
-                        PokemonSpeciesDomain.Name.Language(
-                            name = langDTO.name,
-                            url = langDTO.url
-                        )
-                    }
+                    language = it.language?.let { lang -> PokemonSpeciesDomain.Name.Language(lang.name, lang.url) }
                 )
             }
         },
         order = order,
-        pal_park_encounters = palParkEncountersDTO?.map { encounterDTO ->
-            encounterDTO?.let {
+        pal_park_encounters = pal_park_encounters?.map { p ->
+            p?.let {
                 PokemonSpeciesDomain.PalParkEncounter(
-                    area = it.area?.let { areaDTO ->
-                        PokemonSpeciesDomain.PalParkEncounter.Area(
-                            name = areaDTO.name,
-                            url = areaDTO.url
-                        )
-                    },
-                    base_score = it.baseScore,
+                    area = it.area?.let { a -> PokemonSpeciesDomain.PalParkEncounter.Area(a.name, a.url) },
+                    base_score = it.base_score,
                     rate = it.rate
                 )
             }
         },
-        pokedex_numbers = pokedexNumbersDTO?.map { numberDTO ->
-            numberDTO?.let {
+        pokedex_numbers = pokedex_numbers?.map { pn ->
+            pn?.let {
                 PokemonSpeciesDomain.PokedexNumber(
-                    entry_number = it.entryNumber,
-                    pokedex = it.pokedex?.let { pokedexDTO ->
-                        PokemonSpeciesDomain.PokedexNumber.Pokedex(
-                            name = pokedexDTO.name,
-                            url = pokedexDTO.url
-                        )
-                    }
+                    entry_number = it.entry_number,
+                    pokedex = it.pokedex?.let { pdx -> PokemonSpeciesDomain.PokedexNumber.Pokedex(pdx.name, pdx.url) }
                 )
             }
         },
-        shape = shapeDTO?.let {
-            PokemonSpeciesDomain.Shape(
-                name = it.name,
-                url = it.url
-            )
-        },
-        varieties = varietiesDTO?.map { varietyDTO ->
-            varietyDTO?.let {
+        shape = shape?.let { PokemonSpeciesDomain.Shape(it.name, it.url) },
+        varieties = varieties?.map { v ->
+            v?.let {
                 PokemonSpeciesDomain.Variety(
-                    is_default = it.isDefault,
-                    pokemon = it.pokemon?.let { pokemonDTO ->
-                        PokemonSpeciesDomain.Variety.Pokemon(
-                            name = pokemonDTO.name,
-                            url = pokemonDTO.url
-                        )
-                    }
+                    is_default = it.is_default,
+                    pokemon = it.pokemon?.let { pkm -> PokemonSpeciesDomain.Variety.Pokemon(pkm.name, pkm.url) }
                 )
             }
         }
