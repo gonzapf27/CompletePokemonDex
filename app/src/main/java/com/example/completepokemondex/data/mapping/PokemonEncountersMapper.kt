@@ -83,8 +83,114 @@ fun List<PokemonEncountersDTO>.toEntity(pokemonId: Int): PokemonEncountersEntity
  */
 fun PokemonEncountersEntity.toDomain(): PokemonEncountersDomain {
     val gson = Gson()
-    val encountersType = object : TypeToken<List<PokemonEncountersDTO>>() {}.type
-    val encountersDTO: List<PokemonEncountersDTO> = gson.fromJson(encounters, encountersType)
-    
-    return encountersDTO.toDomain()
+    val type = object : TypeToken<List<PokemonEncountersEntity.LocationAreaEncounter>>() {}.type
+    val items: List<PokemonEncountersEntity.LocationAreaEncounter> = gson.fromJson(encounters, type)
+    return PokemonEncountersDomain(
+        items = items.map { encounterEntity ->
+            PokemonEncountersDomain.LocationAreaEncounter(
+                location_area = encounterEntity.location_area?.let {
+                    PokemonEncountersDomain.LocationAreaEncounter.LocationArea(
+                        name = it.name,
+                        url = it.url
+                    )
+                },
+                version_details = encounterEntity.version_details?.map { versionDetailEntity ->
+                    versionDetailEntity?.let {
+                        PokemonEncountersDomain.LocationAreaEncounter.VersionDetail(
+                            encounter_details = it.encounter_details?.map { encounterDetailEntity ->
+                                encounterDetailEntity?.let { encDetail ->
+                                    PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail(
+                                        chance = encDetail.chance,
+                                        condition_values = encDetail.condition_values?.map { condValue ->
+                                            condValue?.let {
+                                                PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail.ConditionValue(
+                                                    name = it.name,
+                                                    url = it.url
+                                                )
+                                            }
+                                        },
+                                        max_level = encDetail.max_level,
+                                        method = encDetail.method?.let { m ->
+                                            PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.EncounterDetail.Method(
+                                                name = m.name,
+                                                url = m.url
+                                            )
+                                        },
+                                        min_level = encDetail.min_level
+                                    )
+                                }
+                            },
+                            max_chance = it.max_chance,
+                            version = it.version?.let { v ->
+                                PokemonEncountersDomain.LocationAreaEncounter.VersionDetail.Version(
+                                    name = v.name,
+                                    url = v.url
+                                )
+                            }
+                        )
+                    }
+                }
+            )
+        }
+    )
+}
+
+/**
+ * Convierte un objeto de dominio PokemonEncountersDomain a una entidad PokemonEncountersEntity para la base de datos.
+ *
+ * @param pokemonId El ID del Pokémon al que pertenecen estos encuentros.
+ * @return PokemonEncountersEntity convertida desde PokemonEncountersDomain.
+ */
+fun PokemonEncountersDomain.toEntity(pokemonId: Int): PokemonEncountersEntity {
+    val gson = Gson()
+    val items = this.items.map { encounterDomain ->
+        PokemonEncountersEntity.LocationAreaEncounter(
+            location_area = encounterDomain.location_area?.let {
+                PokemonEncountersEntity.LocationAreaEncounter.LocationArea(
+                    name = it.name,
+                    url = it.url
+                )
+            },
+            version_details = encounterDomain.version_details?.map { versionDetailDomain ->
+                versionDetailDomain?.let {
+                    PokemonEncountersEntity.LocationAreaEncounter.VersionDetail(
+                        encounter_details = it.encounter_details?.map { encounterDetailDomain ->
+                            encounterDetailDomain?.let { encDetail ->
+                                PokemonEncountersEntity.LocationAreaEncounter.VersionDetail.EncounterDetail(
+                                    chance = encDetail.chance,
+                                    condition_values = encDetail.condition_values?.map { condValue ->
+                                        condValue?.let {
+                                            PokemonEncountersEntity.LocationAreaEncounter.VersionDetail.EncounterDetail.ConditionValue(
+                                                name = it.name,
+                                                url = it.url
+                                            )
+                                        }
+                                    },
+                                    max_level = encDetail.max_level,
+                                    method = encDetail.method?.let { m ->
+                                        PokemonEncountersEntity.LocationAreaEncounter.VersionDetail.EncounterDetail.Method(
+                                            name = m.name,
+                                            url = m.url
+                                        )
+                                    },
+                                    min_level = encDetail.min_level
+                                )
+                            }
+                        },
+                        max_chance = it.max_chance,
+                        version = it.version?.let { v ->
+                            PokemonEncountersEntity.LocationAreaEncounter.VersionDetail.Version(
+                                name = v.name,
+                                url = v.url
+                            )
+                        }
+                    )
+                }
+            }
+        )
+    }
+    return PokemonEncountersEntity(
+        pokemonId = pokemonId,
+        encounters = gson.toJson(items)
+    )
 }
