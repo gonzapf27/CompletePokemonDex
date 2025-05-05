@@ -59,4 +59,5 @@
     <string name="encounters_loading">Loading encounter locations...</string>
     <string name="encounters_empty">No encounter locations were found for this Pokémon in Red and Blue games.</string>
     <string name="map_content_description">Map of Kanto region with marked locations</string>
+    <string name="favorites">Favorites</string>
 </resources>

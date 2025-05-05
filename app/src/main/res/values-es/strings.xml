@@ -54,4 +54,5 @@
     <string name="encounters_loading">Cargando lugares de encuentro...</string>
     <string name="encounters_empty">No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul.</string>
     <string name="map_content_description">Mapa de la región de Kanto con ubicaciones marcadas</string>
+    <string name="favorites">Favoritos</string>
 </resources>

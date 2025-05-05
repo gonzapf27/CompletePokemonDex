@@ -38,6 +38,10 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
     private val _selectedType = MutableStateFlow("all")
     val selectedType: StateFlow<String> = _selectedType.asStateFlow()
 
+    // Filtro de favoritos
+    private val _showOnlyFavorites = MutableStateFlow(false)
+    val showOnlyFavorites: StateFlow<Boolean> = _showOnlyFavorites.asStateFlow()
+
     // Mapeo de cada pokémon a sus tipos
     private val pokemonTypes = mutableMapOf<Int, List<String>>()
 
@@ -84,12 +88,19 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
         applyFilters()
     }
 
-    /** Aplica los filtros actuales (búsqueda y tipo) a la lista de Pokémon */
+    /** Cambia el filtro de favoritos */
+    fun setShowOnlyFavorites(show: Boolean) {
+        _showOnlyFavorites.value = show
+        applyFilters()
+    }
+
+    /** Aplica los filtros actuales (búsqueda, tipo y favoritos) a la lista de Pokémon */
     private fun applyFilters() {
         if (allPokemonList.isEmpty()) return
 
         val searchQuery = _searchQuery.value
         val selectedType = _selectedType.value
+        val onlyFavorites = _showOnlyFavorites.value
 
         // Filtrar por nombre
         var filteredList = if (searchQuery.isEmpty()) {
@@ -107,8 +118,13 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
             }
         }
 
+        // Filtrar por favoritos si está activado
+        if (onlyFavorites) {
+            filteredList = filteredList.filter { it.favorite }
+        }
+
         // Si la lista filtrada está casi vacía y podemos cargar más Pokémon, intentar cargar más
-        if (filteredList.size < 10 && _canLoadMore.value && !isLoading && currentOffset < maxPokemonCount) {
+        if (filteredList.size < 10 && _canLoadMore.value && !isLoading && currentOffset < maxPokemonCount && !onlyFavorites) {
             loadMorePokemon()
         }
 

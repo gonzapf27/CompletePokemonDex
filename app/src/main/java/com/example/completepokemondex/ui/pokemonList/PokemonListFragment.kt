@@ -91,6 +91,7 @@ class PokemonListFragment : Fragment() {
         setupPokemonRecyclerView()
         setupTypeRecyclerView()
         setupSearchView()
+        setupFavoriteFilter()
         observeViewModel()
     }
 
@@ -192,6 +193,23 @@ class PokemonListFragment : Fragment() {
         binding.searchView.setOnCloseListener {
             viewModel.updateSearchQuery("")
             false
+        }
+    }
+
+    /**
+     * Configura el filtro de favoritos (Chip).
+     */
+    private fun setupFavoriteFilter() {
+        val favoriteChip = binding.favoriteFilterChip
+        favoriteChip.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setShowOnlyFavorites(isChecked)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.showOnlyFavorites.collect { isChecked ->
+                if (favoriteChip.isChecked != isChecked) {
+                    favoriteChip.isChecked = isChecked
+                }
+            }
         }
     }
 
