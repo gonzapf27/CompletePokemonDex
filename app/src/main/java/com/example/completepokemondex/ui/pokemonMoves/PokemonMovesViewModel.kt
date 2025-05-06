@@ -43,6 +43,14 @@ class PokemonMovesViewModel @Inject constructor(
 
     private var moveLearnMethods: List<MoveWithLearnMethod> = emptyList()
 
+    sealed class MoveSectionItem {
+        data class Header(val title: String) : MoveSectionItem()
+        data class MoveItem(val move: PokemonMoveDomain, val learnMethod: String?, val level: Int?) : MoveSectionItem()
+    }
+
+    private val _sectionedMoves = MutableLiveData<List<MoveSectionItem>>(emptyList())
+    val sectionedMoves: LiveData<List<MoveSectionItem>> = _sectionedMoves
+
     fun setPokemonId(pokemonId: Int) {
         if (_pokemonId.value != pokemonId) {
             _pokemonId.value = pokemonId
@@ -96,11 +104,44 @@ class PokemonMovesViewModel @Inject constructor(
                             }
                         }.awaitAll().filterNotNull()
                         val currentList = _moves.value ?: emptyList()
-                        _moves.value = currentList + movesDetails
+                        val newMoves = currentList + movesDetails
+                        _moves.value = newMoves
                         currentOffset += pagedMoves.size
                         isLastPage = pagedMoves.size < pageSize
                         _isLoading.value = false
                         isLoadingMore = false
+                        // Agrupar y crear secciones
+                        val grouped = newMoves.mapNotNull { move ->
+                            val (method, level) = getLearnMethodForMove(move.id ?: -1)
+                            MoveSectionItem.MoveItem(move, method, level)
+                        }.groupBy { it.learnMethodKey() }
+                        val sectionList = mutableListOf<MoveSectionItem>()
+                        val order = listOf("level-up", "machine", "tutor", "egg")
+                        val methodTitles = mapOf(
+                            "level-up" to "Por Nivel",
+                            "machine" to "Por MT/MO",
+                            "tutor" to "Por Tutor",
+                            "egg" to "Por Huevo"
+                        )
+                        for (key in order) {
+                            val items = grouped[key]
+                            if (!items.isNullOrEmpty()) {
+                                sectionList.add(MoveSectionItem.Header(methodTitles[key] ?: key))
+                                sectionList.addAll(
+                                    if (key == "level-up") items.sortedBy { it.level ?: 0 } else items
+                                )
+                            }
+                        }
+                        // Otros métodos
+                        val otherKeys = grouped.keys - order.toSet()
+                        for (key in otherKeys) {
+                            val items = grouped[key]
+                            if (!items.isNullOrEmpty()) {
+                                sectionList.add(MoveSectionItem.Header(methodTitles[key] ?: key.replaceFirstChar { it.uppercase() }))
+                                sectionList.addAll(items)
+                            }
+                        }
+                        _sectionedMoves.value = sectionList
                     }
                     is Resource.Error -> {
                         _error.value = resource.message
@@ -114,6 +155,15 @@ class PokemonMovesViewModel @Inject constructor(
             }
         }
     }
+
+    private fun MoveSectionItem.MoveItem.learnMethodKey(): String =
+        when (learnMethod) {
+            "level-up" -> "level-up"
+            "machine" -> "machine"
+            "tutor" -> "tutor"
+            "egg" -> "egg"
+            else -> learnMethod ?: "otro"
+        }
 
     fun getLearnMethodForMove(moveId: Int): Pair<String?, Int?> {
         val found = moveLearnMethods.firstOrNull { it.moveId == moveId }
