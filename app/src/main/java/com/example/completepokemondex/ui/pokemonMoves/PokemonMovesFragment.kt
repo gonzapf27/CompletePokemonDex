@@ -3,6 +3,7 @@ package com.example.completepokemondex.ui.pokemonMoves
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,6 +57,7 @@ class PokemonMovesFragment : Fragment() {
     private lateinit var binding: FragmentPokemonMovesBinding
     private val viewModel: PokemonMovesViewModel by viewModels()
     private lateinit var moveAdapter: PokemonMoveAdapter
+    private var firstLoadDone = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -93,13 +95,28 @@ class PokemonMovesFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.moves.observe(viewLifecycleOwner) { moves ->
+            Log.d("MovesFragment", "moves observer: moves.size=${moves.size}, isLoading=${viewModel.isLoading.value}, firstLoadDone=$firstLoadDone")
             moveAdapter.submitList(moves)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.isVisible = isLoading
+            Log.d("MovesFragment", "isLoading observer: isLoading=$isLoading, firstLoadDone=$firstLoadDone, moves.size=${moveAdapter.currentList.size}")
+            if (isLoading && moveAdapter.currentList.isEmpty()) {
+                Log.d("MovesFragment", "Mostrando loading de pantalla completa")
+                binding.loadingIndicator.visibility = View.VISIBLE
+                binding.movesRecyclerView.visibility = View.GONE
+                Glide.with(this)
+                    .asGif()
+                    .load(R.drawable.loading_pokeball)
+                    .into(binding.loadingIndicator)
+            } else {
+                Log.d("MovesFragment", "Ocultando loading de pantalla completa")
+                binding.loadingIndicator.visibility = View.GONE
+                binding.movesRecyclerView.visibility = View.VISIBLE
+            }
         }
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
             if (errorMsg != null) {
+                Log.d("MovesFragment", "Error: $errorMsg")
                 // Puedes mostrar un Toast o Snackbar
             }
         }
