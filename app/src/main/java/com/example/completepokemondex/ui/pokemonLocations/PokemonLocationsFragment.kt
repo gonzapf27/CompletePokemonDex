@@ -78,6 +78,26 @@ class PokemonLocationsFragment : Fragment() {
         loadBaseMap()
         
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            // Mostrar el gif de carga y ocultar el contenido mientras isLoading es true
+            if (state.isLoading) {
+                _binding?.loadingIndicator?.visibility = View.VISIBLE
+                Glide.with(this)
+                    .asGif()
+                    .load(R.drawable.loading_pokeball)
+                    .into(_binding!!.loadingIndicator)
+                _binding?.encountersTitle?.visibility = View.GONE
+                _binding?.encountersDescription?.visibility = View.GONE
+                _binding?.encountersText?.visibility = View.GONE
+                _binding?.encountersEmpty?.visibility = View.GONE
+                _binding?.mapImage?.visibility = View.GONE
+                return@observe
+            } else {
+                _binding?.loadingIndicator?.visibility = View.GONE
+                _binding?.encountersTitle?.visibility = View.VISIBLE
+                _binding?.encountersDescription?.visibility = View.VISIBLE
+                _binding?.mapImage?.visibility = View.VISIBLE
+            }
+
             // Gestionar estado de carga
             _binding?.loadingIndicator?.isVisible = state.isLoading
 
