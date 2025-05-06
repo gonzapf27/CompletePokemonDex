@@ -16,123 +16,13 @@ import com.bumptech.glide.Glide
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
-import com.example.completepokemondex.ui.adapters.PokemonMoveListAdapter
+import com.example.completepokemondex.ui.adapters.PokemonMoveAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PokemonMovesFragment : Fragment() {
-    private var _binding: FragmentPokemonMovesBinding? = null
-    private val binding get() = _binding!!
-
-    private val viewModel: PokemonMovesViewModel by viewModels()
-    private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
-    
-    @Inject
-    lateinit var moveListAdapter: PokemonMoveListAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.setPokemonId(pokemonId)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentPokemonMovesBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupRecyclerView()
-
-        Glide.with(this)
-            .asGif()
-            .load(R.drawable.loading_pokeball)
-            .into(binding.loadingIndicator)
-
-        viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            binding.loadingIndicator.isVisible = state.isLoading || state.isLoadingMoveDetails
-            binding.movesCard.isVisible = !state.isLoading
-            binding.movesEmpty.isVisible =
-                state.sections.isEmpty() && !state.isLoading && !state.isLoadingMoveDetails
-
-            state.pokemonTypes?.let { types ->
-                setupGradientBackground(types)
-            }
-
-            // Solo actualiza la lista cuando ya no está cargando detalles
-            if (!state.isLoading && !state.isLoadingMoveDetails) {
-                processMoveSections(state.sections)
-            }
-        }
-    }
-
-    private fun setupRecyclerView() {
-        binding.movesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = moveListAdapter
-        }
-        
-        moveListAdapter.setOnMoveClickListener { move ->
-            // Implementar acción cuando se hace clic en un movimiento
-        }
-    }
-
-    private fun processMoveSections(sections: List<MovesSectionUi>) {
-        // Solo procesa si hay secciones y los detalles están completos
-        if (sections.isEmpty() || viewModel.uiState.value?.isLoadingMoveDetails == true) {
-            return
-        }
-
-        // Usar el scope del lifecycle del view para evitar leaks y NPE
-        viewLifecycleOwner.lifecycleScope.launch {
-            val items = mutableListOf<PokemonMoveListAdapter.ListItem>()
-            sections.forEach { section ->
-                items.add(PokemonMoveListAdapter.ListItem.SectionHeader(section.title))
-                section.moves.forEach { moveUi ->
-                    val moveDomain = viewModel.getMoveDetails(moveUi.moveId)
-                    if (moveDomain != null) {
-                        // Obtener el nombre localizado desde moveUi.name
-                        items.add(
-                            PokemonMoveListAdapter.ListItem.MoveItem(
-                                move = moveDomain,
-                                learnMethod = section.title,
-                                localizedName = moveUi.name // Aquí se pasa el nombre localizado
-                            )
-                        )
-                    }
-                }
-            }
-            moveListAdapter.submitList(items)
-            binding.movesEmpty.isVisible = items.none { it is PokemonMoveListAdapter.ListItem.MoveItem }
-        }
-    }
-
-    private fun setupGradientBackground(types: List<String>) {
-        val typeColors = types.take(2).map { typeName ->
-            ContextCompat.getColor(requireContext(), getTypeColorResId(typeName))
-        }
-
-        val gradientColors = when {
-            typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
-            typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
-            else -> typeColors.toIntArray()
-        }
-
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            gradientColors
-        )
-        gradientDrawable.cornerRadius = 0f
-
-        binding.pokemonMovesGradientBg.background = gradientDrawable
-    }
-
     private fun getTypeColorResId(type: String): Int {
         return when (type.lowercase()) {
             "normal" -> R.color.type_normal
@@ -157,14 +47,61 @@ class PokemonMovesFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     companion object {
         fun newInstance(pokemonId: Int) = PokemonMovesFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
+        }
+    }
+
+    private lateinit var binding: FragmentPokemonMovesBinding
+    private val viewModel: PokemonMovesViewModel by viewModels()
+    private lateinit var moveAdapter: PokemonMoveAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentPokemonMovesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        observeViewModel()
+        val pokemonId = arguments?.getInt("pokemon_id") ?: 0
+        viewModel.setPokemonId(pokemonId)
+    }
+
+    private fun setupRecyclerView() {
+        moveAdapter = PokemonMoveAdapter(viewModel)
+        binding.movesRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = moveAdapter
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val totalItemCount = layoutManager.itemCount
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    if (totalItemCount <= lastVisibleItem + 5) {
+                        viewModel.loadMoreMoves()
+                    }
+                }
+            })
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.moves.observe(viewLifecycleOwner) { moves ->
+            moveAdapter.submitList(moves)
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.isVisible = isLoading
+        }
+        viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
+            if (errorMsg != null) {
+                // Puedes mostrar un Toast o Snackbar
+            }
         }
     }
 }

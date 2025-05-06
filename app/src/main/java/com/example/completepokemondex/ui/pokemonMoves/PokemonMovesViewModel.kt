@@ -14,231 +14,109 @@ import java.util.Locale
 import javax.inject.Inject
 import android.util.Log
 
-data class MoveUi(
-    val name: String,
-    val power: Int? = null,
-    val type: String? = null,
-    val moveId: Int? = null,
-    val accuracy: Int? = null
-)
-
-data class MovesSectionUi(
-    val title: String,
-    val moves: List<MoveUi>
-)
-
-data class PokemonMovesUiState(
-    val isLoading: Boolean = false,
-    val isLoadingMoveDetails: Boolean = false,
-    val sections: List<MovesSectionUi> = emptyList(),
-    val pokemonTypes: List<String>? = null
-)
-
 @HiltViewModel
 class PokemonMovesViewModel @Inject constructor(
     private val repository: PokemonRepository
 ) : ViewModel() {
 
     private val _pokemonId = MutableLiveData<Int>()
-    private val _uiState = MutableLiveData(PokemonMovesUiState())
-    val uiState: LiveData<PokemonMovesUiState> = _uiState
 
-    private val loadedMoveDetails = mutableMapOf<Int, PokemonMoveDomain>()
-    private var totalMovesToLoad = 0
-    private var loadedMovesCount = 0
-    
-    // Mapa para relacionar nombres de movimientos con sus IDs
-    private val moveNameToIdMap = mutableMapOf<String, Int>()
+    private val _moves = MutableLiveData<List<PokemonMoveDomain>>(emptyList())
+    val moves: LiveData<List<PokemonMoveDomain>> = _moves
 
-    fun setPokemonId(id: Int) {
-        if (_pokemonId.value == id) return
-        _pokemonId.value = id
-        fetchMoves(id)
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _error = MutableLiveData<String?>(null)
+    val error: LiveData<String?> = _error
+
+    private var currentOffset = 0
+    private val pageSize = 20
+    private var isLastPage = false
+    private var isLoadingMore = false
+
+    data class MoveWithLearnMethod(
+        val moveId: Int,
+        val learnMethod: String?,
+        val level: Int?
+    )
+
+    private var moveLearnMethods: List<MoveWithLearnMethod> = emptyList()
+
+    fun setPokemonId(pokemonId: Int) {
+        if (_pokemonId.value != pokemonId) {
+            _pokemonId.value = pokemonId
+            resetMoves()
+            loadMoreMoves()
+        }
     }
 
-    private fun fetchMoves(id: Int) {
+    private fun resetMoves() {
+        _moves.value = emptyList()
+        currentOffset = 0
+        isLastPage = false
+        isLoadingMore = false
+        _error.value = null
+    }
+
+    fun loadMoreMoves() {
+        if (isLoadingMore || isLastPage || _pokemonId.value == null) return
+        isLoadingMore = true
+        _isLoading.value = true
+        val pokemonId = _pokemonId.value ?: return
         viewModelScope.launch {
-            _uiState.value = PokemonMovesUiState(isLoading = true)
-            repository.getPokemonDetailsById(id).collect { result ->
-                when (result) {
+            repository.getPokemonDetailsById(pokemonId).collect { resource ->
+                when (resource) {
                     is Resource.Success -> {
-                        val moves = result.data.moves ?: emptyList()
-                        
-                        // Extraer los tipos de Pokémon para el gradiente
-                        val pokemonTypes = result.data.types?.mapNotNull { it?.type?.name } ?: emptyList()
-                        
-                        // Llenar el mapa de nombres a ids
-                        moves.forEach { move ->
-                            move?.move?.url?.let { url ->
-                                val moveId = extractMoveIdFromUrl(url)
-                                val moveName = move.move?.name?.replaceFirstChar { it.uppercase() }?.replace("-", " ")
-                                if (moveId != null && moveName != null) {
-                                    moveNameToIdMap[moveName] = moveId
-                                }
-                            }
-                        }
-                        
-                        val sections = groupMovesByMethod(moves)
-                        
-                        // Mostrar las secciones pero mantener el estado de carga
-                        _uiState.value = PokemonMovesUiState(
-                            isLoading = true,
-                            isLoadingMoveDetails = true,
-                            sections = sections,
-                            pokemonTypes = pokemonTypes
-                        )
-                        
-                        // Cargar detalles de cada movimiento
-                        totalMovesToLoad = moves.size
-                        loadedMovesCount = 0
-                        
-                        // Si no hay movimientos, terminar la carga
-                        if (moves.isEmpty()) {
-                            _uiState.value = PokemonMovesUiState(
-                                isLoading = false,
-                                isLoadingMoveDetails = false,
-                                sections = sections,
-                                pokemonTypes = pokemonTypes
-                            )
+                        val allMoves = resource.data.moves?.mapNotNull { move ->
+                            val url = move?.move?.url
+                            val moveId = url?.trimEnd('/')?.split("/")?.lastOrNull()?.toIntOrNull()
+                            val method = move?.version_group_details?.firstOrNull()?.move_learn_method?.name
+                            val level = move?.version_group_details?.firstOrNull()?.level_learned_at
+                            if (moveId != null) MoveWithLearnMethod(moveId, method, level) else null
+                        } ?: emptyList()
+                        moveLearnMethods = allMoves
+                        val pagedMoves = allMoves.drop(currentOffset).take(pageSize)
+                        if (pagedMoves.isEmpty()) {
+                            isLastPage = true
+                            _isLoading.value = false
+                            isLoadingMore = false
                             return@collect
                         }
-                        
-                        loadMovesDetails(moves, pokemonTypes)
+                        val moveIds = pagedMoves.map { it.moveId }
+                        val movesDetails = moveIds.mapIndexed { idx, moveId ->
+                            async {
+                                var move: PokemonMoveDomain? = null
+                                repository.getMoveById(moveId).collect { moveResource ->
+                                    if (moveResource is Resource.Success) {
+                                        move = moveResource.data
+                                    }
+                                }
+                                move
+                            }
+                        }.awaitAll().filterNotNull()
+                        val currentList = _moves.value ?: emptyList()
+                        _moves.value = currentList + movesDetails
+                        currentOffset += pagedMoves.size
+                        isLastPage = pagedMoves.size < pageSize
+                        _isLoading.value = false
+                        isLoadingMore = false
                     }
                     is Resource.Error -> {
-                        _uiState.value = PokemonMovesUiState(
-                            isLoading = false,
-                            isLoadingMoveDetails = false
-                        )
+                        _error.value = resource.message
+                        _isLoading.value = false
+                        isLoadingMore = false
                     }
                     is Resource.Loading -> {
-                        _uiState.value = PokemonMovesUiState(isLoading = true)
+                        _isLoading.value = true
                     }
                 }
             }
         }
     }
 
-    /**
-     * Obtiene los detalles de un movimiento por su ID
-     */
-    fun getMoveDetails(moveId: Int?): PokemonMoveDomain? {
-        return moveId?.let { loadedMoveDetails[it] }
-    }
-
-    private fun loadMovesDetails(moves: List<PokemonDetailsDomain.Move?>, pokemonTypes: List<String>) {
-        viewModelScope.launch {
-            val moveIds = moves.mapNotNull { move ->
-                move?.move?.url?.let { url ->
-                    extractMoveIdFromUrl(url)
-                }
-            }
-
-            // Normaliza el locale a solo el código de idioma (ej: "es", "en")
-            val currentLocale = Locale.getDefault().language.lowercase()
-
-            // Lanzar todas las peticiones en paralelo
-            coroutineScope {
-                moveIds.map { moveId ->
-                    async {
-                        if (moveId != null) {
-                            repository.getMoveById(moveId).collect { result ->
-                                if (result is Resource.Success) {
-                                    loadedMoveDetails[moveId] = result.data
-                                }
-                            }
-                        }
-                    }
-                }.awaitAll()
-            }
-
-            // Cuando todas terminan, actualiza el estado
-            val updatedSections = getEnhancedMoveSections(currentLocale)
-            _uiState.value = PokemonMovesUiState(
-                isLoading = false,
-                isLoadingMoveDetails = false,
-                sections = updatedSections,
-                pokemonTypes = pokemonTypes
-            )
-        }
-    }
-    
-    private fun getEnhancedMoveSections(locale: String): List<MovesSectionUi> {
-        val currentState = _uiState.value ?: return emptyList()
-        val sections = currentState.sections
-
-        Log.d("PokemonMovesVM", "Locale actual para nombres de movimientos: $locale")
-
-        return sections.map { section ->
-            val enhancedMoves = section.moves.map { moveUi ->
-                val moveId = moveUi.moveId ?: moveNameToIdMap[moveUi.name]
-
-                if (moveId != null) {
-                    val moveDetails = loadedMoveDetails[moveId]
-
-                    moveDetails?.names?.forEach { nameEntry ->
-                        Log.d(
-                            "PokemonMovesVM",
-                            "MoveId: $moveId, name: ${nameEntry?.name}, language: ${nameEntry?.language?.name}"
-                        )
-                    }
-
-                    // Busca primero por el locale exacto, luego por inglés, luego el primer nombre no nulo, luego el campo name
-                    val localizedName = moveDetails?.names
-                        ?.firstOrNull { nameEntry ->
-                            nameEntry?.language?.name?.equals(locale, ignoreCase = true) == true && !nameEntry.name.isNullOrBlank()
-                        }?.name
-                        ?: moveDetails?.names
-                            ?.firstOrNull { nameEntry ->
-                                nameEntry?.language?.name?.equals("en", ignoreCase = true) == true && !nameEntry.name.isNullOrBlank()
-                            }?.name
-                        ?: moveDetails?.names
-                            ?.firstOrNull { nameEntry ->
-                                !nameEntry?.name.isNullOrBlank()
-                            }?.name
-                        ?: moveDetails?.name
-                        ?: moveUi.name
-
-                    MoveUi(
-                        name = localizedName,
-                        power = moveDetails?.power,
-                        type = moveDetails?.type?.name,
-                        moveId = moveId,
-                        accuracy = moveDetails?.accuracy
-                    )
-                } else {
-                    moveUi
-                }
-            }
-
-            MovesSectionUi(section.title, enhancedMoves.sortedBy { it.name })
-        }
-    }
-    
-    private fun extractMoveIdFromUrl(url: String): Int? {
-        // URL ejemplo: https://pokeapi.co/api/v2/move/5/
-        return url.trim('/').split('/').lastOrNull()?.toIntOrNull()
-    }
-
-    private fun groupMovesByMethod(moves: List<PokemonDetailsDomain.Move?>): List<MovesSectionUi> {
-        // Agrupa los movimientos por método de aprendizaje
-        val sectionsMap = linkedMapOf<String, MutableList<MoveUi>>()
-        for (move in moves) {
-            val moveName = move?.move?.name?.replaceFirstChar { it.uppercase() }?.replace("-", " ") ?: continue
-            val moveId = move.move?.url?.let { extractMoveIdFromUrl(it) }
-            val method = move.version_group_details?.firstOrNull()?.move_learn_method?.name ?: "unknown"
-            val sectionTitle = when (method) {
-                "level-up" -> "Por nivel"
-                "machine" -> "Por MT/MO"
-                "tutor" -> "Por tutor"
-                "egg" -> "Por crianza"
-                else -> "Otros"
-            }
-            if (!sectionsMap.containsKey(sectionTitle)) {
-                sectionsMap[sectionTitle] = mutableListOf()
-            }
-            sectionsMap[sectionTitle]?.add(MoveUi(name = moveName, moveId = moveId))
-        }
-        return sectionsMap.map { MovesSectionUi(it.key, it.value.sortedBy { move -> move.name }) }
+    fun getLearnMethodForMove(moveId: Int): Pair<String?, Int?> {
+        val found = moveLearnMethods.firstOrNull { it.moveId == moveId }
+        return found?.let { it.learnMethod to it.level } ?: (null to null)
     }
 }
