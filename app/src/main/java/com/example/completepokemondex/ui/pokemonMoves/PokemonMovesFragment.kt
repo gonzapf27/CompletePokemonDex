@@ -22,8 +22,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Fragmento encargado de mostrar la lista de movimientos de un Pokémon.
+ * Utiliza un RecyclerView y observa el ViewModel para actualizar la UI.
+ */
 @AndroidEntryPoint
 class PokemonMovesFragment : Fragment() {
+    /**
+     * Devuelve el recurso de color asociado a un tipo de Pokémon.
+     */
     private fun getTypeColorResId(type: String): Int {
         return when (type.lowercase()) {
             "normal" -> R.color.type_normal
@@ -49,6 +56,9 @@ class PokemonMovesFragment : Fragment() {
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonMovesFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }
@@ -59,6 +69,9 @@ class PokemonMovesFragment : Fragment() {
     private lateinit var moveAdapter: PokemonMoveAdapter
     private var firstLoadDone = false
 
+    /**
+     * Inicializa el binding y la vista del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -66,6 +79,9 @@ class PokemonMovesFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Configura el RecyclerView y observa los cambios del ViewModel.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
@@ -74,6 +90,9 @@ class PokemonMovesFragment : Fragment() {
         viewModel.setPokemonId(pokemonId)
     }
 
+    /**
+     * Configura el RecyclerView para mostrar los movimientos y manejar la paginación.
+     */
     private fun setupRecyclerView() {
         moveAdapter = PokemonMoveAdapter(viewModel)
         binding.movesRecyclerView.apply {
@@ -93,6 +112,9 @@ class PokemonMovesFragment : Fragment() {
         }
     }
 
+    /**
+     * Observa los LiveData del ViewModel para actualizar la UI según los cambios de datos, carga y errores.
+     */
     private fun observeViewModel() {
         viewModel.moves.observe(viewLifecycleOwner) { moves ->
             Log.d("MovesFragment", "moves observer: moves.size=${moves.size}, isLoading=${viewModel.isLoading.value}, firstLoadDone=$firstLoadDone")

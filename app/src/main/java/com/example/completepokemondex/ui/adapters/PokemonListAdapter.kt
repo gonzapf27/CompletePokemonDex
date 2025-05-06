@@ -19,8 +19,8 @@ import com.example.completepokemondex.util.PokemonTypeUtil
 import javax.inject.Inject
 
 /**
- * Adaptador para mostrar la lista de Pokémon en un RecyclerView
- * Ahora utiliza inyección de dependencias
+ * Adaptador para mostrar la lista de Pokémon en un RecyclerView.
+ * Permite manejar clics en el ítem y en el botón de favorito.
  */
 class PokemonListAdapter @Inject constructor() : 
     ListAdapter<PokemonDomain, PokemonListAdapter.PokemonViewHolder>(PokemonDiffCallback) {
@@ -29,14 +29,23 @@ class PokemonListAdapter @Inject constructor() :
     private var onFavoriteClicked: ((PokemonDomain) -> Unit)? = null
     private var pokemonTypes: Map<Int, List<String>> = emptyMap()
     
+    /**
+     * Establece el listener para clics en el ítem.
+     */
     fun setOnItemClickListener(listener: (PokemonDomain) -> Unit) {
         onItemClicked = listener
     }
     
+    /**
+     * Establece el listener para clics en el botón de favorito.
+     */
     fun setOnFavoriteClickListener(listener: (PokemonDomain) -> Unit) {
         onFavoriteClicked = listener
     }
 
+    /**
+     * Actualiza el mapa de tipos de Pokémon para cada ítem.
+     */
     fun updatePokemonTypes(newTypes: Map<Int, List<String>>) {
         pokemonTypes = newTypes
         notifyDataSetChanged()
@@ -54,6 +63,9 @@ class PokemonListAdapter @Inject constructor() :
         holder.bind(pokemon, types, onItemClicked, onFavoriteClicked)
     }
 
+    /**
+     * ViewHolder para cada tarjeta de Pokémon.
+     */
     class PokemonViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
@@ -63,6 +75,9 @@ class PokemonListAdapter @Inject constructor() :
         private val cardView: CardView = itemView as CardView
         private val favoriteButton: ImageView = itemView.findViewById(R.id.favorite_button)
 
+        /**
+         * Vincula los datos del Pokémon a la vista y aplica el fondo según los tipos.
+         */
         fun bind(
             pokemon: PokemonDomain, 
             types: List<String>?,

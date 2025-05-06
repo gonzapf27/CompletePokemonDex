@@ -45,12 +45,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 /**
- * Repositorio para acceder a los datos de Pokémon. Implementa el patrón repositorio para abstraer
- * las fuentes de datos. Primero busca en la base de datos local, y si no encuentra los datos o
- * están obsoletos, consulta la API y guarda los resultados en la base de datos.
+ * Repositorio para acceder y gestionar los datos de Pokémon.
+ * Implementa el patrón repositorio para abstraer las fuentes de datos (local y remota).
+ * Prioriza la obtención de datos desde la base de datos local y, en caso de no encontrarlos o estar desactualizados,
+ * consulta la API remota y almacena los resultados en la base de datos.
  *
- * @property pokemonDao DAO para acceder a la base de datos local
- * @property remoteDataSource Fuente de datos remota para obtener datos de la API de Pokémon
+ * Proporciona métodos para obtener listas de Pokémon, detalles, especies, habilidades, cadenas de evolución,
+ * movimientos, encuentros y gestionar favoritos.
+ *
+ * @property pokemonDao DAO para acceder a la base de datos local de Pokémon
+ * @property pokemonDetailsDao DAO para detalles de Pokémon
+ * @property pokemonSpeciesDao DAO para especies de Pokémon
+ * @property abilityDao DAO para habilidades de Pokémon
+ * @property remoteDataSource Fuente de datos remota (API)
+ * @property evolutionChainDao DAO para cadenas de evolución
+ * @property pokemonEncountersDao DAO para encuentros de Pokémon
+ * @property pokemonMoveDao DAO para movimientos de Pokémon
  */
 class PokemonRepository(
     private val pokemonDao: PokemonDao,
@@ -65,8 +75,8 @@ class PokemonRepository(
     private val tag = "PokemonRepository"
 
     /**
-     * Obtiene una lista de Pokémon. Primero intenta obtener los datos de la base de datos local. Si
-     * la base de datos está vacía, obtiene los datos de la API y los guarda en la base de datos.
+     * Obtiene una lista de Pokémon, priorizando la base de datos local.
+     * Si no hay suficientes datos locales, consulta la API y guarda los resultados.
      *
      * @param limit Número máximo de Pokémon a obtener
      * @param offset Posición desde donde empezar a obtener Pokémon
@@ -130,8 +140,8 @@ class PokemonRepository(
         }.flowOn(Dispatchers.IO)
 
     /**
-     * Obtiene los detalles de un Pokémon específico por su ID. Primero intenta obtener los datos de la
-     * base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
+     * Obtiene los detalles de un Pokémon específico por su ID.
+     * Prioriza la base de datos local y, si no encuentra datos, consulta la API.
      *
      * @param id Identificador único del Pokémon
      * @return Flow que emite los detalles del Pokémon y el estado de carga
@@ -186,7 +196,7 @@ class PokemonRepository(
 
     /**
      * Obtiene la especie de un Pokémon por su ID.
-     * Primero intenta obtener los datos de la base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
+     * Prioriza la base de datos local y, si no encuentra datos, consulta la API.
      *
      * @param id Identificador único de la especie Pokémon
      * @return Flow que emite la especie del Pokémon y el estado de carga
@@ -328,8 +338,7 @@ class PokemonRepository(
 
     /**
      * Obtiene un movimiento específico por su ID.
-     * Primero intenta obtener los datos de la base de datos local. Si no los encuentra,
-     * los obtiene de la API y los guarda en la base de datos.
+     * Prioriza la base de datos local y, si no encuentra datos, consulta la API.
      *
      * @param id Identificador único del movimiento
      * @return Flow que emite los detalles del movimiento y el estado de carga
@@ -381,8 +390,14 @@ class PokemonRepository(
             }
         }.flowOn(Dispatchers.IO)
 
-    // Funciones auxiliares para evitar código repetido
-
+    /**
+     * Función auxiliar para manejar respuestas de la API de forma genérica.
+     * Ejecuta la llamada a la API y delega en los callbacks según el resultado.
+     *
+     * @param apiCall Llamada suspendida a la API
+     * @param onSuccess Callback en caso de éxito
+     * @param onError Callback en caso de error
+     */
     private suspend inline fun <T> handleApiResponse(
         crossinline apiCall: suspend () -> Resource<T>,
         crossinline onSuccess: suspend (T) -> Unit,
@@ -396,6 +411,16 @@ class PokemonRepository(
         }
     }
 
+    /**
+     * Función auxiliar para manejar fallback a datos locales en caso de error de la API.
+     * Si hay datos locales, los devuelve junto con el mensaje de error.
+     * Si no hay datos locales, emite el error con datos vacíos o nulos.
+     *
+     * @param errorMessage Mensaje de error de la API
+     * @param localData Datos locales disponibles
+     * @param transformData Función para transformar los datos locales
+     * @param emitResult Función para emitir el resultado
+     */
     private suspend inline fun <T, R> handleLocalFallback(
         errorMessage: String,
         localData: T,
@@ -417,6 +442,11 @@ class PokemonRepository(
         }
     }
 
+    /**
+     * Ejecuta un bloque suspendido para guardar datos en la base de datos local en el dispatcher IO.
+     *
+     * @param block Bloque suspendido que realiza la operación de guardado
+     */
     private suspend inline fun saveToDatabase(crossinline block: suspend () -> Unit) {
         withContext(Dispatchers.IO) {
             logDebug("💾 GUARDANDO DATOS: API → BASE DE DATOS LOCAL")
@@ -425,11 +455,20 @@ class PokemonRepository(
         }
     }
 
-    // Funciones de logging para mantener consistencia
+    /**
+     * Función auxiliar para logging de mensajes de depuración.
+     *
+     * @param message Mensaje a registrar
+     */
     private fun logDebug(message: String) {
         Log.d(tag, message)
     }
 
+    /**
+     * Función auxiliar para logging de mensajes de error.
+     *
+     * @param message Mensaje a registrar
+     */
     private fun logError(message: String) {
         Log.e(tag, message)
     }
@@ -448,6 +487,9 @@ class PokemonRepository(
 
     /**
      * Devuelve si un Pokémon es favorito.
+     *
+     * @param pokemonId Identificador único del Pokémon
+     * @return true si es favorito, false en caso contrario
      */
     suspend fun isPokemonFavorite(pokemonId: Int): Boolean {
         val entity = pokemonDao.getPokemonById(pokemonId)
@@ -455,8 +497,8 @@ class PokemonRepository(
     }
 
     /**
-     * Obtiene los detalles de un Pokémon específico por su nombre. Primero intenta obtener los datos de la
-     * base de datos local. Si no los encuentra, los obtiene de la API y los guarda en la base de datos.
+     * Obtiene los detalles de un Pokémon específico por su nombre.
+     * Prioriza la base de datos local y, si no encuentra datos, consulta la API.
      *
      * @param name Nombre del Pokémon
      * @return Flow que emite los detalles del Pokémon y el estado de carga
@@ -511,8 +553,7 @@ class PokemonRepository(
 
     /**
      * Obtiene las ubicaciones donde se puede encontrar un Pokémon por su ID.
-     * Primero intenta obtener los datos de la base de datos local. Si no los encuentra,
-     * los obtiene de la API y los guarda en la base de datos.
+     * Prioriza la base de datos local y, si no encuentra datos, consulta la API.
      *
      * @param id Identificador único del Pokémon
      * @return Flow que emite los lugares de encuentro del Pokémon y el estado de carga

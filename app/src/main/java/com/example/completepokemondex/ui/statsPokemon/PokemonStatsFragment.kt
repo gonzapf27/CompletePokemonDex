@@ -20,6 +20,10 @@ import com.example.completepokemondex.databinding.FragmentPokemonStatsBinding
 import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Fragmento encargado de mostrar las estadísticas de un Pokémon.
+ * Observa el estado del ViewModel y actualiza la UI en consecuencia.
+ */
 @AndroidEntryPoint
 class PokemonStatsFragment : Fragment() {
     private var _binding: FragmentPokemonStatsBinding? = null
@@ -28,11 +32,18 @@ class PokemonStatsFragment : Fragment() {
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
     private val viewModel: PokemonStatsViewModel by viewModels()
 
+    /**
+     * Se llama al crear el fragmento.
+     * Inicializa el ViewModel con el ID del Pokémon.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.setPokemonId(pokemonId)
     }
 
+    /**
+     * Infla el layout del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,6 +52,10 @@ class PokemonStatsFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Se llama cuando la vista ha sido creada.
+     * Observa el estado de la UI y muestra las estadísticas cuando están disponibles.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
@@ -70,13 +85,19 @@ class PokemonStatsFragment : Fragment() {
         }
     }
 
+    /**
+     * Limpia el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     /**
-     * Llama a esta función pasando el objeto PokemonDetailsDomain para mostrar los stats.
+     * Muestra las estadísticas del Pokémon recibido.
+     * Construye dinámicamente las filas de estadísticas y actualiza el total.
+     *
+     * @param pokemon Detalles del Pokémon a mostrar.
      */
     fun showStats(pokemon: PokemonDetailsDomain) {
         val statsContainer = binding.statsContainer
@@ -130,6 +151,11 @@ class PokemonStatsFragment : Fragment() {
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         *
+         * @param pokemonId ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonStatsFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

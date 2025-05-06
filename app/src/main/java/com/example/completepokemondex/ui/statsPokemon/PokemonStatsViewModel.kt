@@ -11,12 +11,25 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Representa el estado de la UI para la pantalla de estadísticas de Pokémon.
+ *
+ * @property isLoading Indica si los datos están cargando.
+ * @property error Mensaje de error si ocurre alguno.
+ * @property pokemon Detalles del Pokémon a mostrar.
+ */
 data class StatsUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val pokemon: PokemonDetailsDomain? = null
 )
 
+/**
+ * ViewModel para la pantalla de estadísticas de Pokémon.
+ * Gestiona la obtención de datos y el estado de la UI.
+ *
+ * @property repository Repositorio de Pokémon para acceder a los datos.
+ */
 @HiltViewModel
 class PokemonStatsViewModel @Inject constructor(
     private val repository: PokemonRepository
@@ -25,6 +38,12 @@ class PokemonStatsViewModel @Inject constructor(
     private val _uiState = MutableLiveData(StatsUiState())
     val uiState: LiveData<StatsUiState> = _uiState
     
+    /**
+     * Establece el ID del Pokémon y obtiene sus detalles.
+     * Actualiza el estado de la UI según el resultado.
+     *
+     * @param pokemonId ID del Pokémon a consultar.
+     */
     fun setPokemonId(pokemonId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)

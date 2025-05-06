@@ -13,8 +13,11 @@ import com.example.completepokemondex.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * MainActivity es la actividad principal de la aplicación que muestra la interfaz de usuario y
- * maneja la interacción del usuario.
+ * MainActivity es la actividad principal de la aplicación.
+ * Se encarga de inicializar el repositorio de Pokémon y de gestionar la vista principal.
+ * 
+ * - Configura la gestión de insets para manejar notch y áreas seguras.
+ * - Inicializa el repositorio de Pokémon utilizando DAOs locales y el data source remoto.
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -22,13 +25,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pokemonRepository: PokemonRepository
 
     /**
-     * Método onCreate se llama cuando la actividad es creada. Inicializa el ViewModel, configura
-     * los observadores y eventos.
+     * Método onCreate se llama cuando la actividad es creada.
+     * Inicializa el binding, configura la gestión de insets y el repositorio de Pokémon.
      *
      * @param savedInstanceState Si la actividad se está recreando, este parámetro contiene
-     * ```
-     *                           los datos más recientes suministrados en onSaveInstanceState.
-     * ```
+     * los datos más recientes suministrados en onSaveInstanceState.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +66,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Configura los insets para manejar correctamente el área segura
+     * Configura los insets para manejar correctamente el área segura de la pantalla,
+     * aplicando el padding necesario al contenedor de fragmentos.
      */
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->

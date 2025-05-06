@@ -12,7 +12,21 @@ package com.example.completepokemondex.data.remote.api
  * @param T El tipo de dato contenido en el recurso.
  */
 sealed class Resource<out T> {
+    /**
+     * Representa un estado exitoso con los datos obtenidos.
+     * @param data Los datos resultantes de la operación.
+     */
     data class Success<T>(val data: T) : Resource<T>()
+
+    /**
+     * Representa un estado de error con un mensaje y opcionalmente datos parciales o en caché.
+     * @param message Mensaje de error descriptivo.
+     * @param data Datos parciales o en caché (opcional).
+     */
     data class Error<T>(val message: String, val data: T? = null) : Resource<T>()
+
+    /**
+     * Representa un estado de carga mientras la operación está en curso.
+     */
     data object Loading : Resource<Nothing>()
 }

@@ -14,6 +14,9 @@ import java.util.Locale
 import javax.inject.Inject
 import android.util.Log
 
+/**
+ * ViewModel encargado de gestionar la lógica y el estado de la pantalla de movimientos de un Pokémon.
+ */
 @HiltViewModel
 class PokemonMovesViewModel @Inject constructor(
     private val repository: PokemonRepository
@@ -35,6 +38,9 @@ class PokemonMovesViewModel @Inject constructor(
     private var isLastPage = false
     private var isLoadingMore = false
 
+    /**
+     * Representa un movimiento junto con el método de aprendizaje y el nivel.
+     */
     data class MoveWithLearnMethod(
         val moveId: Int,
         val learnMethod: String?,
@@ -43,6 +49,9 @@ class PokemonMovesViewModel @Inject constructor(
 
     private var moveLearnMethods: List<MoveWithLearnMethod> = emptyList()
 
+    /**
+     * Representa un ítem de sección para agrupar los movimientos por método de aprendizaje.
+     */
     sealed class MoveSectionItem {
         data class Header(val title: String) : MoveSectionItem()
         data class MoveItem(val move: PokemonMoveDomain, val learnMethod: String?, val level: Int?) : MoveSectionItem()
@@ -51,6 +60,9 @@ class PokemonMovesViewModel @Inject constructor(
     private val _sectionedMoves = MutableLiveData<List<MoveSectionItem>>(emptyList())
     val sectionedMoves: LiveData<List<MoveSectionItem>> = _sectionedMoves
 
+    /**
+     * Establece el ID del Pokémon y carga los movimientos.
+     */
     fun setPokemonId(pokemonId: Int) {
         if (_pokemonId.value != pokemonId) {
             _pokemonId.value = pokemonId
@@ -59,6 +71,9 @@ class PokemonMovesViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Reinicia la lista de movimientos y el estado de paginación.
+     */
     private fun resetMoves() {
         _moves.value = emptyList()
         currentOffset = 0
@@ -67,6 +82,9 @@ class PokemonMovesViewModel @Inject constructor(
         _error.value = null
     }
 
+    /**
+     * Carga más movimientos paginados para el Pokémon actual.
+     */
     fun loadMoreMoves() {
         if (isLoadingMore || isLastPage || _pokemonId.value == null) return
         isLoadingMore = true
@@ -165,6 +183,9 @@ class PokemonMovesViewModel @Inject constructor(
             else -> learnMethod ?: "otro"
         }
 
+    /**
+     * Obtiene el método de aprendizaje y el nivel para un movimiento dado.
+     */
     fun getLearnMethodForMove(moveId: Int): Pair<String?, Int?> {
         val found = moveLearnMethods.firstOrNull { it.moveId == moveId }
         return found?.let { it.learnMethod to it.level } ?: (null to null)

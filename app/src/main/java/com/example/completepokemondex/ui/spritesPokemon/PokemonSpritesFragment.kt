@@ -21,6 +21,10 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonSpritesBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Fragmento encargado de mostrar los sprites de un Pokémon.
+ * Observa el estado del ViewModel y actualiza la UI en consecuencia.
+ */
 @AndroidEntryPoint
 class PokemonSpritesFragment : Fragment() {
     private var _binding: FragmentPokemonSpritesBinding? = null
@@ -29,6 +33,9 @@ class PokemonSpritesFragment : Fragment() {
     private val viewModel: PokemonSpritesViewModel by viewModels()
     private val pokemonId: Int by lazy { arguments?.getInt("pokemon_id") ?: 0 }
 
+    /**
+     * Inicializa la vista y el binding del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +44,9 @@ class PokemonSpritesFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Configura los observadores y carga los datos al crear la vista.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -81,6 +91,10 @@ class PokemonSpritesFragment : Fragment() {
         }
     }
 
+    /**
+     * Muestra los sprites en una cuadrícula.
+     * @param sprites Lista de pares (etiqueta, URL) de sprites.
+     */
     private fun displaySprites(sprites: List<Pair<String, String>>) {
         val context = requireContext()
         val container = binding.spritesContainer
@@ -136,12 +150,18 @@ class PokemonSpritesFragment : Fragment() {
         }
     }
 
+    /**
+     * Libera el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonSpritesFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

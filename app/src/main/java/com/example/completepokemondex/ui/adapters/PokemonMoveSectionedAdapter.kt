@@ -7,7 +7,11 @@ import com.example.completepokemondex.databinding.ItemMoveSectionHeaderBinding
 import com.example.completepokemondex.databinding.ItemPokemonMoveBinding
 import com.example.completepokemondex.ui.pokemonMoves.PokemonMovesViewModel
 
+/**
+ * Adaptador para mostrar movimientos de Pokémon agrupados por secciones (por ejemplo, método de aprendizaje).
+ */
 class PokemonMoveSectionedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    // Lista de ítems (cabeceras y movimientos)
     var items: List<PokemonMovesViewModel.MoveSectionItem> = emptyList()
         set(value) {
             field = value
@@ -40,12 +44,18 @@ class PokemonMoveSectionedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    /**
+     * ViewHolder para la cabecera de sección.
+     */
     inner class HeaderViewHolder(private val binding: ItemMoveSectionHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(header: PokemonMovesViewModel.MoveSectionItem.Header) {
             binding.sectionTitle.text = header.title
         }
     }
 
+    /**
+     * ViewHolder para un movimiento de Pokémon.
+     */
     inner class MoveViewHolder(private val binding: ItemPokemonMoveBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PokemonMovesViewModel.MoveSectionItem.MoveItem) {
             val move = item.move
@@ -71,6 +81,9 @@ class PokemonMoveSectionedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    /**
+     * Devuelve el color de fondo correspondiente al tipo de movimiento.
+     */
     private fun getTypeColorResId(type: String?): Int {
         return when (type?.lowercase()) {
             "normal" -> R.color.type_normal

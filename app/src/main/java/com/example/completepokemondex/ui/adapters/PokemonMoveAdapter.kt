@@ -11,6 +11,10 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.ItemPokemonMoveBinding
 
+/**
+ * Adaptador para mostrar la lista de movimientos de un Pokémon.
+ * Utiliza DiffUtil para optimizar actualizaciones.
+ */
 class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.ui.pokemonMoves.PokemonMovesViewModel) : ListAdapter<PokemonMoveDomain, PokemonMoveAdapter.MoveViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoveViewHolder {
@@ -22,6 +26,9 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
         holder.bind(getItem(position))
     }
 
+    /**
+     * ViewHolder para un movimiento de Pokémon.
+     */
     inner class MoveViewHolder(private val binding: ItemPokemonMoveBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(move: PokemonMoveDomain) {
             // Nombre del movimiento (en español si existe, si no, el nombre base)
@@ -65,6 +72,9 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
         }
     }
 
+    /**
+     * Devuelve el color de fondo correspondiente al tipo de movimiento.
+     */
     private fun getTypeColorResId(type: String?): Int {
         return when (type?.lowercase()) {
             "normal" -> R.color.type_normal

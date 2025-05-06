@@ -26,6 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Fragmento encargado de mostrar la información detallada de un Pokémon.
+ * Observa el estado de la UI desde el ViewModel y actualiza la vista en consecuencia.
+ */
 @AndroidEntryPoint
 class PokemonInfoFragment : Fragment() {
     private var _binding: FragmentPokemonInfoBinding? = null
@@ -35,11 +39,17 @@ class PokemonInfoFragment : Fragment() {
 
     private val viewModel: PokemonInfoViewModel by viewModels()
 
+    /**
+     * Inicializa el ViewModel con el ID del Pokémon recibido por argumentos.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.setPokemonId(pokemonId)
     }
 
+    /**
+     * Infla el layout del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,6 +58,9 @@ class PokemonInfoFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Observa el estado de la UI y actualiza los elementos visuales.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
@@ -261,7 +274,9 @@ class PokemonInfoFragment : Fragment() {
         }
     }
     
-    // Método para navegar a la información de otro Pokémon
+    /**
+     * Navega a la información de otro Pokémon al hacer clic en la cadena evolutiva.
+     */
     private fun navigateToPokemon(pokemonId: Int) {
         // Crear una nueva instancia del fragmento con el ID del Pokémon seleccionado
         val fragment = newInstance(pokemonId)
@@ -295,12 +310,18 @@ class PokemonInfoFragment : Fragment() {
         }
     }
 
+    /**
+     * Libera el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonInfoFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

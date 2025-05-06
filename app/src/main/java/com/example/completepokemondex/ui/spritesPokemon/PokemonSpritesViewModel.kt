@@ -13,6 +13,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Estado de la UI para la pantalla de sprites de Pokémon.
+ * @property isLoading Indica si se están cargando los datos.
+ * @property error Mensaje de error si ocurre alguno.
+ * @property pokemon Detalles del Pokémon.
+ * @property sprites Lista de pares (etiqueta, URL) de sprites.
+ * @property types Lista de tipos del Pokémon para la UI.
+ */
 data class SpritesUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
@@ -21,6 +29,10 @@ data class SpritesUiState(
     val types: List<PokemonTypeUi> = emptyList()
 )
 
+/**
+ * ViewModel encargado de gestionar la lógica y el estado de la pantalla de sprites de un Pokémon.
+ * Utiliza Hilt para la inyección de dependencias.
+ */
 @HiltViewModel
 class PokemonSpritesViewModel @Inject constructor(
     private val repository: PokemonRepository
@@ -28,6 +40,10 @@ class PokemonSpritesViewModel @Inject constructor(
     private val _uiState = MutableLiveData(SpritesUiState())
     val uiState: LiveData<SpritesUiState> = _uiState
     
+    /**
+     * Carga los sprites y tipos del Pokémon dado su ID.
+     * @param pokemonId ID del Pokémon a cargar.
+     */
     fun loadPokemonSprites(pokemonId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
@@ -69,6 +85,11 @@ class PokemonSpritesViewModel @Inject constructor(
         }
     }
     
+    /**
+     * Extrae todos los sprites disponibles de la estructura de sprites del dominio.
+     * @param sprites Objeto de sprites del dominio.
+     * @return Lista de pares (etiqueta, URL) de sprites.
+     */
     fun getAllSprites(sprites: PokemonDetailsDomain.Sprites?): List<Pair<String, String>> {
         if (sprites == null) return emptyList()
         

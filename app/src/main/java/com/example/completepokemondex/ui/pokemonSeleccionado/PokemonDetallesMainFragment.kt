@@ -16,6 +16,10 @@ import com.example.completepokemondex.ui.pokemonMoves.PokemonMovesFragment
 import com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Fragmento principal que contiene la navegación inferior y muestra los diferentes fragmentos
+ * de información, estadísticas, sprites, localizaciones y movimientos de un Pokémon.
+ */
 @AndroidEntryPoint
 class PokemonDetallesMainFragment : Fragment() {
     private var _binding: FragmentPokemonDetallesMainBinding? = null
@@ -31,6 +35,9 @@ class PokemonDetallesMainFragment : Fragment() {
         pokemonId = arguments?.getInt("pokemon_id") ?: 0
     }
 
+    /**
+     * Inicializa el binding y la vista del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,6 +46,9 @@ class PokemonDetallesMainFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Configura la navegación y observa los cambios de destino para mostrar el fragmento correspondiente.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) {
@@ -147,12 +157,18 @@ class PokemonDetallesMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Libera el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento principal con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonDetallesMainFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

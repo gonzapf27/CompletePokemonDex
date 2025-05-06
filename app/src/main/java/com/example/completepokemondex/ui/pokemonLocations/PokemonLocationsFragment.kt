@@ -33,6 +33,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Fragmento encargado de mostrar las localizaciones donde se puede encontrar un Pokémon
+ * en los juegos Rojo y Azul, resaltando las ubicaciones en un mapa y mostrando detalles de encuentros.
+ */
 @AndroidEntryPoint
 class PokemonLocationsFragment : Fragment() {
     private var _binding: FragmentPokemonEncountersBinding? = null
@@ -136,7 +140,7 @@ class PokemonLocationsFragment : Fragment() {
     }
     
     /**
-     * Carga la imagen base del mapa de Kanto
+     * Carga la imagen base del mapa de Kanto.
      */
     private fun loadBaseMap() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -175,7 +179,7 @@ class PokemonLocationsFragment : Fragment() {
     }
     
     /**
-     * Actualiza el mapa con las ubicaciones resaltadas
+     * Actualiza el mapa resaltando las ubicaciones donde aparece el Pokémon.
      */
     private fun updateMapWithLocations(locationNames: List<String>) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -213,7 +217,9 @@ class PokemonLocationsFragment : Fragment() {
         }
     }
 
-    // Copiado y adaptado de fragmento de movimientos
+    /**
+     * Configura el fondo con un gradiente basado en los tipos del Pokémon.
+     */
     private fun setupGradientBackground(types: List<String>) {
         val typeColors = types.take(2).map { typeName ->
             ContextCompat.getColor(requireContext(), getTypeColorResId(typeName))
@@ -234,6 +240,9 @@ class PokemonLocationsFragment : Fragment() {
         _binding?.pokemonEncountersGradientBg?.background = gradientDrawable
     }
 
+    /**
+     * Devuelve el recurso de color asociado a un tipo de Pokémon.
+     */
     private fun getTypeColorResId(type: String): Int {
         return when (type.lowercase()) {
             "normal" -> R.color.type_normal
@@ -258,6 +267,9 @@ class PokemonLocationsFragment : Fragment() {
         }
     }
 
+    /**
+     * Libera recursos y el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Liberar recursos
@@ -267,6 +279,9 @@ class PokemonLocationsFragment : Fragment() {
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonLocationsFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }
