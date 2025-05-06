@@ -88,6 +88,18 @@ class PokemonMovesFragment : Fragment() {
         observeViewModel()
         val pokemonId = arguments?.getInt("pokemon_id") ?: 0
         viewModel.setPokemonId(pokemonId)
+        // Fondo gradiente (puedes personalizar los colores si tienes el tipo)
+        val gradientBg = binding.movesFragmentGradientBg
+        val gradientColors = intArrayOf(
+            ContextCompat.getColor(requireContext(), R.color.type_electric),
+            ContextCompat.getColor(requireContext(), R.color.type_normal)
+        )
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            gradientColors
+        )
+        gradientDrawable.cornerRadius = 0f
+        gradientBg.background = gradientDrawable
     }
 
     /**
@@ -117,28 +129,23 @@ class PokemonMovesFragment : Fragment() {
      */
     private fun observeViewModel() {
         viewModel.moves.observe(viewLifecycleOwner) { moves ->
-            Log.d("MovesFragment", "moves observer: moves.size=${moves.size}, isLoading=${viewModel.isLoading.value}, firstLoadDone=$firstLoadDone")
             moveAdapter.submitList(moves)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            Log.d("MovesFragment", "isLoading observer: isLoading=$isLoading, firstLoadDone=$firstLoadDone, moves.size=${moveAdapter.currentList.size}")
             if (isLoading && moveAdapter.currentList.isEmpty()) {
-                Log.d("MovesFragment", "Mostrando loading de pantalla completa")
                 binding.loadingIndicator.visibility = View.VISIBLE
-                binding.movesRecyclerView.visibility = View.GONE
+                binding.contentContainer.visibility = View.GONE
                 Glide.with(this)
                     .asGif()
                     .load(R.drawable.loading_pokeball)
                     .into(binding.loadingIndicator)
             } else {
-                Log.d("MovesFragment", "Ocultando loading de pantalla completa")
                 binding.loadingIndicator.visibility = View.GONE
-                binding.movesRecyclerView.visibility = View.VISIBLE
+                binding.contentContainer.visibility = View.VISIBLE
             }
         }
         viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
             if (errorMsg != null) {
-                Log.d("MovesFragment", "Error: $errorMsg")
                 // Puedes mostrar un Toast o Snackbar
             }
         }

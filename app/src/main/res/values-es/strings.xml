@@ -47,6 +47,7 @@
     <string name="move_list_explanation">Lista de movimientos que este Pokémon puede aprender a lo largo de los niveles, MT/MO, tutor, etc.</string>
     <string name="move_accuracy">Precisión:</string>
     <string name="move_empty_list">No se encontraron movimientos para este Pokémon.</string>
+    <string name="pokemon_moves">Movimientos</string>
     <!-- Pokemon Encounters -->
     <string name="encounters_title_template">Lugares en %s</string>
     <string name="encounters_red_blue">Rojo/Azul</string>

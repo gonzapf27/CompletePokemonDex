@@ -35,9 +35,9 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
             val nameEs = move.names?.firstOrNull { it?.language?.name == "es" }?.name
             binding.moveName.text = nameEs ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() } ?: "-"
 
-            // Tipo del movimiento
-            val typeName = move.type?.name?.replaceFirstChar { it.uppercase() } ?: "-"
-            binding.moveTypeChip.text = typeName
+            // Tipo del movimiento (internacionalizado)
+            val typeUtil = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(move.type?.name ?: "")
+            binding.moveTypeChip.text = if (typeUtil.stringRes != 0) binding.root.context.getString(typeUtil.stringRes) else move.type?.name?.replaceFirstChar { it.uppercase() } ?: "-"
             val typeColorRes = getTypeColorResId(move.type?.name)
             binding.moveTypeChip.chipBackgroundColor = ContextCompat.getColorStateList(binding.root.context, typeColorRes)
 

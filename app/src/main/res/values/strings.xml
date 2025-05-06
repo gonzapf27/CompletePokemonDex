@@ -58,5 +58,6 @@
     <string name="move_list_explanation">List of moves this Pokémon can learn by level up, TM/HM, tutor, etc.</string>
     <string name="move_accuracy">Accuracy:</string>
     <string name="move_empty_list">No moves found for this Pokémon.</string>
+    <string name="pokemon_moves">Movimientos</string>
     <string name="favorites">favorites</string>
 </resources>
