@@ -33,6 +33,9 @@ class PokemonMovesViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>(null)
     val error: LiveData<String?> = _error
 
+    private val _pokemonTypes = MutableLiveData<List<String>>(emptyList())
+    val pokemonTypes: LiveData<List<String>> = _pokemonTypes
+
     private var currentOffset = 0
     private val pageSize = 20
     private var isLastPage = false
@@ -67,6 +70,15 @@ class PokemonMovesViewModel @Inject constructor(
         if (_pokemonId.value != pokemonId) {
             _pokemonId.value = pokemonId
             resetMoves()
+            // Obtener tipos del Pokémon
+            viewModelScope.launch {
+                repository.getPokemonDetailsById(pokemonId).collect { resource ->
+                    if (resource is Resource.Success) {
+                        val types = resource.data.types?.mapNotNull { it?.type?.name } ?: emptyList()
+                        _pokemonTypes.value = types
+                    }
+                }
+            }
             loadMoreMoves()
         }
     }

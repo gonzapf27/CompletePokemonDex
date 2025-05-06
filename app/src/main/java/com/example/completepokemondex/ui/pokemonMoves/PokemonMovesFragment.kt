@@ -88,18 +88,24 @@ class PokemonMovesFragment : Fragment() {
         observeViewModel()
         val pokemonId = arguments?.getInt("pokemon_id") ?: 0
         viewModel.setPokemonId(pokemonId)
-        // Fondo gradiente (puedes personalizar los colores si tienes el tipo)
-        val gradientBg = binding.movesFragmentGradientBg
-        val gradientColors = intArrayOf(
-            ContextCompat.getColor(requireContext(), R.color.type_electric),
-            ContextCompat.getColor(requireContext(), R.color.type_normal)
-        )
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            gradientColors
-        )
-        gradientDrawable.cornerRadius = 0f
-        gradientBg.background = gradientDrawable
+        // Fondo gradiente según los tipos del Pokémon
+        viewModel.pokemonTypes.observe(viewLifecycleOwner) { types ->
+            val typeColors = types.take(2).map {
+                val type = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(it)
+                ContextCompat.getColor(requireContext(), type.colorRes)
+            }
+            val gradientColors = when {
+                typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
+                typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+                else -> typeColors.toIntArray()
+            }
+            val gradientDrawable = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                gradientColors
+            )
+            gradientDrawable.cornerRadius = 0f
+            binding.movesFragmentGradientBg.background = gradientDrawable
+        }
     }
 
     /**
