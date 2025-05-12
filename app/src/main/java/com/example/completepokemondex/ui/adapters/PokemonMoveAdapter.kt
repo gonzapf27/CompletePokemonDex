@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.ItemPokemonMoveBinding
+import java.util.Locale
 
 /**
  * Adaptador para mostrar la lista de movimientos de un Pokémon.
@@ -31,9 +32,17 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
      */
     inner class MoveViewHolder(private val binding: ItemPokemonMoveBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(move: PokemonMoveDomain) {
-            // Nombre del movimiento (en español si existe, si no, el nombre base)
-            val nameEs = move.names?.firstOrNull { it?.language?.name == "es" }?.name
-            binding.moveName.text = nameEs ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() } ?: "-"
+            // Nombre del movimiento según el locale del dispositivo
+            val locale = Locale.getDefault().language
+            val name = if (locale == "es") {
+                move.names?.firstOrNull { it?.language?.name == "es" }?.name
+                    ?: move.names?.firstOrNull { it?.language?.name == "en" }?.name
+                    ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() }
+            } else {
+                move.names?.firstOrNull { it?.language?.name == "en" }?.name
+                    ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() }
+            }
+            binding.moveName.text = name ?: "-"
 
             // Tipo del movimiento (internacionalizado)
             val typeUtil = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(move.type?.name ?: "")
@@ -47,9 +56,16 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
             binding.moveAccuracy.text = if (move.accuracy != null) "${move.accuracy}%" else "-"
             // PP
             binding.movePp.text = "PP: ${move.pp ?: "-"}"
-            // Descripción (en español si existe)
-            val descEs = move.flavor_text_entries?.firstOrNull { it?.language?.name == "es" }?.flavor_text
-            binding.moveDescription.text = descEs?.replace("\\n", " ")?.replace("\\f", " ") ?: ""
+            // Descripción (flavor_text_entries según locale)
+            val flavorText = if (locale == "es") {
+                move.flavor_text_entries
+                    ?.firstOrNull { it?.language?.name == "es" }?.flavor_text
+                    ?: move.flavor_text_entries?.firstOrNull { it?.language?.name == "en" }?.flavor_text
+            } else {
+                move.flavor_text_entries
+                    ?.firstOrNull { it?.language?.name == "en" }?.flavor_text
+            }
+            binding.moveDescription.text = flavorText?.replace("\\n", " ")?.replace("\\f", " ") ?: ""
             // Método de aprendizaje
             val (learnMethod, level) = viewModel.getLearnMethodForMove(move.id ?: -1)
             val learnText = when (learnMethod) {

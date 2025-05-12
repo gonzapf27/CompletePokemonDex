@@ -6,6 +6,7 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.ItemMoveSectionHeaderBinding
 import com.example.completepokemondex.databinding.ItemPokemonMoveBinding
 import com.example.completepokemondex.ui.pokemonMoves.PokemonMovesViewModel
+import java.util.Locale
 
 /**
  * Adaptador para mostrar movimientos de Pokémon agrupados por secciones (por ejemplo, método de aprendizaje).
@@ -59,8 +60,17 @@ class PokemonMoveSectionedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
     inner class MoveViewHolder(private val binding: ItemPokemonMoveBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PokemonMovesViewModel.MoveSectionItem.MoveItem) {
             val move = item.move
-            val nameEs = move.names?.firstOrNull { it?.language?.name == "es" }?.name
-            binding.moveName.text = nameEs ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() } ?: "-"
+            // Nombre del movimiento según el locale del dispositivo
+            val locale = Locale.getDefault().language
+            val name = if (locale == "es") {
+                move.names?.firstOrNull { it?.language?.name == "es" }?.name
+                    ?: move.names?.firstOrNull { it?.language?.name == "en" }?.name
+                    ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() }
+            } else {
+                move.names?.firstOrNull { it?.language?.name == "en" }?.name
+                    ?: move.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() }
+            }
+            binding.moveName.text = name ?: "-"
             // Tipo del movimiento (internacionalizado)
             val typeUtil = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(move.type?.name ?: "")
             binding.moveTypeChip.text = if (typeUtil.stringRes != 0) binding.root.context.getString(typeUtil.stringRes) else move.type?.name?.replaceFirstChar { it.uppercase() } ?: "-"
@@ -69,8 +79,16 @@ class PokemonMoveSectionedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
             binding.movePower.text = move.power?.toString() ?: "-"
             binding.moveAccuracy.text = if (move.accuracy != null) "${move.accuracy}%" else "-"
             binding.movePp.text = "PP: ${move.pp ?: "-"}"
-            val descEs = move.flavor_text_entries?.firstOrNull { it?.language?.name == "es" }?.flavor_text
-            binding.moveDescription.text = descEs?.replace("\\n", " ")?.replace("\\f", " ") ?: ""
+            // Descripción (flavor_text_entries según locale)
+            val flavorText = if (locale == "es") {
+                move.flavor_text_entries
+                    ?.firstOrNull { it?.language?.name == "es" }?.flavor_text
+                    ?: move.flavor_text_entries?.firstOrNull { it?.language?.name == "en" }?.flavor_text
+            } else {
+                move.flavor_text_entries
+                    ?.firstOrNull { it?.language?.name == "en" }?.flavor_text
+            }
+            binding.moveDescription.text = flavorText?.replace("\\n", " ")?.replace("\\f", " ") ?: ""
             val learnText = when (item.learnMethod) {
                 "level-up" -> if (item.level != null && item.level > 0) "Nivel ${item.level}" else "Nivel"
                 "machine" -> "MT/MO"
