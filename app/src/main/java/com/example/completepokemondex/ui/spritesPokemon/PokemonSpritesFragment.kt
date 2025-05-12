@@ -126,11 +126,11 @@ class PokemonSpritesFragment : Fragment() {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER_HORIZONTAL
                 setPadding(12, 18, 12, 18)
-                // Fondo con borde y esquinas redondeadas
+                // Fondo con borde y esquinas redondeadas adaptado a tema
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
                     cornerRadius = 32f
-                    setColor(Color.parseColor("#FAFAFA"))
+                    setColor(ContextCompat.getColor(context, R.color.card_bg))
                     setStroke(3, ContextCompat.getColor(context, R.color.divider))
                 }
                 elevation = 10f
