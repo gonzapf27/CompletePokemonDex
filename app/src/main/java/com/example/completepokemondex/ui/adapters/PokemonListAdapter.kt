@@ -2,10 +2,7 @@ package com.example.completepokemondex.ui.adapters
 
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -15,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDomain
+import com.example.completepokemondex.databinding.ItemPokemonBinding
 import com.example.completepokemondex.util.PokemonTypeUtil
 import javax.inject.Inject
 
@@ -52,9 +50,8 @@ class PokemonListAdapter @Inject constructor() :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_pokemon, parent, false)
-        return PokemonViewHolder(view)
+        val binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PokemonViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
@@ -64,16 +61,11 @@ class PokemonListAdapter @Inject constructor() :
     }
 
     /**
-     * ViewHolder para cada tarjeta de Pokémon.
+     * ViewHolder para cada tarjeta de Pokémon usando ViewBinding.
      */
     class PokemonViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
-        private val nameTextView: TextView = itemView.findViewById(R.id.pokemon_name)
-        private val idTextView: TextView = itemView.findViewById(R.id.pokemon_id)
-        private val imageView: ImageView = itemView.findViewById(R.id.pokemon_list_image)
-        private val cardView: CardView = itemView as CardView
-        private val favoriteButton: ImageView = itemView.findViewById(R.id.favorite_button)
+        private val binding: ItemPokemonBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         /**
          * Vincula los datos del Pokémon a la vista y aplica el fondo según los tipos.
@@ -84,24 +76,23 @@ class PokemonListAdapter @Inject constructor() :
             onItemClicked: ((PokemonDomain) -> Unit)?,
             onFavoriteClicked: ((PokemonDomain) -> Unit)?
         ) {
-            nameTextView.text = pokemon.name
-            idTextView.text = "#${pokemon.id.toString().padStart(3, '0')}"
+            binding.pokemonName.text = pokemon.name
+            binding.pokemonId.text = "#${pokemon.id.toString().padStart(3, '0')}"
             
             // Cargar la imagen del Pokémon si está disponible
             pokemon.imageUrl?.let { url ->
-                Glide.with(itemView.context)
+                Glide.with(binding.root.context)
                     .load(url)
                     .apply(RequestOptions()
                         .placeholder(R.drawable.ic_launcher_foreground)
                         .error(R.drawable.ic_launcher_foreground))
-                    .into(imageView)
+                    .into(binding.pokemonListImage)
             } ?: run {
-                // Si no hay URL de imagen, mostrar un placeholder
-                imageView.setImageResource(R.drawable.ic_launcher_foreground)
+                binding.pokemonListImage.setImageResource(R.drawable.ic_launcher_foreground)
             }
 
             // Fondo gradiente según tipos
-            val context = itemView.context
+            val context = binding.root.context
             val colors = types?.map {
                 val type = PokemonTypeUtil.getTypeByName(it)
                 ContextCompat.getColor(context, type.colorRes)
@@ -111,20 +102,20 @@ class PokemonListAdapter @Inject constructor() :
                 GradientDrawable.Orientation.LEFT_RIGHT,
                 gradientColors
             )
-            gradientDrawable.cornerRadius = cardView.radius
-            cardView.background = gradientDrawable
+            gradientDrawable.cornerRadius = (binding.root as CardView).radius
+            binding.root.background = gradientDrawable
             
             // Estado del icono de favorito
             if (pokemon.favorite) {
-                favoriteButton.setImageResource(R.drawable.ic_star_filled)
+                binding.favoriteButton.setImageResource(R.drawable.ic_star_filled)
             } else {
-                favoriteButton.setImageResource(R.drawable.ic_star_outline)
+                binding.favoriteButton.setImageResource(R.drawable.ic_star_outline)
             }
-            favoriteButton.setOnClickListener {
+            binding.favoriteButton.setOnClickListener {
                 onFavoriteClicked?.invoke(pokemon)
             }
 
-            itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 onItemClicked?.invoke(pokemon)
             }
         }
