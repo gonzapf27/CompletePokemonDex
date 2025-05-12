@@ -73,11 +73,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Favorite Button"
             android:src="@android:drawable/btn_star"
-            android:tint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/pokemon_id"
             app:layout_constraintTop_toBottomOf="@id/pokemon_name"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0"
+            app:tint="@android:color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

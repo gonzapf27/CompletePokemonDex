@@ -1,18 +1,17 @@
 package com.example.completepokemondex.ui.pokemonMoves
 
-import androidx.lifecycle.*
-import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import java.util.Locale
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import android.util.Log
 
 /**
  * ViewModel encargado de gestionar la lógica y el estado de la pantalla de movimientos de un Pokémon.
@@ -61,7 +60,6 @@ class PokemonMovesViewModel @Inject constructor(
     }
 
     private val _sectionedMoves = MutableLiveData<List<MoveSectionItem>>(emptyList())
-    val sectionedMoves: LiveData<List<MoveSectionItem>> = _sectionedMoves
 
     /**
      * Establece el ID del Pokémon y carga los movimientos.

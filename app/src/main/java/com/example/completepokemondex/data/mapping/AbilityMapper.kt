@@ -6,8 +6,7 @@ import com.example.completepokemondex.data.local.entities.AbilityEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class AbilityMapper {
-}
+
 
 // Mapper de DTO a Domain
 fun AbilityDTO.toDomain(): AbilityDomain {

@@ -3,24 +3,18 @@ package com.example.completepokemondex.ui.pokemonMoves
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.completepokemondex.R
-import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
 import com.example.completepokemondex.databinding.FragmentPokemonMovesBinding
 import com.example.completepokemondex.ui.adapters.PokemonMoveAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Fragmento encargado de mostrar la lista de movimientos de un Pokémon.
@@ -40,7 +34,6 @@ class PokemonMovesFragment : Fragment() {
     private lateinit var binding: FragmentPokemonMovesBinding
     private val viewModel: PokemonMovesViewModel by viewModels()
     private lateinit var moveAdapter: PokemonMoveAdapter
-    private var firstLoadDone = false
 
     /**
      * Inicializa el binding y la vista del fragmento.
@@ -121,11 +114,6 @@ class PokemonMovesFragment : Fragment() {
             } else {
                 binding.loadingIndicator.visibility = View.GONE
                 binding.contentContainer.visibility = View.VISIBLE
-            }
-        }
-        viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
-            if (errorMsg != null) {
-                // Puedes mostrar un Toast o Snackbar
             }
         }
     }

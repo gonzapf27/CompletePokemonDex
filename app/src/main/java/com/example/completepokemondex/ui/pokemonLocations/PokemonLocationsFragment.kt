@@ -1,9 +1,9 @@
 package com.example.completepokemondex.ui.pokemonLocations
 
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.SpannableString
@@ -13,22 +13,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.graphics.Typeface
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonEncountersBinding
 import com.example.completepokemondex.util.PokemonLocationsUtil
 import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
-import android.widget.ImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,13 +66,13 @@ class PokemonLocationsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // Crear una ImageView temporal para mostrar la animación de carga
-        val loadingImageView = ImageView(requireContext()).apply {
+        ImageView(requireContext()).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-        
+
         // Cargar la imagen del mapa base primero
         loadBaseMap()
         
@@ -242,7 +241,7 @@ class PokemonLocationsFragment : Fragment() {
      */
     private fun setupGradientBackground(types: List<String>) {
         val typeColors = types.take(2).map { typeName ->
-            ContextCompat.getColor(requireContext(), com.example.completepokemondex.util.PokemonTypeUtil.getTypeColorResId(typeName))
+            ContextCompat.getColor(requireContext(), PokemonTypeUtil.getTypeColorResId(typeName))
         }
 
         val gradientColors = when {

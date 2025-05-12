@@ -17,14 +17,9 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.completepokemondex.R
-import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.databinding.FragmentPokemonInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Fragmento encargado de mostrar la información detallada de un Pokémon.
@@ -184,7 +179,7 @@ class PokemonInfoFragment : Fragment() {
             // Mostrar tasa de captura + dificultad
             val captureRateText = state.captureRate?.toString() ?: "?"
             val difficultyText = state.captureRate?.let {
-                val resId = com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain(
+                val resId = PokemonSpeciesDomain(
                     capture_rate = it,
                     base_happiness = null, color = null, egg_groups = null, evolution_chain = null,
                     evolves_from_species = null, flavor_text_entries = null, form_descriptions = null,

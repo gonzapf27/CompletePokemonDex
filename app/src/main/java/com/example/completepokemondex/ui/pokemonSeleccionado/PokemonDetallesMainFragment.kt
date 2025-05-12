@@ -11,7 +11,6 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
 import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsFragment
-import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsVIewModel
 import com.example.completepokemondex.ui.pokemonMoves.PokemonMovesFragment
 import com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment
 import dagger.hilt.android.AndroidEntryPoint

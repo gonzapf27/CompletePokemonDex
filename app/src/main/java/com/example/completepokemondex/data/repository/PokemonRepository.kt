@@ -1,7 +1,7 @@
 package com.example.completepokemondex.data.repository
 
 import android.util.Log
-import com.example.completepokemondex.data.mapping.PokemonDTOToEntityList
+import com.example.completepokemondex.data.mapping.pokemonDTOToEntityList
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.domain.model.PokemonDomain
 import com.example.completepokemondex.data.domain.model.PokemonEncountersDomain
@@ -115,7 +115,7 @@ class PokemonRepository(
                             // Guardar en la base de datos local
                             saveToDatabase {
                                 logDebug("Insertando ${apiResponse.size} Pokémon en la base de datos")
-                                pokemonDao.insertAllPokemon(apiResponse.PokemonDTOToEntityList())
+                                pokemonDao.insertAllPokemon(apiResponse.pokemonDTOToEntityList())
                             }
 
                             logDebug("Devolviendo ${apiResponse.size} Pokémon obtenidos de la API")
@@ -421,7 +421,7 @@ class PokemonRepository(
      * @param transformData Función para transformar los datos locales
      * @param emitResult Función para emitir el resultado
      */
-    private suspend inline fun <T, R> handleLocalFallback(
+    private inline fun <T, R> handleLocalFallback(
         errorMessage: String,
         localData: T,
         transformData: (T) -> R,

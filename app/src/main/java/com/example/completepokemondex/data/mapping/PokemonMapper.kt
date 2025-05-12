@@ -21,7 +21,7 @@ fun PokemonDTO.extractId(): Int {
  *
  * @return Lista de PokemonEntity convertida desde PokemonDTO.
  */
-fun List<PokemonDTO>.PokemonDTOToEntityList(): List<PokemonEntity> {
+fun List<PokemonDTO>.pokemonDTOToEntityList(): List<PokemonEntity> {
     return this.map { pokemonDTO ->
         PokemonEntity(
             id = pokemonDTO.extractId(),

@@ -225,38 +225,6 @@ class PokemonRemoteDataSource(private val dispatcher: CoroutineDispatcher = Disp
     }
 
     /**
-     * Obtiene las ubicaciones donde se puede encontrar un Pokémon específico por su nombre desde la API.
-     *
-     * @param name Nombre del Pokémon
-     * @return Un objeto Resource que contiene la lista de ubicaciones donde se puede encontrar el Pokémon o un mensaje de error
-     */
-    suspend fun getPokemonEncountersByName(name: String): Resource<List<PokemonEncountersDTO>> {
-        return try {
-            val response = apiService.getPokemonEncountersByName(name)
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    Log.d(
-                        "PokemonRemoteDataSource",
-                        "Encuentros del pokemon obtenidos por nombre: ${body.size}"
-                    )
-                    Resource.Success(body)
-                } else {
-                    Resource.Error("Cuerpo de respuesta vacío", emptyList())
-                }
-            } else {
-                Resource.Error("Error ${response.code()}: ${response.message()}", emptyList())
-            }
-        } catch (e: Exception) {
-            Log.e(
-                "PokemonRemoteDataSource",
-                "Error obteniendo encuentros del pokemon por nombre: ${e.message}"
-            )
-            Resource.Error("Error de red: ${e.message}", emptyList())
-        }
-    }
-
-    /**
      * Obtiene un movimiento específico por su ID desde la API.
      *
      * @param id Identificador único del movimiento

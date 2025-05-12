@@ -3,10 +3,8 @@ package com.example.completepokemondex.ui.pokemonSeleccionado
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.completepokemondex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -44,12 +42,4 @@ class PokemonDetallesViewModel @Inject constructor(
         _navState.value = destination
     }
 
-    /**
-     * Marca o desmarca el Pokémon como favorito.
-     */
-    fun markAsFavorite(isFavorite: Boolean) {
-        viewModelScope.launch {
-            repository.updatePokemonFavorite(currentPokemonId, isFavorite)
-        }
-    }
 }

@@ -3,11 +3,10 @@ package com.example.completepokemondex.ui.adapters
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.completepokemondex.databinding.ItemPokemonTypeBinding
 import com.example.completepokemondex.util.PokemonTypeUtil.PokemonType
-import com.google.android.material.chip.Chip
-import androidx.core.content.ContextCompat
 import javax.inject.Inject
 
 /**

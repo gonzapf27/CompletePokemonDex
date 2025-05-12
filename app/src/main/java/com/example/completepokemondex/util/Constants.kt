@@ -1,5 +1,5 @@
 package com.example.completepokemondex.util
 
-class constants {
+class Constants {
     // Constantes (URLs, etc.)
 }

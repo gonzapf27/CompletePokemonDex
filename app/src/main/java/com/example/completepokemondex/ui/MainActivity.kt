@@ -2,12 +2,7 @@ package com.example.completepokemondex.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import com.example.completepokemondex.data.local.database.PokedexDatabase
-import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,24 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         // Aplicar insets para respetar el área segura
         //setupInsets()
-    }
-
-    /**
-     * Configura los insets para manejar correctamente el área segura de la pantalla,
-     * aplicando el padding necesario al contenedor de fragmentos.
-     */
-    private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            // Aplicar padding al fragmentContainerView para respetar las áreas seguras
-            binding.fragmentContainerView.updatePadding(
-                top = insets.top,
-                bottom = insets.bottom
-            )
-
-            windowInsets
-        }
     }
 
 }
