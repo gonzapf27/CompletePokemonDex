@@ -102,7 +102,7 @@ class PokemonLocationsFragment : Fragment() {
             _binding?.loadingIndicator?.isVisible = state.isLoading
 
             // Actualizar título
-            _binding?.encountersTitle?.text = "Lugares en Rojo/Azul: ${state.nombre}"
+            _binding?.encountersTitle?.text = getString(R.string.encounters_title_template, getString(R.string.encounters_red_blue))
 
             // Solo aplica el gradiente si pokemonTypes no es nulo
             if (state.pokemonTypes != null) {
