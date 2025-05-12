@@ -47,7 +47,7 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
             // Tipo del movimiento (internacionalizado)
             val typeUtil = com.example.completepokemondex.util.PokemonTypeUtil.getTypeByName(move.type?.name ?: "")
             binding.moveTypeChip.text = if (typeUtil.stringRes != 0) binding.root.context.getString(typeUtil.stringRes) else move.type?.name?.replaceFirstChar { it.uppercase() } ?: "-"
-            val typeColorRes = getTypeColorResId(move.type?.name)
+            val typeColorRes = com.example.completepokemondex.util.PokemonTypeUtil.getTypeColorResId(move.type?.name)
             binding.moveTypeChip.chipBackgroundColor = ContextCompat.getColorStateList(binding.root.context, typeColorRes)
 
             // Poder
@@ -85,33 +85,6 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
         }
         override fun areContentsTheSame(oldItem: PokemonMoveDomain, newItem: PokemonMoveDomain): Boolean {
             return oldItem == newItem
-        }
-    }
-
-    /**
-     * Devuelve el color de fondo correspondiente al tipo de movimiento.
-     */
-    private fun getTypeColorResId(type: String?): Int {
-        return when (type?.lowercase()) {
-            "normal" -> R.color.type_normal
-            "fire" -> R.color.type_fire
-            "water" -> R.color.type_water
-            "electric" -> R.color.type_electric
-            "grass" -> R.color.type_grass
-            "ice" -> R.color.type_ice
-            "fighting" -> R.color.type_fighting
-            "poison" -> R.color.type_poison
-            "ground" -> R.color.type_ground
-            "flying" -> R.color.type_flying
-            "psychic" -> R.color.type_psychic
-            "bug" -> R.color.type_bug
-            "rock" -> R.color.type_rock
-            "ghost" -> R.color.type_ghost
-            "dragon" -> R.color.type_dragon
-            "dark" -> R.color.type_dark
-            "steel" -> R.color.type_steel
-            "fairy" -> R.color.type_fairy
-            else -> R.color.type_normal
         }
     }
 }
