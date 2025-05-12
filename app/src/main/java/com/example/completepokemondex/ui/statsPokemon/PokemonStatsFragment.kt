@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.animation.ValueAnimator
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
@@ -106,11 +107,17 @@ class PokemonStatsFragment : Fragment() {
         val stats = pokemon.stats?.filterNotNull() ?: emptyList()
         var total = 0
         val maxStat = 255 // Máximo base para una barra de progreso
+        val animDuration = 2000L // Duración de la animación en ms
+        val animators = mutableListOf<ValueAnimator>()
+        val valueViews = mutableListOf<TextView>()
+        val progressBars = mutableListOf<ProgressBar>()
+        val statValues = mutableListOf<Int>()
 
         for (stat in stats) {
             val statName = stat.stat?.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() } ?: "?"
             val statValue = stat.base_stat ?: 0
             total += statValue
+            statValues.add(statValue)
 
             val row = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -124,7 +131,7 @@ class PokemonStatsFragment : Fragment() {
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             }
             val valueView = TextView(requireContext()).apply {
-                text = statValue.toString()
+                text = "0" // Inicialmente 0
                 layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 setPadding(8, 0, 8, 0)
             }
@@ -134,7 +141,7 @@ class PokemonStatsFragment : Fragment() {
                 android.R.attr.progressBarStyleHorizontal
             ).apply {
                 max = maxStat
-                progress = statValue
+                progress = 0 // Inicialmente 0
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f)
             }
 
@@ -142,12 +149,42 @@ class PokemonStatsFragment : Fragment() {
             row.addView(progressBar)
             row.addView(valueView)
             statsContainer.addView(row)
+
+            // Guardar referencias para animar después
+            valueViews.add(valueView)
+            progressBars.add(progressBar)
         }
 
-        // Asegurarse de que el campo Total esté fuera del statsContainer
+        // Animar cada barra y número
+        for (i in stats.indices) {
+            val valueView = valueViews[i]
+            val progressBar = progressBars[i]
+            val endValue = statValues[i]
+            val animator = ValueAnimator.ofInt(0, endValue).apply {
+                duration = animDuration
+                addUpdateListener { animation ->
+                    val animatedValue = animation.animatedValue as Int
+                    valueView.text = animatedValue.toString()
+                    progressBar.progress = animatedValue
+                }
+            }
+            animators.add(animator)
+        }
+
+        // Animar el total
         val parent = statsContainer.parent as? ViewGroup
         val totalLabel = parent?.findViewById<TextView>(R.id.text_stats_total)
-        totalLabel?.text = if (stats.isNotEmpty()) total.toString() else "-"
+        val totalAnimator = ValueAnimator.ofInt(0, if (stats.isNotEmpty()) total else 0).apply {
+            duration = animDuration
+            addUpdateListener { animation ->
+                val animatedValue = animation.animatedValue as Int
+                totalLabel?.text = if (stats.isNotEmpty()) animatedValue.toString() else "-"
+            }
+        }
+        animators.add(totalAnimator)
+
+        // Iniciar todas las animaciones
+        animators.forEach { it.start() }
     }
 
     companion object {
