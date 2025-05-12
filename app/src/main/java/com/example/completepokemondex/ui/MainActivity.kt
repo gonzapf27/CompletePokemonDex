@@ -11,6 +11,7 @@ import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSo
 import com.example.completepokemondex.data.repository.PokemonRepository
 import com.example.completepokemondex.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * MainActivity es la actividad principal de la aplicación.
@@ -22,7 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var pokemonRepository: PokemonRepository
+    @Inject
+    lateinit var pokemonRepository: PokemonRepository
 
     /**
      * Método onCreate se llama cuando la actividad es creada.
@@ -42,27 +44,6 @@ class MainActivity : AppCompatActivity() {
 
         // Aplicar insets para respetar el área segura
         //setupInsets()
-
-        // Inicializar repository manualmente
-        val database = PokedexDatabase.Companion.getDatabase(applicationContext)
-        val pokemonDao = database.pokemonDao()
-        val pokemonDetailsDao = database.pokemonDetailsDao()
-        val remoteDataSource = PokemonRemoteDataSource()
-        val pokemonSpeciesDao = database.pokemonSpeciesDao()
-        val abilityDao = database.abilityDao()
-        val evolutionChainDao = database.evolutionChainDao()
-        val pokemonEncountersDao = database.pokemonEncountersDao()
-        val pokemonMoveDao = database.pokemonMoveDao()
-        pokemonRepository = PokemonRepository(
-            pokemonDao,
-            pokemonDetailsDao,
-            pokemonSpeciesDao,
-            abilityDao,
-            remoteDataSource,
-            evolutionChainDao,
-            pokemonEncountersDao,
-            pokemonMoveDao
-        )
     }
 
     /**
