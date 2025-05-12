@@ -72,7 +72,7 @@ class PokemonInfoFragment : Fragment() {
                     .asGif()
                     .load(R.drawable.loading_pokeball)
                     .into(binding.loadingIndicator)
-                return@observe // No mostrar nada más mientras carga
+                return@observe
             } else {
                 binding.loadingIndicator.visibility = View.GONE
                 binding.contentContainer.visibility = View.VISIBLE
@@ -81,12 +81,23 @@ class PokemonInfoFragment : Fragment() {
             binding.pokemonDetailsNombre.text = state.nombre
             binding.pokemonDetailsHeight.text = state.height
             binding.pokemonDetailsWeight.text = state.weight
-            // Imagen
+            // Imagen principal animada
             state.imageUrl?.let {
                 binding.pokemonImage.setBackgroundColor(Color.TRANSPARENT)
+                binding.pokemonImage.alpha = 0f
+                binding.pokemonImage.scaleX = 0.92f
+                binding.pokemonImage.scaleY = 0.92f
                 Glide.with(requireContext())
                     .load(it)
+                    .transition(DrawableTransitionOptions.withCrossFade(500))
                     .into(binding.pokemonImage)
+                binding.pokemonImage.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(500)
+                    .setStartDelay(100)
+                    .start()
             }
             // Cambiar icono de favorito según el estado
             if (state.isFavorite) {
@@ -94,7 +105,7 @@ class PokemonInfoFragment : Fragment() {
             } else {
                 binding.btnFavorite.setImageResource(R.drawable.ic_star_outline)
             }
-            // Fondo gradiente
+            // Fondo gradiente animado
             val gradientBg = binding.pokemonFragmentGradientBg
             val typeColors = state.types.take(2).map {
                 ContextCompat.getColor(requireContext(), it.color)
@@ -110,10 +121,12 @@ class PokemonInfoFragment : Fragment() {
             )
             gradientDrawable.cornerRadius = 0f
             gradientBg.background = gradientDrawable
+            gradientBg.alpha = 0f
+            gradientBg.animate().alpha(1f).setDuration(600).start()
 
-            // Mostrar tipos (máximo 2 chips)
+            // Mostrar tipos (máximo 2 chips) con animación
             val chips = listOf(binding.pokemonTypeChip1, binding.pokemonTypeChip2)
-            chips.forEach { it.visibility = View.GONE }
+            chips.forEach { chip -> chip.visibility = View.GONE }
             state.types.take(2).forEachIndexed { idx, typeUi ->
                 val chip = chips[idx]
                 chip.visibility = View.VISIBLE
@@ -122,9 +135,13 @@ class PokemonInfoFragment : Fragment() {
                 val realColor = ContextCompat.getColor(requireContext(), typeUi.color)
                 chip.chipBackgroundColor = ColorStateList.valueOf(realColor)
                 chip.setTextColor(Color.WHITE)
+                chip.scaleX = 0.9f
+                chip.scaleY = 0.9f
+                chip.alpha = 0f
+                chip.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(350).setStartDelay(200L * idx).start()
             }
 
-            // Mostrar habilidades (máximo 3)
+            // Mostrar habilidades (máximo 3) con animación
             val habilidadCards = listOf(
                 Triple(binding.habilidadCard1, binding.habilidadNombre1, binding.habilidadDesc1),
                 Triple(binding.habilidadCard2, binding.habilidadNombre2, binding.habilidadDesc2),
@@ -136,6 +153,9 @@ class PokemonInfoFragment : Fragment() {
             state.habilidades.take(3).forEachIndexed { idx, habilidad ->
                 val triple = habilidadCards[idx]
                 triple.first.visibility = View.VISIBLE
+                triple.first.alpha = 0f
+                triple.first.translationY = 40f
+                triple.first.animate().alpha(1f).translationY(0f).setDuration(400).setStartDelay(250L * idx).start()
                 if (habilidad.isOculta == true) {
                     triple.second.text = "${habilidad.nombre} (${getString(R.string.hidden_ability)})"
                 } else {
@@ -164,7 +184,7 @@ class PokemonInfoFragment : Fragment() {
             // Mostrar tasa de captura + dificultad
             val captureRateText = state.captureRate?.toString() ?: "?"
             val difficultyText = state.captureRate?.let {
-                val resId = PokemonSpeciesDomain(
+                val resId = com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain(
                     capture_rate = it,
                     base_happiness = null, color = null, egg_groups = null, evolution_chain = null,
                     evolves_from_species = null, flavor_text_entries = null, form_descriptions = null,
@@ -190,12 +210,11 @@ class PokemonInfoFragment : Fragment() {
                 }
             }
 
-            // Mostrar la cadena de evolución (imágenes y nombres)
+            // Mostrar la cadena de evolución (imágenes y nombres) con animación
             val evolutionContainer = binding.evolutionChainContainer
             evolutionContainer.removeAllViews()
             val context = requireContext()
             val evolutionDetails = state.evolutionChainDetails
-            val total = evolutionDetails.size.coerceAtLeast(1)
             for ((idx, poke) in evolutionDetails.withIndex()) {
                 val pokeLayout = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
@@ -203,28 +222,25 @@ class PokemonInfoFragment : Fragment() {
                     layoutParams = LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1f // Ocupa el mismo espacio proporcionalmente
+                        1f
                     )
-                    
-                    // Añadir listener de clic a cada Pokémon de la cadena evolutiva
                     setOnClickListener {
                         poke.id?.let { pokemonId ->
-                            // Navegar al fragmento de información del Pokémon seleccionado
                             navigateToPokemon(pokemonId)
                         }
                     }
-                    
-                    // Cambiar el fondo al presionar para dar feedback visual
                     isClickable = true
                     isFocusable = true
                     background = ContextCompat.getDrawable(context, R.drawable.ripple_effect)
+                    alpha = 0f
+                    scaleX = 0.92f
+                    scaleY = 0.92f
                 }
-                
                 val imageView = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         0,
-                        1f // Imagen ocupa la mayor parte verticalmente
+                        1f
                     ).apply {
                         height = 0
                         width = LinearLayout.LayoutParams.MATCH_PARENT
@@ -241,7 +257,7 @@ class PokemonInfoFragment : Fragment() {
                     text = poke.name?.replaceFirstChar { it.uppercase() } ?: ""
                     textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                     setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                    textSize = 12f // Fuente más pequeña
+                    textSize = 12f
                     maxLines = 2
                     isSingleLine = false
                     setLineSpacing(0f, 1.1f)
@@ -256,7 +272,14 @@ class PokemonInfoFragment : Fragment() {
                 pokeLayout.addView(imageView, 0)
                 pokeLayout.addView(nameView, 1)
                 evolutionContainer.addView(pokeLayout)
-
+                // Animación vistosa para cada Pokémon de la cadena
+                pokeLayout.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(400)
+                    .setStartDelay(120L * idx)
+                    .start()
                 // Flecha entre pokémon (excepto el último)
                 if (idx < evolutionDetails.size - 1) {
                     val arrow = ImageView(context).apply {
@@ -267,8 +290,10 @@ class PokemonInfoFragment : Fragment() {
                         }
                         setImageResource(R.drawable.ic_arrow_right)
                         setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
+                        alpha = 0f
                     }
                     evolutionContainer.addView(arrow)
+                    arrow.animate().alpha(1f).setDuration(300).setStartDelay(120L * idx + 80).start()
                 }
             }
         }

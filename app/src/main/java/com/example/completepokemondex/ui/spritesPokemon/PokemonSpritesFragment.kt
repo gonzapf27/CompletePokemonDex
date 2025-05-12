@@ -105,6 +105,7 @@ class PokemonSpritesFragment : Fragment() {
                 text = "No hay sprites disponibles"
                 gravity = Gravity.CENTER
                 textSize = 18f
+                setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
             }
             container.addView(tv)
             return
@@ -114,6 +115,9 @@ class PokemonSpritesFragment : Fragment() {
             columnCount = 2
             rowCount = GridLayout.UNDEFINED
             setPadding(24, 24, 24, 24)
+            // Animación de aparición para la cuadrícula
+            alpha = 0f
+            animate().alpha(1f).setDuration(500).start()
         }
         container.addView(grid)
 
@@ -122,21 +126,36 @@ class PokemonSpritesFragment : Fragment() {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER_HORIZONTAL
                 setPadding(12, 18, 12, 18)
+                // Fondo con borde y esquinas redondeadas
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 32f
+                    setColor(Color.parseColor("#FAFAFA"))
+                    setStroke(3, ContextCompat.getColor(context, R.color.divider))
+                }
+                elevation = 10f
+                scaleX = 0.85f
+                scaleY = 0.85f
+                alpha = 0f
             }
             val image = ImageView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(180, 180)
                 scaleType = ImageView.ScaleType.FIT_CENTER
+                alpha = 0f
             }
             Glide.with(context)
                 .load(url)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .transition(DrawableTransitionOptions.withCrossFade(400))
                 .into(image)
 
+            image.animate().alpha(1f).setDuration(600).setStartDelay(100L * idx).start()
+
             val text = TextView(context).apply {
-                text = label.replace('_', ' ').replace('-', ' ').replace('/', '\n')
+                text = label.replace('_', ' ').replace('-', ' ').replace("/", "\n")
                 gravity = Gravity.CENTER
                 textSize = 13f
                 setPadding(0, 8, 0, 0)
+                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
             }
             itemLayout.addView(image)
             itemLayout.addView(text)
@@ -147,6 +166,10 @@ class PokemonSpritesFragment : Fragment() {
                 setMargins(8, 8, 8, 8)
             }
             grid.addView(itemLayout, params)
+
+            // Animación de aparición escalada y fade
+            itemLayout.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                .setDuration(400).setStartDelay(120L * idx).start()
         }
     }
 
