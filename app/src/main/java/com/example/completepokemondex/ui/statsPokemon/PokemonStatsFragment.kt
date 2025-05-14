@@ -95,7 +95,7 @@ class PokemonStatsFragment : Fragment() {
      * @param pokemon Detalles del Pokémon a mostrar.
      */
     fun showStats(pokemon: PokemonDetailsDomain) {
-        var total = 0;
+        var total = 0
         pokemon.stats?.forEach { stat ->
                 when (stat?.stat?.name) {
                     "hp" -> {
@@ -106,40 +106,35 @@ class PokemonStatsFragment : Fragment() {
                     }
                     }
                     "attack"   ->{
-                        stat.base_stat?.let { baseStat ->{
+                    stat.base_stat?.let { baseStat ->
                             binding.barAttack.progress = baseStat
                             binding.lblNumberAttack.text = baseStat.toString()
                             total+=baseStat
                         }
                 }
-            }
                     "defense"  ->{
-                        stat.base_stat?.let { baseStat ->{
+                    stat.base_stat?.let { baseStat ->
                             binding.barDefense.progress = baseStat
                             binding.lblDefenseNumber.text = baseStat.toString()
                             total+=baseStat
                         }
                 }
-            }
                     "special-attack" -> {
                         stat.base_stat?.let { baseStat ->
-                            {
                                 binding.barSpAttack.progress = baseStat
                                 binding.lblSpAttackNumber.text = baseStat.toString()
                                 total+=baseStat
                             }
                         }
-                    }
                     "special-defense" ->{
-                        stat.base_stat?.let { baseStat ->{
+                    stat.base_stat?.let { baseStat ->
                             binding.barSpDefense.progress = baseStat
                             binding.lblSpDefenseNumber.text = baseStat.toString()
                             total+=baseStat
                         }
                 }
-            }
                     "speed"    ->{
-                        stat.base_stat?.let { baseStat ->{
+                    stat.base_stat?.let { baseStat ->
                             binding.barSpeed.progress = baseStat
                             binding.lblSpeedNumber.text = baseStat.toString()
                             total+=baseStat
@@ -147,8 +142,6 @@ class PokemonStatsFragment : Fragment() {
                 }
             }
         }
-    }
-
         binding.lblTotalNumber.text = total.toString()
     }
 
