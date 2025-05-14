@@ -3,16 +3,10 @@ package com.example.completepokemondex.ui.statsPokemon
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.animation.ValueAnimator
 import androidx.core.content.ContextCompat
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.completepokemondex.R
@@ -101,100 +95,71 @@ class PokemonStatsFragment : Fragment() {
      * @param pokemon Detalles del Pokémon a mostrar.
      */
     fun showStats(pokemon: PokemonDetailsDomain) {
-        val statsContainer = binding.statsContainer
-        statsContainer.removeAllViews()
-
-        val stats = pokemon.stats?.filterNotNull() ?: emptyList()
-        var total = 0
-        val maxStat = 255 // Máximo base para una barra de progreso
-        val animDuration = 2000L // Duración de la animación en ms
-        val animators = mutableListOf<ValueAnimator>()
-        val valueViews = mutableListOf<TextView>()
-        val progressBars = mutableListOf<ProgressBar>()
-        val statValues = mutableListOf<Int>()
-
-        for (stat in stats) {
-            val statName = stat.stat?.name?.replace("-", " ")?.replaceFirstChar { it.uppercase() } ?: "?"
-            val statValue = stat.base_stat ?: 0
-            total += statValue
-            statValues.add(statValue)
-
-            val row = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
-                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                setPadding(8)
-                gravity = Gravity.CENTER_VERTICAL
-            }
-
-            val nameView = TextView(requireContext()).apply {
-                text = statName
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            val valueView = TextView(requireContext()).apply {
-                text = "0" // Inicialmente 0
-                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                setPadding(8, 0, 8, 0)
-            }
-            val progressBar = ProgressBar(
-                requireContext(),
-                null,
-                android.R.attr.progressBarStyleHorizontal
-            ).apply {
-                max = maxStat
-                progress = 0 // Inicialmente 0
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f)
-            }
-
-            row.addView(nameView)
-            row.addView(progressBar)
-            row.addView(valueView)
-            statsContainer.addView(row)
-
-            // Guardar referencias para animar después
-            valueViews.add(valueView)
-            progressBars.add(progressBar)
-        }
-
-        // Animar cada barra y número
-        for (i in stats.indices) {
-            val valueView = valueViews[i]
-            val progressBar = progressBars[i]
-            val endValue = statValues[i]
-            val animator = ValueAnimator.ofInt(0, endValue).apply {
-                duration = animDuration
-                addUpdateListener { animation ->
-                    val animatedValue = animation.animatedValue as Int
-                    valueView.text = animatedValue.toString()
-                    progressBar.progress = animatedValue
+        var total = 0;
+        pokemon.stats?.forEach { stat ->
+                when (stat?.stat?.name) {
+                    "hp" -> {
+                    stat.base_stat?.let { baseStat ->
+                        binding.barHp.progress = baseStat
+                        binding.lblHpNumber.text = baseStat.toString()
+                        total+=baseStat
+                    }
+                    }
+                    "attack"   ->{
+                        stat.base_stat?.let { baseStat ->{
+                            binding.barAttack.progress = baseStat
+                            binding.lblNumberAttack.text = baseStat.toString()
+                            total+=baseStat
+                        }
                 }
             }
-            animators.add(animator)
-        }
-
-        // Animar el total
-        val parent = statsContainer.parent as? ViewGroup
-        val totalLabel = parent?.findViewById<TextView>(R.id.text_stats_total)
-        val totalAnimator = ValueAnimator.ofInt(0, if (stats.isNotEmpty()) total else 0).apply {
-            duration = animDuration
-            addUpdateListener { animation ->
-                val animatedValue = animation.animatedValue as Int
-                totalLabel?.text = if (stats.isNotEmpty()) animatedValue.toString() else "-"
+                    "defense"  ->{
+                        stat.base_stat?.let { baseStat ->{
+                            binding.barDefense.progress = baseStat
+                            binding.lblDefenseNumber.text = baseStat.toString()
+                            total+=baseStat
+                        }
+                }
+            }
+                    "special-attack" -> {
+                        stat.base_stat?.let { baseStat ->
+                            {
+                                binding.barSpAttack.progress = baseStat
+                                binding.lblSpAttackNumber.text = baseStat.toString()
+                                total+=baseStat
+                            }
+                        }
+                    }
+                    "special-defense" ->{
+                        stat.base_stat?.let { baseStat ->{
+                            binding.barSpDefense.progress = baseStat
+                            binding.lblSpDefenseNumber.text = baseStat.toString()
+                            total+=baseStat
+                        }
+                }
+            }
+                    "speed"    ->{
+                        stat.base_stat?.let { baseStat ->{
+                            binding.barSpeed.progress = baseStat
+                            binding.lblSpeedNumber.text = baseStat.toString()
+                            total+=baseStat
+                        }
+                }
             }
         }
-        animators.add(totalAnimator)
-
-        // Iniciar todas las animaciones
-        animators.forEach { it.start() }
     }
 
-    companion object {
-        /**
-         * Crea una nueva instancia del fragmento con el ID del Pokémon.
-         *
-         * @param pokemonId ID del Pokémon.
-         */
-        fun newInstance(pokemonId: Int) = PokemonStatsFragment().apply {
-            arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
-        }
+        binding.lblTotalNumber.text = total.toString()
     }
+
+companion object {
+    /**
+     * Crea una nueva instancia del fragmento con el ID del Pokémon.
+     *
+     * @param pokemonId ID del Pokémon.
+     */
+    fun newInstance(pokemonId: Int) = PokemonStatsFragment().apply {
+        arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
+    }
+}
 }

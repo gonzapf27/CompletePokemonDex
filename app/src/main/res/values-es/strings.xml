@@ -56,4 +56,11 @@
     <string name="encounters_empty">No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul.</string>
     <string name="map_content_description">Mapa de la región de Kanto con ubicaciones marcadas</string>
     <string name="favorites">Favoritos</string>
+    <string name="hp">PS</string>
+    <string name="attack">Ataque</string>
+    <string name="sp_defense">Defensa S.</string>
+    <string name="sp_attack">Ataque S.</string>
+    <string name="defense">Defensa</string>
+    <string name="speed">Velocidad</string>
+    <string name="total">Total</string>
 </resources>

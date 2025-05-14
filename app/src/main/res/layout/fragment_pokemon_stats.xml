@@ -52,36 +52,295 @@
                     android:layout_gravity="center_horizontal"
                     android:paddingBottom="12dp"/>
 
-                <!-- Aquí se agregarán dinámicamente las filas de stats -->
-
-                <View
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#CCCCCC"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_hp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hp"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_hp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_hp_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="end">
+                    android:gravity="center_vertical">
                     <TextView
-                        android:id="@+id/text_stats_total_label"
+                        android:id="@+id/lbl_attack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total: "
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:id="@+id/text_stats_total"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="@string/attack"
                         android:textStyle="bold"
-                        android:paddingStart="4dp"/>
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_attack"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_number_attack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_sp_attack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sp_attack"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_sp_attack"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_sp_attack_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_defense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/defense"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_defense"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_defense_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_sp_defense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sp_defense"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_sp_defense"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_sp_defense_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
+<LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_speed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/speed"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_speed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="255"
+                        android:progress="100"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_speed_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#CCCCCC"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/lbl_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total"
+                        android:textStyle="bold"
+                        android:minWidth="80dp"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginEnd="8dp"/>
+                    <ProgressBar
+                        android:id="@+id/bar_total"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="720"
+                        android:progress="600"/>
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#CCCCCC"
+                        android:layout_marginStart="8dp"/>
+                    <TextView
+                        android:id="@+id/lbl_total_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="600"
+                        android:textStyle="bold"
+                        android:minWidth="40dp"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
 
         <ProgressBar
             android:id="@+id/loading_indicator"
