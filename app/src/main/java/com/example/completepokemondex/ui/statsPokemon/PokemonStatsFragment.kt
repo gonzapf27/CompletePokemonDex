@@ -1,11 +1,13 @@
 package com.example.completepokemondex.ui.statsPokemon
 
+import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -88,6 +90,13 @@ class PokemonStatsFragment : Fragment() {
         _binding = null
     }
 
+    private fun animateProgress(progressBar: ProgressBar, toProgress: Int, duration: Long = 2000L) {
+        ObjectAnimator.ofInt(progressBar, "progress", 0, toProgress).apply {
+            this.duration = duration
+            start()
+        }
+    }
+
     /**
      * Muestra las estadísticas del Pokémon recibido.
      * Construye dinámicamente las filas de estadísticas y actualiza el total.
@@ -97,62 +106,68 @@ class PokemonStatsFragment : Fragment() {
     fun showStats(pokemon: PokemonDetailsDomain) {
         var total = 0
         pokemon.stats?.forEach { stat ->
-                when (stat?.stat?.name) {
-                    "hp" -> {
+            when (stat?.stat?.name) {
+                "hp" -> {
                     stat.base_stat?.let { baseStat ->
-                        binding.barHp.progress = baseStat
+                        animateProgress(binding.barHp, baseStat)
                         binding.lblHpNumber.text = baseStat.toString()
-                        total+=baseStat
+                        total += baseStat
                     }
+                }
+
+                "attack" -> {
+                    stat.base_stat?.let { baseStat ->
+                        animateProgress(binding.barAttack, baseStat)
+                        binding.lblNumberAttack.text = baseStat.toString()
+                        total += baseStat
                     }
-                    "attack"   ->{
-                    stat.base_stat?.let { baseStat ->
-                            binding.barAttack.progress = baseStat
-                            binding.lblNumberAttack.text = baseStat.toString()
-                            total+=baseStat
-                        }
                 }
-                    "defense"  ->{
+
+                "defense" -> {
                     stat.base_stat?.let { baseStat ->
-                            binding.barDefense.progress = baseStat
-                            binding.lblDefenseNumber.text = baseStat.toString()
-                            total+=baseStat
-                        }
+                        animateProgress(binding.barDefense, baseStat)
+                        binding.lblDefenseNumber.text = baseStat.toString()
+                        total += baseStat
+                    }
                 }
-                    "special-attack" -> {
-                        stat.base_stat?.let { baseStat ->
-                                binding.barSpAttack.progress = baseStat
-                                binding.lblSpAttackNumber.text = baseStat.toString()
-                                total+=baseStat
-                            }
-                        }
-                    "special-defense" ->{
+
+                "special-attack" -> {
                     stat.base_stat?.let { baseStat ->
-                            binding.barSpDefense.progress = baseStat
-                            binding.lblSpDefenseNumber.text = baseStat.toString()
-                            total+=baseStat
-                        }
+                        animateProgress(binding.barSpAttack, baseStat)
+                        binding.lblSpAttackNumber.text = baseStat.toString()
+                        total += baseStat
+                    }
                 }
-                    "speed"    ->{
+
+                "special-defense" -> {
                     stat.base_stat?.let { baseStat ->
-                            binding.barSpeed.progress = baseStat
-                            binding.lblSpeedNumber.text = baseStat.toString()
-                            total+=baseStat
-                        }
+                        animateProgress(binding.barSpDefense, baseStat)
+                        binding.lblSpDefenseNumber.text = baseStat.toString()
+                        total += baseStat
+                    }
+                }
+
+                "speed" -> {
+                    stat.base_stat?.let { baseStat ->
+                        animateProgress(binding.barSpeed, baseStat)
+                        binding.lblSpeedNumber.text = baseStat.toString()
+                        total += baseStat
+                    }
                 }
             }
         }
-        binding.lblTotalNumber.text = total.toString()
+        animateProgress(binding.barTotal, total)
+
     }
 
-companion object {
-    /**
-     * Crea una nueva instancia del fragmento con el ID del Pokémon.
-     *
-     * @param pokemonId ID del Pokémon.
-     */
-    fun newInstance(pokemonId: Int) = PokemonStatsFragment().apply {
-        arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
+    companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         *
+         * @param pokemonId ID del Pokémon.
+         */
+        fun newInstance(pokemonId: Int) = PokemonStatsFragment().apply {
+            arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
+        }
     }
-}
 }
