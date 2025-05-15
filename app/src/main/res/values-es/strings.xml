@@ -63,4 +63,5 @@
     <string name="defense">Defensa</string>
     <string name="speed">Velocidad</string>
     <string name="total">Total</string>
+    <string name="sprite_image">Sprite</string>
 </resources>
