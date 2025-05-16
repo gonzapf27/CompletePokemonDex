@@ -7,6 +7,7 @@ import com.example.completepokemondex.data.remote.models.PokemonDetailsDTO
 import com.example.completepokemondex.data.remote.models.PokemonEncountersDTO
 import com.example.completepokemondex.data.remote.models.PokemonMoveDTO
 import com.example.completepokemondex.data.remote.models.PokemonSpeciesDTO
+import com.example.completepokemondex.data.remote.models.TypeDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -120,6 +121,17 @@ interface ApiService {
     suspend fun getMoveById(
         @Path("id") id: Int
     ): Response<PokemonMoveDTO>
+
+    /**
+     * Obtiene un tipo por su ID.
+     *
+     * @param id ID del tipo.
+     * @return Respuesta con los datos del tipo.
+     */
+    @GET("type/{id}")
+    suspend fun getTypeById(
+        @Path("id") id: Int
+    ): Response<TypeDTO>
 }
 
 /**
