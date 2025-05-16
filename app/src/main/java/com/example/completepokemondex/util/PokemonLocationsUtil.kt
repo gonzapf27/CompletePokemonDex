@@ -12,7 +12,7 @@ import android.util.Log
 class PokemonLocationsUtil {
     companion object {
         /**
-         * Mapa que contiene las coordenadas (x, y) de las diferentes ubicaciones en Kanto
+         * Mapa que contiene las coordenadas (x, y) de las diferentes ubicaciones en Kanto con respecto a la imágen de resources.
          */
         val LOCATION_MAP = mapOf(
             "pallet-town-area" to Pair(1555, 734),
