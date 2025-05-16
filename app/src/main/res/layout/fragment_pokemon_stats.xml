@@ -337,6 +337,54 @@
                         android:gravity="end"/>
                 </LinearLayout>
 
+                <!-- NUEVO: Resistencias, inmunidades y efectividades en secciones separadas -->
+                <TextView
+                    android:id="@+id/lbl_resistencias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/resistencias_fmt"
+                    android:textStyle="bold"
+                    android:paddingTop="12dp"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tipos_resistencias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:paddingTop="2dp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/lbl_inmunidades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/inmunidades_fmt"
+                    android:textStyle="bold"
+                    android:paddingTop="12dp"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tipos_inmunidades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:paddingTop="2dp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/lbl_efectividades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/efectividades_fmt"
+                    android:textStyle="bold"
+                    android:paddingTop="12dp"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tipos_efectividades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:paddingTop="2dp"
+                    android:textColor="@color/black"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

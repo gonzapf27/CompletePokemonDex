@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.repository.PokemonRepository
+import com.example.completepokemondex.data.domain.model.TypeDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +20,17 @@ import javax.inject.Inject
  * @property isLoading Indica si los datos están cargando.
  * @property error Mensaje de error si ocurre alguno.
  * @property pokemon Detalles del Pokémon a mostrar.
+ * @property resistencias Tipos contra los que el Pokémon tiene resistencia.
+ * @property inmunidades Tipos contra los que el Pokémon es inmune.
+ * @property efectividades Tipos contra los que el Pokémon es efectivo.
  */
 data class StatsUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
-    val pokemon: PokemonDetailsDomain? = null
+    val pokemon: PokemonDetailsDomain? = null,
+    val resistencias: Set<String> = emptySet(),
+    val inmunidades: Set<String> = emptySet(),
+    val efectividades: Set<String> = emptySet()
 )
 
 /**
@@ -47,14 +56,54 @@ class PokemonStatsViewModel @Inject constructor(
     fun setPokemonId(pokemonId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
-            
+
             repository.getPokemonDetailsById(pokemonId).collect { result ->
                 when (result) {
                     is Resource.Success -> {
-                        _uiState.value = StatsUiState(
-                            isLoading = false,
-                            pokemon = result.data
-                        )
+                        val pokemon = result.data
+                        if (pokemon != null) {
+                            val typeNames = pokemon.types?.mapNotNull { it?.type?.name } ?: emptyList()
+                            val typeDomains = typeNames.map { typeName ->
+                                async {
+                                    val typeId = getTypeIdByName(typeName)
+                                    repository.getTypeById(typeId)
+                                }
+                            }.awaitAll()
+
+                            val allDoubleDamageFrom = mutableSetOf<String>()
+                            val allHalfDamageFrom = mutableSetOf<String>()
+                            val allNoDamageFrom = mutableSetOf<String>()
+
+                            typeDomains.forEach { flow ->
+                                flow.collect { typeResult ->
+                                    if (typeResult is Resource.Success && typeResult.data != null) {
+                                        val rel = typeResult.data.damageRelations
+                                        allDoubleDamageFrom += rel.doubleDamageFrom.map { it.name }
+                                        allHalfDamageFrom += rel.halfDamageFrom.map { it.name }
+                                        allNoDamageFrom += rel.noDamageFrom.map { it.name }
+                                    }
+                                }
+                            }
+
+                            val inmunidades = allNoDamageFrom
+                            val resistencias = allHalfDamageFrom - inmunidades - allDoubleDamageFrom
+                            val efectividades = allDoubleDamageFrom - inmunidades - allHalfDamageFrom
+
+                            // Mostrar por consola los resultados
+                            println("Resistencias: ${resistencias.joinToString(", ").ifEmpty { "-" }}")
+                            println("Inmunidades: ${inmunidades.joinToString(", ").ifEmpty { "-" }}")
+                            println("Efectividades: ${efectividades.joinToString(", ").ifEmpty { "-" }}")
+
+                            _uiState.value = StatsUiState(
+                                isLoading = false,
+                                pokemon = pokemon,
+                                resistencias = resistencias,
+                                inmunidades = inmunidades,
+                                efectividades = efectividades
+                            )
+                        } else {
+                            _uiState.value = StatsUiState(isLoading = false, error = "No se encontraron datos del Pokémon")
+                        }
                     }
                     is Resource.Error -> {
                         _uiState.value = _uiState.value?.copy(
@@ -69,4 +118,15 @@ class PokemonStatsViewModel @Inject constructor(
             }
         }
     }
+
+    private fun getTypeIdByName(typeName: String): Int {
+        val typeMap = mapOf(
+            "normal" to 1, "fighting" to 2, "flying" to 3, "poison" to 4, "ground" to 5,
+            "rock" to 6, "bug" to 7, "ghost" to 8, "steel" to 9, "fire" to 10, "water" to 11,
+            "grass" to 12, "electric" to 13, "psychic" to 14, "ice" to 15, "dragon" to 16,
+            "dark" to 17, "fairy" to 18
+        )
+        return typeMap[typeName.lowercase()] ?: 1
+    }
 }
+

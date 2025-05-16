@@ -9,6 +9,7 @@ import com.example.completepokemondex.data.domain.model.PokemonSpeciesDomain
 import com.example.completepokemondex.data.domain.model.AbilityDomain
 import com.example.completepokemondex.data.domain.model.EvolutionChainDomain
 import com.example.completepokemondex.data.domain.model.PokemonMoveDomain
+import com.example.completepokemondex.data.domain.model.TypeDomain
 import com.example.completepokemondex.data.local.dao.PokemonEncountersDao
 import com.example.completepokemondex.data.mapping.pokemonDTOToDomainList
 import com.example.completepokemondex.data.mapping.pokemonDetailsDTOToDomain
@@ -30,12 +31,16 @@ import com.example.completepokemondex.data.mapping.toDomain as evolutionChainEnt
 import com.example.completepokemondex.data.mapping.toDomain as pokemonMoveDTOToDomain
 import com.example.completepokemondex.data.mapping.toEntity as pokemonMoveDTOToEntity
 import com.example.completepokemondex.data.mapping.toDomain as pokemonMoveEntityToDomain
+import com.example.completepokemondex.data.mapping.toDomain as typeEntityToDomain
+import com.example.completepokemondex.data.mapping.toEntity as typeDTOToEntity
+import com.example.completepokemondex.data.mapping.toDomain as typeDTOToDomain
 import com.example.completepokemondex.data.local.dao.PokemonDao
 import com.example.completepokemondex.data.local.dao.PokemonDetailsDao
 import com.example.completepokemondex.data.local.dao.PokemonSpeciesDao
 import com.example.completepokemondex.data.local.dao.AbilityDao
 import com.example.completepokemondex.data.local.dao.EvolutionChainDao
 import com.example.completepokemondex.data.local.dao.PokemonMoveDao
+import com.example.completepokemondex.data.local.dao.TypeDao
 import com.example.completepokemondex.data.remote.api.Resource
 import com.example.completepokemondex.data.remote.datasource.PokemonRemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +66,7 @@ import kotlinx.coroutines.withContext
  * @property evolutionChainDao DAO para cadenas de evolución
  * @property pokemonEncountersDao DAO para encuentros de Pokémon
  * @property pokemonMoveDao DAO para movimientos de Pokémon
+ * @property typeDao DAO para tipos de Pokémon
  */
 class PokemonRepository(
     private val pokemonDao: PokemonDao,
@@ -70,7 +76,8 @@ class PokemonRepository(
     private val remoteDataSource: PokemonRemoteDataSource,
     private val evolutionChainDao: EvolutionChainDao,
     private val pokemonEncountersDao: PokemonEncountersDao,
-    private val pokemonMoveDao: PokemonMoveDao
+    private val pokemonMoveDao: PokemonMoveDao,
+    private val typeDao: TypeDao
 ) {
     private val tag = "PokemonRepository"
 
@@ -386,6 +393,53 @@ class PokemonRepository(
                 }
             } catch (e: Exception) {
                 logError("Error inesperado al obtener movimiento: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    /**
+     * Obtiene un tipo por su ID, usando caché local y API remota.
+     *
+     * @param id Identificador único del tipo
+     * @return Flow que emite el tipo y el estado de carga
+     */
+    fun getTypeById(id: Int): Flow<Resource<TypeDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de tipo [id=$id]")
+
+            try {
+                // Consultar caché local
+                logDebug("Consultando base de datos local para tipo $id...")
+                val localType = typeDao.getTypeById(id)
+
+                if (localType != null) {
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo tipo $id de la base de datos local")
+                    emit(Resource.Success(localType.typeEntityToDomain()))
+                } else {
+                    logDebug("No se encontró tipo $id en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getTypeById(id) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibido tipo $id de la API")
+                            saveToDatabase {
+                                logDebug("Insertando tipo $id en la base de datos")
+                                typeDao.insertType(apiResponse.typeDTOToEntity())
+                            }
+                            logDebug("Devolviendo tipo $id obtenido de la API")
+                            emit(Resource.Success(apiResponse.typeDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener tipo $id de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener tipo: ${e.message}")
                 emit(Resource.Error(message = "Error: ${e.message}"))
             }
         }.flowOn(Dispatchers.IO)

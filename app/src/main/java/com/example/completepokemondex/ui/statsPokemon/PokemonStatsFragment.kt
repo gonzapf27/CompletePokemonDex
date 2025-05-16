@@ -79,6 +79,10 @@ class PokemonStatsFragment : Fragment() {
                 gradientDrawable.cornerRadius = 0f
                 gradientBg?.background = gradientDrawable
             }
+            // Mostrar los tipos debajo de cada título
+            binding.tiposResistencias.text = state.resistencias.joinToString(", ").ifEmpty { "-" }
+            binding.tiposInmunidades.text = state.inmunidades.joinToString(", ").ifEmpty { "-" }
+            binding.tiposEfectividades.text = state.efectividades.joinToString(", ").ifEmpty { "-" }
         }
     }
 
