@@ -63,7 +63,7 @@ class PokemonMoveAdapter(private val viewModel: com.example.completepokemondex.u
                 move.flavor_text_entries
                     ?.firstOrNull { it?.language?.name == "en" }?.flavor_text
             }
-            binding.moveDescription.text = flavorText?.replace("\\n", " ")?.replace("\\f", " ") ?: ""
+            binding.moveDescription.text = (flavorText?.replace("\\n", " ")?.replace("\\f", " ") ?: "") + "\n"
             // Método de aprendizaje
             val (learnMethod, level) = viewModel.getLearnMethodForMove(move.id ?: -1)
             val learnText = when (learnMethod) {
