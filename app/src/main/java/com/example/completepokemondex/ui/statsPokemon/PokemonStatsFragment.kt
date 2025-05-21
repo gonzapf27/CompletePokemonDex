@@ -1,6 +1,7 @@
 package com.example.completepokemondex.ui.statsPokemon
 
 import android.animation.ObjectAnimator
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -15,7 +16,9 @@ import com.example.completepokemondex.R
 import com.example.completepokemondex.data.domain.model.PokemonDetailsDomain
 import com.example.completepokemondex.databinding.FragmentPokemonStatsBinding
 import com.example.completepokemondex.util.PokemonTypeUtil
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.log
 
 /**
  * Fragmento encargado de mostrar las estadísticas de un Pokémon.
@@ -35,6 +38,12 @@ class PokemonStatsFragment : Fragment() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Inyecta el mapper de nombres internacionalizados al ViewModel
+        viewModel.setTypeNameMapper { typeName ->
+            val type = PokemonTypeUtil.getTypeByName(typeName)
+            if (type.stringRes != 0) requireContext().getString(type.stringRes)
+            else typeName.replaceFirstChar { it.uppercase() }
+        }
         viewModel.setPokemonId(pokemonId)
     }
 
@@ -79,10 +88,42 @@ class PokemonStatsFragment : Fragment() {
                 gradientDrawable.cornerRadius = 0f
                 gradientBg?.background = gradientDrawable
             }
-            // Mostrar los tipos debajo de cada título
-            binding.tiposResistencias.text = state.resistencias.joinToString(", ").ifEmpty { "-" }
-            binding.tiposInmunidades.text = state.inmunidades.joinToString(", ").ifEmpty { "-" }
-            binding.tiposEfectividades.text = state.efectividades.joinToString(", ").ifEmpty { "-" }
+
+            // Mostrar los tipos como chips de color correspondiente
+            fun showTypeChips(
+                chipGroup: com.google.android.material.chip.ChipGroup,
+                typeNamesIntl: List<String>,
+                typeNamesRaw: List<String>
+            ) {
+                chipGroup.removeAllViews()
+                if (typeNamesRaw.isEmpty()) {
+                    val chip = Chip(requireContext())
+                    chip.text = "-"
+                    chip.isClickable = false
+                    chip.isCheckable = false
+                    chip.chipCornerRadius = 24f
+                    chip.textSize = 13f
+                    chip.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+                    chipGroup.addView(chip)
+                } else {
+                    typeNamesRaw.forEachIndexed { idx, typeNameRaw ->
+                        val typeNameIntl = typeNamesIntl.getOrNull(idx)
+                            ?: typeNameRaw.replaceFirstChar { it.uppercase() }
+                        val chip = Chip(requireContext())
+                        chip.text = typeNameIntl
+                        chip.isClickable = false
+                        chip.isCheckable = false
+                        chip.chipCornerRadius = 24f
+                        chip.textSize = 13f
+                        chip.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+                        chipGroup.addView(chip)
+                    }
+                }
+            }
+
+            showTypeChips(binding.chipGroupResistencias, state.resistencias, state.resistenciasRaw)
+            showTypeChips(binding.chipGroupInmunidades, state.inmunidades, state.inmunidadesRaw)
+            showTypeChips(binding.chipGroupEfectividades, state.efectividades, state.efectividadesRaw)
         }
     }
 

@@ -23,14 +23,20 @@ import javax.inject.Inject
  * @property resistencias Tipos contra los que el Pokémon tiene resistencia.
  * @property inmunidades Tipos contra los que el Pokémon es inmune.
  * @property efectividades Tipos contra los que el Pokémon es efectivo.
+ * @property resistenciasRaw Tipos contra los que el Pokémon tiene resistencia (en inglés).
+ * @property inmunidadesRaw Tipos contra los que el Pokémon es inmune (en inglés).
+ * @property efectividadesRaw Tipos contra los que el Pokémon es efectivo (en inglés).
  */
 data class StatsUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val pokemon: PokemonDetailsDomain? = null,
-    val resistencias: Set<String> = emptySet(),
-    val inmunidades: Set<String> = emptySet(),
-    val efectividades: Set<String> = emptySet()
+    val resistencias: List<String> = emptyList(),
+    val inmunidades: List<String> = emptyList(),
+    val efectividades: List<String> = emptyList(),
+    val resistenciasRaw: List<String> = emptyList(),
+    val inmunidadesRaw: List<String> = emptyList(),
+    val efectividadesRaw: List<String> = emptyList()
 )
 
 /**
@@ -46,6 +52,17 @@ class PokemonStatsViewModel @Inject constructor(
     
     private val _uiState = MutableLiveData(StatsUiState())
     val uiState: LiveData<StatsUiState> = _uiState
+
+    // LiveData para exponer los tipos del Pokémon (en inglés)
+    private val _pokemonTypes = MutableLiveData<List<String>>()
+    val pokemonTypes: LiveData<List<String>> = _pokemonTypes
+
+    // Mapper para internacionalizar nombres de tipos
+    private var typeNameMapper: ((String) -> String)? = null
+
+    fun setTypeNameMapper(mapper: (String) -> String) {
+        typeNameMapper = mapper
+    }
     
     /**
      * Establece el ID del Pokémon y obtiene sus detalles.
@@ -63,6 +80,8 @@ class PokemonStatsViewModel @Inject constructor(
                         val pokemon = result.data
                         if (pokemon != null) {
                             val typeNames = pokemon.types?.mapNotNull { it?.type?.name } ?: emptyList()
+                            // Actualiza el LiveData de tipos
+                            _pokemonTypes.value = typeNames
                             val typeDomains = typeNames.map { typeName ->
                                 async {
                                     // Usar getTypeByName en vez de getTypeById
@@ -89,17 +108,26 @@ class PokemonStatsViewModel @Inject constructor(
                             val resistencias = allHalfDamageFrom - inmunidades - allDoubleDamageFrom
                             val efectividades = allDoubleDamageFrom - inmunidades - allHalfDamageFrom
 
+                            // Internacionalizar los nombres de tipos
+                            val mapper = typeNameMapper ?: { it.replaceFirstChar { c -> c.uppercase() } }
+                            val resistenciasIntl = resistencias.map(mapper).sorted()
+                            val inmunidadesIntl = inmunidades.map(mapper).sorted()
+                            val efectividadesIntl = efectividades.map(mapper).sorted()
+
                             // Mostrar por consola los resultados
-                            println("Resistencias: ${resistencias.joinToString(", ").ifEmpty { "-" }}")
-                            println("Inmunidades: ${inmunidades.joinToString(", ").ifEmpty { "-" }}")
-                            println("Efectividades: ${efectividades.joinToString(", ").ifEmpty { "-" }}")
+                            println("Resistencias: ${resistenciasIntl.joinToString(", ").ifEmpty { "-" }}")
+                            println("Inmunidades: ${inmunidadesIntl.joinToString(", ").ifEmpty { "-" }}")
+                            println("Efectividades: ${efectividadesIntl.joinToString(", ").ifEmpty { "-" }}")
 
                             _uiState.value = StatsUiState(
                                 isLoading = false,
                                 pokemon = pokemon,
-                                resistencias = resistencias,
-                                inmunidades = inmunidades,
-                                efectividades = efectividades
+                                resistencias = resistenciasIntl,
+                                inmunidades = inmunidadesIntl,
+                                efectividades = efectividadesIntl,
+                                resistenciasRaw = resistencias.sorted(),
+                                inmunidadesRaw = inmunidades.sorted(),
+                                efectividadesRaw = efectividades.sorted()
                             )
                         } else {
                             _uiState.value = StatsUiState(isLoading = false, error = "No se encontraron datos del Pokémon")

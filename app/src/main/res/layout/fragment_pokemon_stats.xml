@@ -337,7 +337,6 @@
                         android:gravity="end"/>
                 </LinearLayout>
 
-                <!-- NUEVO: Resistencias, inmunidades y efectividades en secciones separadas -->
                 <TextView
                     android:id="@+id/lbl_resistencias"
                     android:layout_width="match_parent"
@@ -346,13 +345,16 @@
                     android:textStyle="bold"
                     android:paddingTop="12dp"
                     android:textColor="@color/black"/>
-                <TextView
-                    android:id="@+id/tipos_resistencias"
+                <!-- Chips de resistencias -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupResistencias"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="-"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"/>
+                    app:singleLine="false"
+                    app:singleSelection="false"
+                    app:chipSpacing="8dp"
+                    />
 
                 <TextView
                     android:id="@+id/lbl_inmunidades"
@@ -362,13 +364,16 @@
                     android:textStyle="bold"
                     android:paddingTop="12dp"
                     android:textColor="@color/black"/>
-                <TextView
-                    android:id="@+id/tipos_inmunidades"
+                <!-- Chips de inmunidades -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupInmunidades"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="-"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"/>
+                    app:singleLine="false"
+                    app:singleSelection="false"
+                    app:chipSpacing="8dp"
+                    />
 
                 <TextView
                     android:id="@+id/lbl_efectividades"
@@ -378,13 +383,16 @@
                     android:textStyle="bold"
                     android:paddingTop="12dp"
                     android:textColor="@color/black"/>
-                <TextView
-                    android:id="@+id/tipos_efectividades"
+                <!-- Chips de efectividades -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupEfectividades"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="-"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"/>
+                    app:singleLine="false"
+                    app:singleSelection="false"
+                    app:chipSpacing="8dp"
+                    />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
