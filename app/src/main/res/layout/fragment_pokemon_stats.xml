@@ -344,7 +344,7 @@
                     android:text="@string/resistencias_fmt"
                     android:textStyle="bold"
                     android:paddingTop="12dp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/text_primary"/>
                 <!-- Chips de resistencias -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupResistencias"
@@ -363,7 +363,7 @@
                     android:text="@string/inmunidades_fmt"
                     android:textStyle="bold"
                     android:paddingTop="12dp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/text_primary"/>
                 <!-- Chips de inmunidades -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupInmunidades"
@@ -382,7 +382,7 @@
                     android:text="@string/efectividades_fmt"
                     android:textStyle="bold"
                     android:paddingTop="12dp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/text_primary"/>
                 <!-- Chips de efectividades -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupEfectividades"
