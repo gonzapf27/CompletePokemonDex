@@ -48,11 +48,10 @@ class MainActivity : AppCompatActivity() {
             } else {
                 binding.noInternetOverlay.visibility = android.view.View.VISIBLE
                 binding.fragmentContainerView.visibility = android.view.View.GONE
-                // Cargar el gif (opcional, si usas Glide)
-                Glide.with(this)
-                    .asGif()
-                    .load(com.example.completepokemondex.R.drawable.loading_pokeball)
-                    .into(binding.loadingPokeballGif)
+//                Glide.with(this)
+//                    .asGif()
+//                    .load(com.example.completepokemondex.R.drawable.loading_pokeball)
+//                    .into(binding.loadingPokeballGif)
             }
         }
     }

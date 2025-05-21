@@ -41,10 +41,11 @@
 
         <ImageView
             android:id="@+id/loadingPokeballGif"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@drawable/loading_pokeball"/>
+            android:scaleType="fitXY"
+            android:src="@drawable/no_internet_transparent"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
