@@ -444,6 +444,54 @@ class PokemonRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+
+    /**
+     * Obtiene un tipo por su nombre, usando caché local y API remota.
+     *
+     * @param name Nombre por defecto del tipo
+     * @return Flow que emite el tipo y el estado de carga
+     */
+    fun getTypeByName(name: String): Flow<Resource<TypeDomain>> =
+        flow {
+            emit(Resource.Loading)
+            logDebug("Iniciando búsqueda de tipo [name=$name]")
+
+            try {
+                // Consultar caché local
+                logDebug("Consultando base de datos local para tipo $name...")
+                val localType = typeDao.getTypeByName(name)
+
+                if (localType != null) {
+                    logDebug("📋 ORIGEN DE DATOS: BASE DE DATOS LOCAL")
+                    logDebug("Devolviendo tipo $name de la base de datos local")
+                    emit(Resource.Success(localType.typeEntityToDomain()))
+                } else {
+                    logDebug("No se encontró tipo $name en la DB local, consultando API...")
+
+                    handleApiResponse(
+                        apiCall = { remoteDataSource.getTypeByName(name) },
+                        onSuccess = { apiResponse ->
+                            logDebug("📡 ORIGEN DE DATOS: API REMOTA")
+                            logDebug("Recibido tipo $name de la API")
+                            saveToDatabase {
+                                logDebug("Insertando tipo $name en la base de datos")
+                                typeDao.insertType(apiResponse.typeDTOToEntity())
+                            }
+                            logDebug("Devolviendo tipo $name obtenido de la API")
+                            emit(Resource.Success(apiResponse.typeDTOToDomain()))
+                        },
+                        onError = { errorMessage ->
+                            logError("Error al obtener tipo $name de la API: $errorMessage")
+                            emit(Resource.Error(message = errorMessage))
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logError("Error inesperado al obtener tipo: ${e.message}")
+                emit(Resource.Error(message = "Error: ${e.message}"))
+            }
+        }.flowOn(Dispatchers.IO)
+
     /**
      * Función auxiliar para manejar respuestas de la API de forma genérica.
      * Ejecuta la llamada a la API y delega en los callbacks según el resultado.

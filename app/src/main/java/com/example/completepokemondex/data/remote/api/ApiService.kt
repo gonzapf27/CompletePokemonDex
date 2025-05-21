@@ -132,6 +132,17 @@ interface ApiService {
     suspend fun getTypeById(
         @Path("id") id: Int
     ): Response<TypeDTO>
+
+    /**
+     * Obtiene un tipo por su nombre.
+     *
+     * @param id ID del tipo.
+     * @return Respuesta con los datos del tipo.
+     */
+    @GET("type/{name}")
+    suspend fun getTypeByName(
+        @Path("name") name: String
+    ): Response<TypeDTO>
 }
 
 /**

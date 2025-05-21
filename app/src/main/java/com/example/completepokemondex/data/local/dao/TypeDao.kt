@@ -32,4 +32,11 @@ interface TypeDao {
      */
     @Query("SELECT * FROM type_table")
     suspend fun getAllTypes(): List<TypeEntity>
+
+   /**
+    * Obtiene un tipo por su nombre.
+    */
+   @Query("SELECT * FROM type_table WHERE name = :name")
+   suspend fun getTypeByName(name: String): TypeEntity?
+
 }

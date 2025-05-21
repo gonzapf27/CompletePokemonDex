@@ -10,7 +10,7 @@ import com.example.completepokemondex.util.PokemonTypeUtil.PokemonType
 import javax.inject.Inject
 
 /**
- * Adaptador para mostrar y manejar chips selectores de tipo de Pokémon.
+ * Adaptador para mostrar y manejar chips de tipo de Pokémon.
  * Permite seleccionar un tipo y notifica el cambio mediante un listener.
  */
 class PokemonTypeAdapter @Inject constructor() : 
