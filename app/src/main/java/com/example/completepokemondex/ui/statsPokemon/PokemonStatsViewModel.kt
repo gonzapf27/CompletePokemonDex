@@ -65,8 +65,8 @@ class PokemonStatsViewModel @Inject constructor(
                             val typeNames = pokemon.types?.mapNotNull { it?.type?.name } ?: emptyList()
                             val typeDomains = typeNames.map { typeName ->
                                 async {
-                                    val typeId = getTypeIdByName(typeName)
-                                    repository.getTypeById(typeId)
+                                    // Usar getTypeByName en vez de getTypeById
+                                    repository.getTypeByName(typeName)
                                 }
                             }.awaitAll()
 
@@ -118,15 +118,4 @@ class PokemonStatsViewModel @Inject constructor(
             }
         }
     }
-
-    private fun getTypeIdByName(typeName: String): Int {
-        val typeMap = mapOf(
-            "normal" to 1, "fighting" to 2, "flying" to 3, "poison" to 4, "ground" to 5,
-            "rock" to 6, "bug" to 7, "ghost" to 8, "steel" to 9, "fire" to 10, "water" to 11,
-            "grass" to 12, "electric" to 13, "psychic" to 14, "ice" to 15, "dragon" to 16,
-            "dark" to 17, "fairy" to 18
-        )
-        return typeMap[typeName.lowercase()] ?: 1
-    }
 }
-
