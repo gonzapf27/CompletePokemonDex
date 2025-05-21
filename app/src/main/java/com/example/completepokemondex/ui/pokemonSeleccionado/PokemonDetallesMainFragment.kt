@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import com.example.completepokemondex.util.NetworkStatusLiveData
 import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
@@ -28,6 +32,9 @@ class PokemonDetallesMainFragment : Fragment() {
     private var currentDestination: PokemonDetallesViewModel.NavDestination? = null
 
     private val viewModel: PokemonDetallesViewModel by viewModels()
+
+    private lateinit var networkStatusLiveData: NetworkStatusLiveData
+    private var noInternetView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +60,18 @@ class PokemonDetallesMainFragment : Fragment() {
         if (savedInstanceState == null) {
             viewModel.setInitialPokemonId(pokemonId)
         }
+
+        // --- INICIO: Observador de red ---
+        networkStatusLiveData = NetworkStatusLiveData(requireContext().applicationContext)
+        networkStatusLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
+            if (!isConnected) {
+                showNoInternetView()
+            } else {
+                hideNoInternetView()
+            }
+        })
+        // --- FIN: Observador de red ---
+
         binding.pokemonDetallesBottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_info -> {
@@ -154,6 +173,29 @@ class PokemonDetallesMainFragment : Fragment() {
             PokemonDetallesViewModel.NavDestination.LOCATIONS -> 3
             PokemonDetallesViewModel.NavDestination.MOVES -> 4
         }
+    }
+
+    /**
+     * Muestra la vista de "sin internet" y oculta el contenido principal.
+     */
+    private fun showNoInternetView() {
+        if (noInternetView == null) {
+            val container = binding.root as ViewGroup
+            noInternetView = LayoutInflater.from(requireContext()).inflate(R.layout.view_no_internet, container, false)
+            container.addView(noInternetView)
+        }
+        noInternetView?.visibility = View.VISIBLE
+        binding.pokemonDetallesFragmentContainer.visibility = View.GONE
+        binding.pokemonDetallesBottomNav.visibility = View.GONE
+    }
+
+    /**
+     * Oculta la vista de "sin internet" y restaura el contenido principal.
+     */
+    private fun hideNoInternetView() {
+        noInternetView?.visibility = View.GONE
+        binding.pokemonDetallesFragmentContainer.visibility = View.VISIBLE
+        binding.pokemonDetallesBottomNav.visibility = View.VISIBLE
     }
 
     /**
