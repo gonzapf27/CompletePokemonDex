@@ -163,22 +163,21 @@ class PokemonListFragment : Fragment() {
      */
     private fun setupSearchView() {
         val searchView = binding.searchView
-        
-        // Personalizar colores de la SearchView
+
+        // Personalizar colores de la SearchView usando binding.searchView directamente
         val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         searchEditText?.apply {
             setTextColor(ContextCompat.getColor(requireContext(), R.color.search_bar_text))
             setHintTextColor(ContextCompat.getColor(requireContext(), R.color.search_bar_hint))
         }
-        
-        // Personalizar color de los iconos
+
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)
         searchIcon?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.search_bar_icon))
-        
+
         val closeIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)
         closeIcon?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.search_bar_icon))
 
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -190,7 +189,7 @@ class PokemonListFragment : Fragment() {
         })
 
         // Botón de cierre para limpiar la búsqueda
-        binding.searchView.setOnCloseListener {
+        searchView.setOnCloseListener {
             viewModel.updateSearchQuery("")
             false
         }

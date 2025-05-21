@@ -51,13 +51,25 @@
     <string name="move_list_explanation">List of moves this Pokémon can learn by level up, TM/HM, tutor, etc.</string>
     <string name="move_accuracy">Accuracy:</string>
     <string name="move_empty_list">No moves found for this Pokémon.</string>
+    <string name="pokemon_moves">Moves</string>
 
     <!-- Pokemon Encounters -->
     <string name="encounters_title_template">Locations in %s</string>
     <string name="encounters_red_blue">Red/Blue</string>
     <string name="encounters_description">Locations marked on the map where this Pokémon can be found in the Red and Blue games.</string>
-    <string name="encounters_loading">Loading encounter locations...</string>
+    <string name="encounters_loading">Loading encounter locations…</string>
     <string name="encounters_empty">No encounter locations were found for this Pokémon in Red and Blue games.</string>
     <string name="map_content_description">Map of Kanto region with marked locations</string>
     <string name="favorites">Favorites</string>
+    <string name="hp">HP</string>
+    <string name="attack">Attack</string>
+    <string name="sp_defense">SP Defense</string>
+    <string name="sp_attack">SP Attack</string>
+    <string name="defense">Defense</string>
+    <string name="speed">Speed</string>
+    <string name="total">Total</string>
+    <string name="sprite_image">Sprite</string>
+    <string name="resistencias_fmt">Resistances</string>
+    <string name="inmunidades_fmt">Immunities</string>
+    <string name="efectividades_fmt">Effectiveness</string>
 </resources>

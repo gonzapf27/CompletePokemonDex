@@ -12,18 +12,31 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * Representa la información visual de un tipo de Pokémon para la UI.
+ */
 data class PokemonTypeUi(
     val name: String,
     val color: Int,
     val stringRes: Int
 )
 
+/**
+ * Representa una habilidad de Pokémon para mostrar en la UI.
+ * @param nombre Nombre de la habilidad.
+ * @param descripcion Descripción localizada de la habilidad.
+ * @param isOculta Indica si la habilidad es oculta.
+ */
 data class HabilidadUi(
     val nombre: String,
     val descripcion: String,
     val isOculta: Boolean? = false
 )
 
+/**
+ * Estado de la UI para la pantalla de información de Pokémon.
+ * Contiene todos los datos necesarios para mostrar la información detallada de un Pokémon.
+ */
 data class PokemonInfoUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -45,21 +58,33 @@ data class PokemonInfoUiState(
     val evolutionChainDetails: List<PokemonDetailsDomain> = emptyList()
 )
 
+/**
+ * ViewModel encargado de gestionar la lógica y el estado de la pantalla de información de Pokémon.
+ * Recupera detalles, especie, habilidades y cadena evolutiva del Pokémon.
+ */
 @HiltViewModel
 class PokemonInfoViewModel @Inject constructor(
     private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
 
+    // ID del Pokémon seleccionado
     private val _pokemonId = MutableLiveData<Int>()
+    // Estado de la UI observable
     private val _uiState = MutableLiveData(PokemonInfoUiState())
     val uiState: LiveData<PokemonInfoUiState> = _uiState
 
+    /**
+     * Establece el ID del Pokémon y dispara la carga de datos si cambia.
+     */
     fun setPokemonId(id: Int) {
         if (_pokemonId.value == id) return
         _pokemonId.value = id
         fetchPokemon(id)
     }
 
+    /**
+     * Recupera todos los datos necesarios del Pokémon (detalles, especie, habilidades, cadena evolutiva).
+     */
     private fun fetchPokemon(id: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value?.copy(isLoading = true, error = null)
@@ -218,6 +243,9 @@ class PokemonInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Marca o desmarca un Pokémon como favorito.
+     */
     fun toggleFavorite(id: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             pokemonRepository.updatePokemonFavorite(id, isFavorite)
@@ -226,6 +254,9 @@ class PokemonInfoViewModel @Inject constructor(
     }
 }
 
+/**
+ * Extrae el texto descriptivo (flavor text) de la especie de Pokémon en el idioma actual.
+ */
 fun extractFlavorText(species: PokemonSpeciesDomain?): String {
     if (species == null) return ""
     val lang = Locale.getDefault().language
@@ -238,6 +269,9 @@ fun extractFlavorText(species: PokemonSpeciesDomain?): String {
     return (flavor ?: fallback ?: "").replace("\n", " ").replace("\u000c", " ").trim()
 }
 
+/**
+ * Formatea la altura del Pokémon según el idioma (metros o pulgadas).
+ */
 fun formatHeight(heightInDecimeters: Int?): String {
     if (heightInDecimeters == null) return ""
     val isEnglish = Locale.getDefault().language == "en"
@@ -250,6 +284,9 @@ fun formatHeight(heightInDecimeters: Int?): String {
     }
 }
 
+/**
+ * Formatea el peso del Pokémon según el idioma (kg o libras).
+ */
 fun formatWeight(weightInHectograms: Int?): String {
     if (weightInHectograms == null) return ""
     val isEnglish = Locale.getDefault().language == "en"
@@ -262,6 +299,9 @@ fun formatWeight(weightInHectograms: Int?): String {
     }
 }
 
+/**
+ * Calcula el porcentaje de género masculino y femenino a partir del gender_rate.
+ */
 fun calculateGenderPercents(genderRate: Int?): Pair<Double?, Double?> {
     return when (genderRate) {
         null -> Pair(null, null)

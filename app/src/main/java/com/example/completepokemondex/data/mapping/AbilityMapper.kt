@@ -4,8 +4,7 @@ import com.example.completepokemondex.data.remote.models.AbilityDTO
 import com.example.completepokemondex.data.domain.model.AbilityDomain
 import com.example.completepokemondex.data.local.entities.AbilityEntity
 
-class AbilityMapper {
-}
+
 
 // Mapper de DTO a Domain
 fun AbilityDTO.toDomain(): AbilityDomain {

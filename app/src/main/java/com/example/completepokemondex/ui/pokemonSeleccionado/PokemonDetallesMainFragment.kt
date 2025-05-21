@@ -4,18 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import com.example.completepokemondex.util.NetworkStatusLiveData
 import com.example.completepokemondex.ui.statsPokemon.PokemonStatsFragment
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonDetallesMainBinding
 import com.example.completepokemondex.ui.infoPokemon.PokemonInfoFragment
 import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsFragment
-import com.example.completepokemondex.ui.pokemonLocations.PokemonLocationsVIewModel
 import com.example.completepokemondex.ui.pokemonMoves.PokemonMovesFragment
 import com.example.completepokemondex.ui.spritesPokemon.PokemonSpritesFragment
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Fragmento principal que contiene la navegación inferior y muestra los diferentes fragmentos
+ * de información, estadísticas, sprites, localizaciones y movimientos de un Pokémon.
+ */
 @AndroidEntryPoint
 class PokemonDetallesMainFragment : Fragment() {
     private var _binding: FragmentPokemonDetallesMainBinding? = null
@@ -26,11 +33,17 @@ class PokemonDetallesMainFragment : Fragment() {
 
     private val viewModel: PokemonDetallesViewModel by viewModels()
 
+    private lateinit var networkStatusLiveData: NetworkStatusLiveData
+    private var noInternetView: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pokemonId = arguments?.getInt("pokemon_id") ?: 0
     }
 
+    /**
+     * Inicializa el binding y la vista del fragmento.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,11 +52,26 @@ class PokemonDetallesMainFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Configura la navegación y observa los cambios de destino para mostrar el fragmento correspondiente.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) {
             viewModel.setInitialPokemonId(pokemonId)
         }
+
+        // --- INICIO: Observador de red ---
+        networkStatusLiveData = NetworkStatusLiveData(requireContext().applicationContext)
+        networkStatusLiveData.observe(viewLifecycleOwner, Observer { isConnected ->
+            if (!isConnected) {
+                showNoInternetView()
+            } else {
+                hideNoInternetView()
+            }
+        })
+        // --- FIN: Observador de red ---
+
         binding.pokemonDetallesBottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_info -> {
@@ -147,12 +175,41 @@ class PokemonDetallesMainFragment : Fragment() {
         }
     }
 
+    /**
+     * Muestra la vista de "sin internet" y oculta el contenido principal.
+     */
+    private fun showNoInternetView() {
+        if (noInternetView == null) {
+            val container = binding.root as ViewGroup
+            noInternetView = LayoutInflater.from(requireContext()).inflate(R.layout.view_no_internet, container, false)
+            container.addView(noInternetView)
+        }
+        noInternetView?.visibility = View.VISIBLE
+        binding.pokemonDetallesFragmentContainer.visibility = View.GONE
+        binding.pokemonDetallesBottomNav.visibility = View.GONE
+    }
+
+    /**
+     * Oculta la vista de "sin internet" y restaura el contenido principal.
+     */
+    private fun hideNoInternetView() {
+        noInternetView?.visibility = View.GONE
+        binding.pokemonDetallesFragmentContainer.visibility = View.VISIBLE
+        binding.pokemonDetallesBottomNav.visibility = View.VISIBLE
+    }
+
+    /**
+     * Libera el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento principal con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonDetallesMainFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

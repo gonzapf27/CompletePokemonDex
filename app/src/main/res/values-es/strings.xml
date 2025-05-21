@@ -47,12 +47,24 @@
     <string name="move_list_explanation">Lista de movimientos que este Pokémon puede aprender a lo largo de los niveles, MT/MO, tutor, etc.</string>
     <string name="move_accuracy">Precisión:</string>
     <string name="move_empty_list">No se encontraron movimientos para este Pokémon.</string>
+    <string name="pokemon_moves">Movimientos</string>
     <!-- Pokemon Encounters -->
     <string name="encounters_title_template">Lugares en %s</string>
     <string name="encounters_red_blue">Rojo/Azul</string>
     <string name="encounters_description">Ubicaciones marcadas en el mapa donde se puede encontrar este Pokémon en los juegos Rojo y Azul.</string>
-    <string name="encounters_loading">Cargando lugares de encuentro...</string>
+    <string name="encounters_loading">Cargando lugares de encuentro…</string>
     <string name="encounters_empty">No se encontraron lugares de encuentro para este Pokémon en los juegos Rojo y Azul.</string>
     <string name="map_content_description">Mapa de la región de Kanto con ubicaciones marcadas</string>
     <string name="favorites">Favoritos</string>
+    <string name="hp">PS</string>
+    <string name="attack">Ataque</string>
+    <string name="sp_defense">Defensa S.</string>
+    <string name="sp_attack">Ataque S.</string>
+    <string name="defense">Defensa</string>
+    <string name="speed">Velocidad</string>
+    <string name="total">Total</string>
+    <string name="sprite_image">Sprite</string>
+    <string name="resistencias_fmt">Resistencias</string>
+    <string name="inmunidades_fmt">Inmunidades</string>
+    <string name="efectividades_fmt">Efectividades</string>
 </resources>

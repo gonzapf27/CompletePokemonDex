@@ -1,9 +1,9 @@
 package com.example.completepokemondex.ui.pokemonLocations
 
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.SpannableString
@@ -13,26 +13,29 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.graphics.Typeface
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.completepokemondex.R
 import com.example.completepokemondex.databinding.FragmentPokemonEncountersBinding
 import com.example.completepokemondex.util.PokemonLocationsUtil
 import com.example.completepokemondex.util.PokemonTypeUtil
 import dagger.hilt.android.AndroidEntryPoint
-import android.widget.ImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Fragmento encargado de mostrar las localizaciones donde se puede encontrar un Pokémon
+ * en los juegos Rojo y Azul, resaltando las ubicaciones en un mapa y mostrando detalles de encuentros.
+ */
 @AndroidEntryPoint
 class PokemonLocationsFragment : Fragment() {
     private var _binding: FragmentPokemonEncountersBinding? = null
@@ -63,22 +66,42 @@ class PokemonLocationsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // Crear una ImageView temporal para mostrar la animación de carga
-        val loadingImageView = ImageView(requireContext()).apply {
+        ImageView(requireContext()).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-        
+
         // Cargar la imagen del mapa base primero
         loadBaseMap()
         
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            // Mostrar el gif de carga y ocultar el contenido mientras isLoading es true
+            if (state.isLoading) {
+                _binding?.loadingIndicator?.visibility = View.VISIBLE
+                Glide.with(this)
+                    .asGif()
+                    .load(R.drawable.loading_pokeball)
+                    .into(_binding!!.loadingIndicator)
+                _binding?.encountersTitle?.visibility = View.GONE
+                _binding?.encountersDescription?.visibility = View.GONE
+                _binding?.encountersText?.visibility = View.GONE
+                _binding?.encountersEmpty?.visibility = View.GONE
+                _binding?.mapImage?.visibility = View.GONE
+                return@observe
+            } else {
+                _binding?.loadingIndicator?.visibility = View.GONE
+                _binding?.encountersTitle?.visibility = View.VISIBLE
+                _binding?.encountersDescription?.visibility = View.VISIBLE
+                _binding?.mapImage?.visibility = View.VISIBLE
+            }
+
             // Gestionar estado de carga
             _binding?.loadingIndicator?.isVisible = state.isLoading
 
             // Actualizar título
-            _binding?.encountersTitle?.text = "Lugares en Rojo/Azul: ${state.nombre}"
+            _binding?.encountersTitle?.text = getString(R.string.encounters_title_template, getString(R.string.encounters_red_blue))
 
             // Solo aplica el gradiente si pokemonTypes no es nulo
             if (state.pokemonTypes != null) {
@@ -136,7 +159,7 @@ class PokemonLocationsFragment : Fragment() {
     }
     
     /**
-     * Carga la imagen base del mapa de Kanto
+     * Carga la imagen base del mapa de Kanto.
      */
     private fun loadBaseMap() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -175,7 +198,7 @@ class PokemonLocationsFragment : Fragment() {
     }
     
     /**
-     * Actualiza el mapa con las ubicaciones resaltadas
+     * Actualiza el mapa resaltando las ubicaciones donde aparece el Pokémon.
      */
     private fun updateMapWithLocations(locationNames: List<String>) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -213,10 +236,12 @@ class PokemonLocationsFragment : Fragment() {
         }
     }
 
-    // Copiado y adaptado de fragmento de movimientos
+    /**
+     * Configura el fondo con un gradiente basado en los tipos del Pokémon.
+     */
     private fun setupGradientBackground(types: List<String>) {
         val typeColors = types.take(2).map { typeName ->
-            ContextCompat.getColor(requireContext(), getTypeColorResId(typeName))
+            ContextCompat.getColor(requireContext(), PokemonTypeUtil.getTypeColorResId(typeName))
         }
 
         val gradientColors = when {
@@ -234,30 +259,9 @@ class PokemonLocationsFragment : Fragment() {
         _binding?.pokemonEncountersGradientBg?.background = gradientDrawable
     }
 
-    private fun getTypeColorResId(type: String): Int {
-        return when (type.lowercase()) {
-            "normal" -> R.color.type_normal
-            "fire" -> R.color.type_fire
-            "water" -> R.color.type_water
-            "electric" -> R.color.type_electric
-            "grass" -> R.color.type_grass
-            "ice" -> R.color.type_ice
-            "fighting" -> R.color.type_fighting
-            "poison" -> R.color.type_poison
-            "ground" -> R.color.type_ground
-            "flying" -> R.color.type_flying
-            "psychic" -> R.color.type_psychic
-            "bug" -> R.color.type_bug
-            "rock" -> R.color.type_rock
-            "ghost" -> R.color.type_ghost
-            "dragon" -> R.color.type_dragon
-            "dark" -> R.color.type_dark
-            "steel" -> R.color.type_steel
-            "fairy" -> R.color.type_fairy
-            else -> R.color.type_normal
-        }
-    }
-
+    /**
+     * Libera recursos y el binding al destruir la vista.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Liberar recursos
@@ -267,6 +271,9 @@ class PokemonLocationsFragment : Fragment() {
     }
 
     companion object {
+        /**
+         * Crea una nueva instancia del fragmento con el ID del Pokémon.
+         */
         fun newInstance(pokemonId: Int) = PokemonLocationsFragment().apply {
             arguments = Bundle().apply { putInt("pokemon_id", pokemonId) }
         }

@@ -12,7 +12,7 @@ import android.util.Log
 class PokemonLocationsUtil {
     companion object {
         /**
-         * Mapa que contiene las coordenadas (x, y) de las diferentes ubicaciones en Kanto
+         * Mapa que contiene las coordenadas (x, y) de las diferentes ubicaciones en Kanto con respecto a la imágen de resources.
          */
         val LOCATION_MAP = mapOf(
             "pallet-town-area" to Pair(1555, 734),
@@ -167,48 +167,5 @@ class PokemonLocationsUtil {
             }
         }
 
-        /**
-         * Resalta una ubicación en un mapa base
-         *
-         * @param context Contexto de la aplicación
-         * @param mapImage La imagen base del mapa
-         * @param x Coordenada x de la ubicación
-         * @param y Coordenada y de la ubicación
-         * @return Bitmap con la ubicación resaltada o la imagen original si falla
-         */
-        fun highlightLocation(context: Context, mapImage: Bitmap, x: Int, y: Int): Bitmap {
-            try {
-                // Crear una copia mutable del bitmap original
-                val resultBitmap = mapImage.copy(Bitmap.Config.ARGB_8888, true)
-                val canvas = Canvas(resultBitmap)
-
-                // Configurar el círculo para resaltar la ubicación
-                val paint = Paint().apply {
-                    color = Color.RED
-                    style = Paint.Style.STROKE
-                    strokeWidth = 8f
-                    isAntiAlias = true
-                }
-
-                // Dibujar círculo exterior
-                canvas.drawCircle(x.toFloat(), y.toFloat(), 40f, paint)
-
-                // Configurar círculo interior semitransparente
-                val fillPaint = Paint().apply {
-                    color = Color.RED
-                    alpha = 100 // Semitransparente
-                    style = Paint.Style.FILL
-                    isAntiAlias = true
-                }
-
-                // Dibujar círculo interior
-                canvas.drawCircle(x.toFloat(), y.toFloat(), 30f, fillPaint)
-
-                return resultBitmap
-            } catch (e: Exception) {
-                Log.e("PokemonLocationsUtil", "Error al resaltar ubicación: ${e.message}")
-                return mapImage // Devolver la imagen original si falla
-            }
-        }
     }
 }

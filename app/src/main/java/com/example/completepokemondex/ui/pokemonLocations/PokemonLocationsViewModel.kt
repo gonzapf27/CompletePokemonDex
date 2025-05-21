@@ -10,7 +10,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 /**
- * Clase que representa un encuentro de Pokémon para la UI
+ * Clase que representa un encuentro de Pokémon para la UI.
  */
 data class LocationEncounterUi(
     val locationName: String,
@@ -22,7 +22,7 @@ data class LocationEncounterUi(
 )
 
 /**
- * Estado de la UI para el fragmento de localizaciones
+ * Estado de la UI para el fragmento de localizaciones.
  */
 data class PokemonLocationsUiState(
     val isLoading: Boolean = false,
@@ -36,6 +36,10 @@ data class PokemonLocationsUiState(
     val pokemonTypes: List<String>? = null // <-- NUEVO
 )
 
+/**
+ * ViewModel encargado de obtener y procesar la información de localizaciones de un Pokémon,
+ * filtrando solo para los juegos Rojo y Azul y preparando los datos para la UI.
+ */
 @HiltViewModel
 class PokemonLocationsVIewModel @Inject constructor(
     private val pokemonRepository: PokemonRepository
@@ -48,6 +52,9 @@ class PokemonLocationsVIewModel @Inject constructor(
     // Lista de versiones que queremos filtrar (solo Red y Blue)
     private val targetVersions = listOf("red", "blue")
 
+    /**
+     * Establece el ID del Pokémon y obtiene los datos de encuentros y detalles.
+     */
     fun setPokemonId(id: Int) {
         if (_pokemonId.value == id) return
         _pokemonId.value = id
@@ -121,7 +128,7 @@ class PokemonLocationsVIewModel @Inject constructor(
 
     /**
      * Procesa los datos de encuentros del dominio a un formato más amigable para la UI,
-     * filtrando solo para los juegos Rojo y Azul
+     * filtrando solo para los juegos Rojo y Azul.
      */
     private fun processEncounters(encounters: PokemonEncountersDomain): List<LocationEncounterUi> {
         val result = mutableListOf<LocationEncounterUi>()
@@ -200,7 +207,7 @@ class PokemonLocationsVIewModel @Inject constructor(
     }
 
     /**
-     * Formatea el nombre de la localización para ser más legible
+     * Formatea el nombre de la localización para ser más legible.
      */
     private fun formatLocationName(name: String): String {
         return name.replace("-", " ")
@@ -211,7 +218,7 @@ class PokemonLocationsVIewModel @Inject constructor(
     }
 
     /**
-     * Formatea el nombre del juego para ser más legible
+     * Formatea el nombre del juego para ser más legible.
      */
     private fun formatGameName(name: String): String {
         // Mapeo de nombres de versión a nombres más amigables

@@ -3,16 +3,15 @@ package com.example.completepokemondex.ui.adapters
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.completepokemondex.databinding.ItemPokemonTypeBinding
 import com.example.completepokemondex.util.PokemonTypeUtil.PokemonType
-import com.google.android.material.chip.Chip
-import androidx.core.content.ContextCompat
 import javax.inject.Inject
 
 /**
- * Adaptador para mostrar y manejar chips selectores de tipo de Pokémon
- * Ahora utiliza inyección de dependencias
+ * Adaptador para mostrar y manejar chips de tipo de Pokémon.
+ * Permite seleccionar un tipo y notifica el cambio mediante un listener.
  */
 class PokemonTypeAdapter @Inject constructor() : 
     RecyclerView.Adapter<PokemonTypeAdapter.TypeViewHolder>() {
@@ -23,11 +22,17 @@ class PokemonTypeAdapter @Inject constructor() :
     // Posición del tipo seleccionado, por defecto "all" (posición 0)
     private var selectedPosition = 0
     
+    /**
+     * Establece la lista de tipos de Pokémon a mostrar.
+     */
     fun setTypesList(typesList: List<PokemonType>) {
         types = typesList
         notifyDataSetChanged()
     }
     
+    /**
+     * Establece el listener para cuando se selecciona un tipo.
+     */
     fun setOnTypeSelectedListener(listener: (String) -> Unit) {
         onTypeSelected = listener
     }
@@ -48,7 +53,7 @@ class PokemonTypeAdapter @Inject constructor() :
     override fun getItemCount() = types.size
     
     /**
-     * Actualiza qué tipo está seleccionado y notifica al adaptador para reflejar los cambios
+     * Actualiza el tipo seleccionado y notifica los cambios.
      */
     fun selectType(position: Int) {
         if (position != selectedPosition && position in types.indices) {
@@ -60,6 +65,9 @@ class PokemonTypeAdapter @Inject constructor() :
         }
     }
     
+    /**
+     * ViewHolder para cada chip de tipo de Pokémon.
+     */
     inner class TypeViewHolder(private val binding: ItemPokemonTypeBinding) : 
         RecyclerView.ViewHolder(binding.root) {
         
@@ -72,6 +80,9 @@ class PokemonTypeAdapter @Inject constructor() :
             }
         }
         
+        /**
+         * Vincula los datos del tipo al chip y aplica estilos según si está seleccionado.
+         */
         fun bind(type: PokemonType, isSelected: Boolean) {
             binding.typeChip.apply {
                 text = if (type.stringRes != 0) {

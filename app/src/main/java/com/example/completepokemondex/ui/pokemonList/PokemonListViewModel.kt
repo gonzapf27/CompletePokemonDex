@@ -32,11 +32,9 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
 
     // Término de búsqueda actual
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     // Filtro de tipo actual
     private val _selectedType = MutableStateFlow("all")
-    val selectedType: StateFlow<String> = _selectedType.asStateFlow()
 
     // Filtro de favoritos
     private val _showOnlyFavorites = MutableStateFlow(false)

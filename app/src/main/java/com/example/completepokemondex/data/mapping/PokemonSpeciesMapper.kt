@@ -323,32 +323,3 @@ fun PokemonSpeciesEntity.pokemonSpeciesEntityToDomain(): PokemonSpeciesDomain {
     )
 }
 
-/**
- * Función de extensión para obtener la descripción de un Pokémon en un idioma específico.
- * 
- * @param language El código del idioma deseado (por ejemplo, "es", "en").
- * @return La primera descripción encontrada en el idioma especificado o null si no hay ninguna.
- */
-fun PokemonSpeciesDomain.getDescriptionByLanguage(language: String): String? {
-    return this.flavor_text_entries
-        ?.filterNotNull()
-        ?.find { it.language?.name == language }
-        ?.flavor_text
-        ?.replace("\n", " ")
-        ?.replace("\u000c", " ")
-        ?.trim()
-}
-
-/**
- * Función de extensión para obtener el género del Pokémon como texto descriptivo.
- * 
- * @return Descripción del género según el valor de gender_rate.
- */
-fun PokemonSpeciesDomain.getGenderRateDescription(): String {
-    return when (this.gender_rate) {
-        -1 -> "Sin género"
-        0 -> "100% masculino"
-        8 -> "100% femenino"
-        else -> "${((8 - (this.gender_rate ?: 0)) * 12.5).toInt()}% masculino, ${(this.gender_rate?.times(12.5))?.toInt()}% femenino"
-    }
-}

@@ -3,7 +3,6 @@ package com.example.completepokemondex
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import dagger.hilt.android.HiltAndroidApp
