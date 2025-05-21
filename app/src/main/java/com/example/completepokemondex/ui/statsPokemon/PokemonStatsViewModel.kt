@@ -65,6 +65,15 @@ class PokemonStatsViewModel @Inject constructor(
     }
     
     /**
+     * Traduce un nombre de tipo utilizando el mapper definido
+     * @param typeName Nombre del tipo en inglés
+     * @return Nombre traducido del tipo
+     */
+    fun translateTypeName(typeName: String): String {
+        return typeNameMapper?.invoke(typeName) ?: typeName.replaceFirstChar { it.uppercase() }
+    }
+    
+    /**
      * Establece el ID del Pokémon y obtiene sus detalles.
      * Actualiza el estado de la UI según el resultado.
      *

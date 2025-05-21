@@ -67,26 +67,6 @@ class PokemonStatsFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             if (!state.isLoading && state.pokemon != null) {
                 showStats(state.pokemon)
-                // Gradiente igual que en fragment_pokemon_info.xml
-                val gradientBg = binding.root.findViewById<View>(R.id.pokemon_stats_gradient_bg)
-                val typeColors = state.pokemon.types?.take(2)?.mapNotNull { typeInfo ->
-                    typeInfo?.type?.name?.let { typeName ->
-                        // Usa el utilitario para obtener el color del tipo
-                        val type = PokemonTypeUtil.getTypeByName(typeName)
-                        ContextCompat.getColor(requireContext(), type.colorRes)
-                    }
-                } ?: listOf(ContextCompat.getColor(requireContext(), R.color.type_normal))
-                val gradientColors = when {
-                    typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
-                    typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
-                    else -> typeColors.toIntArray()
-                }
-                val gradientDrawable = GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    gradientColors
-                )
-                gradientDrawable.cornerRadius = 0f
-                gradientBg?.background = gradientDrawable
             }
 
             // Mostrar los tipos como chips de color correspondiente
@@ -106,9 +86,10 @@ class PokemonStatsFragment : Fragment() {
                     chip.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
                     chipGroup.addView(chip)
                 } else {
-                    typeNamesRaw.forEachIndexed { idx, typeNameRaw ->
-                        val typeNameIntl = typeNamesIntl.getOrNull(idx)
-                            ?: typeNameRaw.replaceFirstChar { it.uppercase() }
+                    typeNamesRaw.forEach { typeNameRaw ->
+                        // Obtener el nombre internacionalizado correspondiente
+                        val typeNameIntl = viewModel.translateTypeName(typeNameRaw)
+                        
                         val chip = Chip(requireContext())
                         chip.text = typeNameIntl
                         chip.isClickable = false
@@ -116,6 +97,13 @@ class PokemonStatsFragment : Fragment() {
                         chip.chipCornerRadius = 24f
                         chip.textSize = 13f
                         chip.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+                        
+                        // Usar el objeto PokemonType correcto según el nombre original
+                        val type = PokemonTypeUtil.getTypeByName(typeNameRaw)
+                        chip.chipBackgroundColor = ColorStateList.valueOf(
+                            ContextCompat.getColor(requireContext(), type.colorRes)
+                        )
+                        chip.setTextColor(Color.WHITE)
                         chipGroup.addView(chip)
                     }
                 }
@@ -124,6 +112,26 @@ class PokemonStatsFragment : Fragment() {
             showTypeChips(binding.chipGroupResistencias, state.resistencias, state.resistenciasRaw)
             showTypeChips(binding.chipGroupInmunidades, state.inmunidades, state.inmunidadesRaw)
             showTypeChips(binding.chipGroupEfectividades, state.efectividades, state.efectividadesRaw)
+        }
+
+        // Gradiente de fondo según los tipos del Pokémon
+        viewModel.pokemonTypes.observe(viewLifecycleOwner) { types ->
+            val typeColors = types.take(2).map {
+                val type = PokemonTypeUtil.getTypeByName(it)
+                ContextCompat.getColor(requireContext(), type.colorRes)
+            }
+            val gradientColors = when {
+                typeColors.isEmpty() -> intArrayOf(Color.LTGRAY, Color.LTGRAY)
+                typeColors.size == 1 -> intArrayOf(typeColors[0], typeColors[0])
+                else -> typeColors.toIntArray()
+            }
+            val gradientDrawable = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                gradientColors
+            )
+            gradientDrawable.cornerRadius = 0f
+            val gradientBg = binding.root.findViewById<View>(R.id.pokemon_stats_gradient_bg)
+            gradientBg?.background = gradientDrawable
         }
     }
 
